@@ -1,0 +1,5 @@
+{
+    "notInPullRequestMessage": "Nothing occured because this build is not being run from a pull request",
+    "noFailureMessage": "Nothing occured because the build did not fail",
+    "commentCompletedMessage": "Comment was successfully posted"
+}
