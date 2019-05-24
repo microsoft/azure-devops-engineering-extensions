@@ -7,33 +7,36 @@ export class EnvironmentConfigurations{
     private static readonly PULL_REQUEST_ID_KEY = "SYSTEM_PULLREQUEST_PULLREQUESTID";
     private static readonly PROJECT_KEY = "SYSTEM_TEAMPROJECT";
     private static readonly BUILD_ID_KEY = "BUILD_BUILDID";
+    private static readonly PULL_REQUEST_TARGET_BRANCH = "SYSTEM_PULLREQUEST_TARGETBRANCH";
 
-    public getTeamURI() : string {
+    public getTeamURI(): string {
         return this.loadFromEnvironment(EnvironmentConfigurations.TEAM_FOUNDATION_KEY);
     }
 
-    public getAccessKey() : string {
+    public getAccessKey(): string {
         return this.loadFromEnvironment(EnvironmentConfigurations.ACCESS_KEY);
     }
 
-    public getRepository() : string {
+    public getRepository(): string {
         return this.loadFromEnvironment(EnvironmentConfigurations.REPOSITORY_KEY);
     }
 
-    public getPullRequestId() : number {
+    public getPullRequestId(): number {
         return Number(this.loadFromEnvironment(EnvironmentConfigurations.PULL_REQUEST_ID_KEY));
     }
 
-    public getProjectName() : string {
+    public getProjectName(): string {
         return this.loadFromEnvironment(EnvironmentConfigurations.PROJECT_KEY);
     }
 
-    public getBuildId() : number {
+    public getBuildId(): number {
         return Number(this.loadFromEnvironment(EnvironmentConfigurations.BUILD_ID_KEY));
     }
 
+    public getTargetBranch(): string {
+        return this.loadFromEnvironment(EnvironmentConfigurations.PULL_REQUEST_TARGET_BRANCH);
+    }
     private loadFromEnvironment (key : string){
         return tl.getVariable(key);
     }
-
 }

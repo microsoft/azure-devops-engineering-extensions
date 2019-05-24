@@ -42,13 +42,12 @@ var AzureApi = /** @class */ (function () {
     }
     AzureApi.prototype.postNewCommentThread = function (thread, pullRequestId, repositoryId, projectName) {
         return __awaiter(this, void 0, void 0, function () {
-            var gitApi;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.connection.getGitApi()];
+                    case 0: return [4 /*yield*/, this.checkForGitApi()];
                     case 1:
-                        gitApi = _a.sent();
-                        gitApi.createThread(thread, repositoryId, pullRequestId, projectName);
+                        _a.sent();
+                        this.gitApi.createThread(thread, repositoryId, pullRequestId, projectName);
                         return [2 /*return*/];
                 }
             });
@@ -56,19 +55,75 @@ var AzureApi = /** @class */ (function () {
     };
     AzureApi.prototype.getBuild = function (project, buildId) {
         return __awaiter(this, void 0, void 0, function () {
-            var buildApi;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.connection.getBuildApi()];
+                    case 0: return [4 /*yield*/, this.checkForBuildApi()];
                     case 1:
-                        buildApi = _a.sent();
-                        return [2 /*return*/, buildApi.getBuild(project, buildId)];
+                        _a.sent();
+                        return [2 /*return*/, this.buildApi.getBuild(project, buildId)];
+                }
+            });
+        });
+    };
+    AzureApi.prototype.getBuilds = function (project, definitions, reason, status, maxNumber, branchName) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.checkForBuildApi()];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/, this.buildApi.getBuilds(project, definitions, undefined, undefined, undefined, undefined, undefined, reason, status, undefined, undefined, undefined, maxNumber, undefined, undefined, undefined, undefined, branchName)];
+                }
+            });
+        });
+    };
+    AzureApi.prototype.getBuildTimeline = function (project, buildId) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.checkForBuildApi()];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/, this.buildApi.getBuildTimeline(project, buildId)];
+                }
+            });
+        });
+    };
+    AzureApi.prototype.checkForGitApi = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var _a;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        if (!!this.gitApi) return [3 /*break*/, 2];
+                        _a = this;
+                        return [4 /*yield*/, this.connection.getGitApi()];
+                    case 1:
+                        _a.gitApi = _b.sent();
+                        _b.label = 2;
+                    case 2: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    AzureApi.prototype.checkForBuildApi = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var _a;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        if (!!this.buildApi) return [3 /*break*/, 2];
+                        _a = this;
+                        return [4 /*yield*/, this.connection.getBuildApi()];
+                    case 1:
+                        _a.buildApi = _b.sent();
+                        _b.label = 2;
+                    case 2: return [2 /*return*/];
                 }
             });
         });
     };
     AzureApi.prototype.createConnection = function (teamFoundationUri, accessToken) {
-        console.log("team foundation uri = ", teamFoundationUri);
         var creds = WebApi_1.getPersonalAccessTokenHandler(accessToken);
         return new WebApi_1.WebApi(teamFoundationUri, creds);
     };

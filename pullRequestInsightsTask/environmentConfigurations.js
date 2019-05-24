@@ -22,6 +22,9 @@ var EnvironmentConfigurations = /** @class */ (function () {
     EnvironmentConfigurations.prototype.getBuildId = function () {
         return Number(this.loadFromEnvironment(EnvironmentConfigurations.BUILD_ID_KEY));
     };
+    EnvironmentConfigurations.prototype.getTargetBranch = function () {
+        return this.loadFromEnvironment(EnvironmentConfigurations.PULL_REQUEST_TARGET_BRANCH);
+    };
     EnvironmentConfigurations.prototype.loadFromEnvironment = function (key) {
         return tl.getVariable(key);
     };
@@ -31,6 +34,7 @@ var EnvironmentConfigurations = /** @class */ (function () {
     EnvironmentConfigurations.PULL_REQUEST_ID_KEY = "SYSTEM_PULLREQUEST_PULLREQUESTID";
     EnvironmentConfigurations.PROJECT_KEY = "SYSTEM_TEAMPROJECT";
     EnvironmentConfigurations.BUILD_ID_KEY = "BUILD_BUILDID";
+    EnvironmentConfigurations.PULL_REQUEST_TARGET_BRANCH = "SYSTEM_PULLREQUEST_TARGETBRANCH";
     return EnvironmentConfigurations;
 }());
 exports.EnvironmentConfigurations = EnvironmentConfigurations;
