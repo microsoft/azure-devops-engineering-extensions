@@ -36,7 +36,7 @@ export class EnvironmentConfigurations{
     public getTargetBranch(): string {
         return this.loadFromEnvironment(EnvironmentConfigurations.PULL_REQUEST_TARGET_BRANCH);
     }
-    private loadFromEnvironment (key : string){
+    private loadFromEnvironment (key: string): string{
         return tl.getVariable(key);
     }
 }
