@@ -34,7 +34,7 @@ var Build = /** @class */ (function () {
         if (this.buildData.definition !== undefined && this.buildData.definition.id !== undefined) {
             return this.buildData.definition.id;
         }
-        throw ("no definition available");
+        throw (new Error("no definition available"));
     };
     Build.prototype.getLink = function () {
         return String(this.buildData._links.web.href);

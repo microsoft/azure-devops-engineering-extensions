@@ -66,6 +66,7 @@ function run() {
                     desiredBuildStatus = azureBuildInterfaces.BuildStatus.Completed;
                     configurations = new environmentConfigurations_1.EnvironmentConfigurations();
                     azureApi = new azureApi_1.AzureApi(configurations.getTeamURI(), configurations.getAccessKey());
+                    tl.debug("past creating azure api");
                     currentProject = configurations.getProjectName();
                     currentBuildId = configurations.getBuildId();
                     _a = build_1.Build.bind;
@@ -86,7 +87,7 @@ function run() {
                 case 5:
                     retrievedBuilds = _d.sent();
                     targetBranch = new branch_1.Branch(configurations.getTargetBranch(), convertBuildData(retrievedBuilds));
-                    if (tooManyBuildsFailed(targetBranch.getBuildFailStreak(), pastFailureThreshold)) {
+                    if (targetBranch.tooManyBuildsFailed(pastFailureThreshold)) {
                         postBuildFailuresComment(azureApi, targetBranch, configurations.getPullRequestId(), configurations.getRepository(), configurations.getProjectName());
                     }
                     _d.label = 6;
@@ -106,9 +107,6 @@ function convertBuildData(retrievedBuildsData) {
         builds[numberBuild] = new build_1.Build(retrievedBuildsData[numberBuild]);
     }
     return builds;
-}
-function tooManyBuildsFailed(failedBuilds, pastFailureThreshold) {
-    return failedBuilds >= pastFailureThreshold;
 }
 function postBuildFailuresComment(azureApi, targetBranch, pullRequestId, repository, project) {
     var mostRecentTargetFailedBuild = targetBranch.getMostRecentFailedBuild();

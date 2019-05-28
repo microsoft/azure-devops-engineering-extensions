@@ -16,6 +16,7 @@ async function run() {
         const desiredBuildStatus: number = azureBuildInterfaces.BuildStatus.Completed;
         let configurations: EnvironmentConfigurations = new EnvironmentConfigurations();
         let azureApi: AzureApi = new AzureApi(configurations.getTeamURI(), configurations.getAccessKey());
+        tl.debug("past creating azure api");
         let currentProject: string = configurations.getProjectName();
         let currentBuildId: number = configurations.getBuildId();
         let currentBuild: Build = new Build(await azureApi.getBuild(currentProject, currentBuildId));
@@ -29,8 +30,8 @@ async function run() {
         else {
             let retrievedBuilds: Array<azureBuildInterfaces.Build> = await azureApi.getBuilds(currentProject, new Array(currentBuild.getDefinitionId()), desiredBuildReasons, desiredBuildStatus, numberBuildsToQuery, configurations.getTargetBranch());
             let targetBranch: Branch = new Branch(configurations.getTargetBranch(), convertBuildData(retrievedBuilds));
-            if (tooManyBuildsFailed(targetBranch.getBuildFailStreak(), pastFailureThreshold)){
-                    postBuildFailuresComment(azureApi, targetBranch, configurations.getPullRequestId(), configurations.getRepository(), configurations.getProjectName());
+            if (targetBranch.tooManyBuildsFailed(pastFailureThreshold)){
+                postBuildFailuresComment(azureApi, targetBranch, configurations.getPullRequestId(), configurations.getRepository(), configurations.getProjectName());
             }
         }   
     }
@@ -45,11 +46,6 @@ function convertBuildData(retrievedBuildsData: azureBuildInterfaces.Build[]): Bu
         builds[numberBuild] = new Build(retrievedBuildsData[numberBuild]);
     }
     return builds;
-}
-
-
-function tooManyBuildsFailed(failedBuilds: number, pastFailureThreshold: number){
-    return failedBuilds >= pastFailureThreshold;
 }
 
 function postBuildFailuresComment(azureApi: AzureApi, targetBranch: Branch, pullRequestId: number, repository: string, project: string): void {

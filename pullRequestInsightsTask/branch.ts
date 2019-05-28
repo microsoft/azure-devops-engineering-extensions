@@ -7,8 +7,8 @@ export class Branch{
     private name: string;
 
     constructor(name: string, builds: Build[]){
-    this.builds = builds;
-    this.name = name;
+        this.builds = builds;
+        this.name = name;
     }
 
     public getBuildFailStreak(): number{
@@ -29,11 +29,14 @@ export class Branch{
         for (let build of this.builds){
             tl.debug(build.getId() + " : " + String(build.failed()));
             if (build.failed()){
-                tl.debug("failure: " + build.getId());
                 return build; 
             }
         }
         return null;
+    }
+
+    public tooManyBuildsFailed(failureThreshold: number): boolean {
+        return this.getBuildFailStreak() >= failureThreshold;
     }
 
     public getName(): string{

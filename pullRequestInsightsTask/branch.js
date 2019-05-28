@@ -24,11 +24,13 @@ var Branch = /** @class */ (function () {
             var build = _a[_i];
             tl.debug(build.getId() + " : " + String(build.failed()));
             if (build.failed()) {
-                tl.debug("failure: " + build.getId());
                 return build;
             }
         }
         return null;
+    };
+    Branch.prototype.tooManyBuildsFailed = function (failureThreshold) {
+        return this.getBuildFailStreak() >= failureThreshold;
     };
     Branch.prototype.getName = function () {
         return this.name;

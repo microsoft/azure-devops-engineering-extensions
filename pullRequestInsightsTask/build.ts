@@ -33,7 +33,7 @@ export class Build{
         if (this.buildData.definition !== undefined && this.buildData.definition.id !== undefined){
             return this.buildData.definition.id;
         }
-        throw("no definition available");            
+        throw(new Error("no definition available"));            
     }
 
     public getLink(): string{
