@@ -2,7 +2,7 @@ import tl = require('azure-pipelines-task-lib/task');
 import { AzureApi } from './azureApi';
 import * as azureGitInterfaces from "azure-devops-node-api/interfaces/GitInterfaces";
 import { EnvironmentConfigurations } from './environmentConfigurations';
-import { Build } from './build';
+import { Build } from './pipeline';
 let fs = require('fs');
 import messages from './user_messages.json';
 import * as azureBuildInterfaces from "azure-devops-node-api/interfaces/BuildInterfaces";
