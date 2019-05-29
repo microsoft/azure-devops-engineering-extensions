@@ -19,11 +19,17 @@ var EnvironmentConfigurations = /** @class */ (function () {
     EnvironmentConfigurations.prototype.getProjectName = function () {
         return this.loadFromEnvironment(EnvironmentConfigurations.PROJECT_KEY);
     };
-    EnvironmentConfigurations.prototype.getBuildId = function () {
-        return Number(this.loadFromEnvironment(EnvironmentConfigurations.BUILD_ID_KEY));
-    };
     EnvironmentConfigurations.prototype.getTargetBranch = function () {
         return this.loadFromEnvironment(EnvironmentConfigurations.PULL_REQUEST_TARGET_BRANCH);
+    };
+    EnvironmentConfigurations.prototype.getHostType = function () {
+        return this.loadFromEnvironment(EnvironmentConfigurations.HOST_KEY);
+    };
+    EnvironmentConfigurations.prototype.getReleaseId = function () {
+        return Number(this.loadFromEnvironment(EnvironmentConfigurations.RELEASE_ID_KEY));
+    };
+    EnvironmentConfigurations.prototype.getBuildId = function () {
+        return Number(this.loadFromEnvironment(EnvironmentConfigurations.BUILD_ID_KEY));
     };
     EnvironmentConfigurations.prototype.loadFromEnvironment = function (key) {
         return tl.getVariable(key);
@@ -34,6 +40,8 @@ var EnvironmentConfigurations = /** @class */ (function () {
     EnvironmentConfigurations.PULL_REQUEST_ID_KEY = "SYSTEM_PULLREQUEST_PULLREQUESTID";
     EnvironmentConfigurations.PROJECT_KEY = "SYSTEM_TEAMPROJECT";
     EnvironmentConfigurations.BUILD_ID_KEY = "BUILD_BUILDID";
+    EnvironmentConfigurations.RELEASE_ID_KEY = "RELEASE_RELEASEID";
+    EnvironmentConfigurations.HOST_KEY = "SYSTEM_HOSTTYPE";
     EnvironmentConfigurations.PULL_REQUEST_TARGET_BRANCH = "SYSTEM_PULLREQUEST_TARGETBRANCH";
     return EnvironmentConfigurations;
 }());

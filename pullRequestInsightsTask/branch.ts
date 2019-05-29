@@ -22,7 +22,7 @@ export class Branch{
                 break;
             }
         }
-        tl.debug(`number builds failing on ${this.name} is ${count}`)
+        tl.debug(`number pipelines failing on ${this.name} is ${count}`)
         return count;
     }
 
@@ -38,7 +38,7 @@ export class Branch{
         return null;
     }
 
-    public tooManyBuildsFailed(failureThreshold: number): boolean {
+    public tooManyPipelinesFailed(failureThreshold: number): boolean {
         return this.getPipelineFailStreak() >= failureThreshold;
     }
 

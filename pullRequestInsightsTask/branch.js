@@ -17,7 +17,7 @@ var Branch = /** @class */ (function () {
                 break;
             }
         }
-        tl.debug("number builds failing on " + this.name + " is " + count);
+        tl.debug("number pipelines failing on " + this.name + " is " + count);
         return count;
     };
     Branch.prototype.getMostRecentFailedPipeline = function () {
@@ -32,7 +32,7 @@ var Branch = /** @class */ (function () {
         }
         return null;
     };
-    Branch.prototype.tooManyBuildsFailed = function (failureThreshold) {
+    Branch.prototype.tooManyPipelinesFailed = function (failureThreshold) {
         return this.getPipelineFailStreak() >= failureThreshold;
     };
     Branch.prototype.getName = function () {

@@ -1,9 +1,6 @@
 import * as azureBuildInterfaces from "azure-devops-node-api/interfaces/BuildInterfaces";
 import * as azureReleaseInterfaces from "azure-devops-node-api/interfaces/ReleaseInterfaces";
 import tl = require('azure-pipelines-task-lib/task');
-import { AzureApi } from "./azureApi";
-import { EnvironmentConfigurations } from "./environmentConfigurations";
-
 
 export interface IPipeline{
     // loadData: ()=> void;
@@ -15,46 +12,56 @@ export interface IPipeline{
     getId: ()=> number;
 }
 
-export class PipelineFactory{
-
-    public async create(apiCaller: AzureApi, type: string, project: string, id: number): Promise<IPipeline>{
-        if (type === EnvironmentConfigurations.BUILD){
-            return apiCaller.getBuild(project, id); 
-        }
-        if (type === EnvironmentConfigurations.RELEASE){
-            return apiCaller.getRelease(project, id); 
-        }
-        throw(new Error(`ERROR: CANNOT RUN FOR HOST TYPE ${type}`));
-    }
-}
-
 export class Release implements IPipeline{
 
     // private apiCaller: AzureApi;
     // private project: string;
     // private id: number;
-    private releaseData: azureReleaseInterfaces.Release; 
+    private static readonly DESIRED_DEPLOYMENT_REASON = azureReleaseInterfaces.DeploymentReason.Automated;
+    private releaseData: azureReleaseInterfaces.Release;
+    private environmentData: azureReleaseInterfaces.ReleaseEnvironment;
 
     constructor(releaseData: azureReleaseInterfaces.Release){
         // this.apiCaller = apiCaller;
         // this.project = project;
         // this.id = id;
         this.releaseData = releaseData;
+        this.environmentData = releaseData.environments[0];
     }
 
     // public async loadData(): Promise<void> {
     //     this.releaseData = await this.apiCaller.getRelease(this.project, this.id);
     // }
+    private getSelectedDeployment(DeploymentAttempts: azureReleaseInterfaces.DeploymentAttempt[]): azureReleaseInterfaces.DeploymentAttempt {
+        for (let deployment of DeploymentAttempts){
+            if (deployment.reason === Release.DESIRED_DEPLOYMENT_REASON){
+                return deployment; 
+            }
+        }
+        throw(new Error("no deployment attempt available"));
+    }
     public getDefinitionId(): number{
-        return 1; 
+        return Number(this.releaseData.releaseDefinition.id); 
+    }
+
+    public getEnvironmentDefinitionId(): number{
+        return Number(this.environmentData.definitionEnvironmentId);
     }
 
     public isFailure() : boolean{
-        return true;
+        if (this.isComplete()){
+            //return this.selectDeployment(this.environmentData.deploySteps) === azureReleaseInterfaces.DeploymentStatus.Failed;
+        }
+        for (let task of this.getSelectedDeployment(this.environmentData.deploySteps).tasks){
+            if (this.taskFailed(task)){
+                return true;
+            }
+        }
+        return false;
     }
-
+    
     public isComplete(): boolean{
-        return true;
+        return this.getSelectedDeployment(this.environmentData.deploySteps).status !== azureReleaseInterfaces.DeploymentStatus.InProgress;
     }
 
     public getLink(): string{
@@ -64,15 +71,18 @@ export class Release implements IPipeline{
     public getId(): number{
         return Number(this.releaseData.id);
     }
+
+    private taskFailed(task: azureReleaseInterfaces.ReleaseTask): boolean{
+        return task.status === azureReleaseInterfaces.TaskStatus.Failed || task.status === azureReleaseInterfaces.TaskStatus.Failure;
+    }
 }
 
 
 
 export class Build implements IPipeline{
 
-    private apiCaller: AzureApi;
-    private project: string;
-    private id: number;
+    // private project: string;
+    // private id: number;
     private buildData: azureBuildInterfaces.Build; 
     private timelineData: azureBuildInterfaces.Timeline;
 
@@ -93,15 +103,17 @@ export class Build implements IPipeline{
     // }
 
     public isFailure() : boolean {
-        let failed = false;
-        if (this.timelineData.records !== undefined){
-            this.timelineData.records.forEach(taskRecord => {
-                if (this.taskFailed(taskRecord)){
-                    failed = true;
-                }
-            }); 
+        if (this.isComplete()){
+            return this.buildData.result === azureBuildInterfaces.BuildResult.Failed;
         }
-        return failed;
+        if (this.timelineData.records){
+            for (let taskRecord of this.timelineData.records){
+                if (this.taskFailed(taskRecord)){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public isComplete(): boolean {
@@ -109,10 +121,7 @@ export class Build implements IPipeline{
     }
 
     public getDefinitionId(): number{
-        if (this.buildData.definition !== undefined && this.buildData.definition.id !== undefined){
-            return this.buildData.definition.id;
-        }
-        throw(new Error("no definition available"));            
+        return Number(this.buildData.definition.id);
     }
 
     public getLink(): string{

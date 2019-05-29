@@ -11,8 +11,6 @@ export class EnvironmentConfigurations{
     private static readonly HOST_KEY = "SYSTEM_HOSTTYPE";
     private static readonly PULL_REQUEST_TARGET_BRANCH = "SYSTEM_PULLREQUEST_TARGETBRANCH";
 
-    public static readonly BUILD = "build";
-    public static readonly RELEASE = "release";
 
     public getTeamURI(): string {
         return this.loadFromEnvironment(EnvironmentConfigurations.TEAM_FOUNDATION_KEY);
@@ -38,26 +36,15 @@ export class EnvironmentConfigurations{
         return this.loadFromEnvironment(EnvironmentConfigurations.PULL_REQUEST_TARGET_BRANCH);
     }
 
-    public getCurrentPipelineId(): number{
-        let type: string = this.getHostType();
-        if (type === EnvironmentConfigurations.BUILD){
-            return this.getBuildId(); 
-        }
-        if (type === EnvironmentConfigurations.RELEASE){
-            return this.getReleaseId(); 
-        }
-        throw(new Error(`ERROR: CANNOT RUN FOR HOST TYPE ${type}`));
-    }
-
     public getHostType(): string{
         return this.loadFromEnvironment(EnvironmentConfigurations.HOST_KEY);
     }
 
-    private getReleaseId(): number {
+    public getReleaseId(): number {
         return Number(this.loadFromEnvironment(EnvironmentConfigurations.RELEASE_ID_KEY));
     }
 
-    private getBuildId(): number {
+    public getBuildId(): number {
         return Number(this.loadFromEnvironment(EnvironmentConfigurations.BUILD_ID_KEY));
     }
 
