@@ -2,14 +2,15 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var tl = require("azure-pipelines-task-lib/task");
 var Branch = /** @class */ (function () {
-    function Branch(name, builds) {
-        this.builds = builds;
+    function Branch(name, pipelines) {
+        this.pipelines = pipelines;
         this.name = name;
     }
-    Branch.prototype.getBuildFailStreak = function () {
+    Branch.prototype.getPipelineFailStreak = function () {
         var count = 0;
-        for (var numberBuild = 0; numberBuild < this.builds.length; numberBuild++) {
-            if (this.builds[numberBuild].failed()) {
+        for (var numberPipeline = 0; numberPipeline < this.pipelines.length; numberPipeline++) {
+            //    if (this.pipelines[numberPipeline].hasFailed()){
+            if (this.pipelines[numberPipeline].isFailure()) {
                 count++;
             }
             else {
@@ -19,18 +20,20 @@ var Branch = /** @class */ (function () {
         tl.debug("number builds failing on " + this.name + " is " + count);
         return count;
     };
-    Branch.prototype.getMostRecentFailedBuild = function () {
-        for (var _i = 0, _a = this.builds; _i < _a.length; _i++) {
-            var build = _a[_i];
-            tl.debug(build.getId() + " : " + String(build.failed()));
-            if (build.failed()) {
-                return build;
+    Branch.prototype.getMostRecentFailedPipeline = function () {
+        for (var _i = 0, _a = this.pipelines; _i < _a.length; _i++) {
+            var pipeline = _a[_i];
+            // tl.debug(pipeline.getId() + " : " + String(pipeline.hasFailed()));
+            // if (pipeline.hasFailed()){
+            tl.debug(pipeline.getId() + " : " + String(pipeline.isFailure()));
+            if (pipeline.isFailure()) {
+                return pipeline;
             }
         }
         return null;
     };
     Branch.prototype.tooManyBuildsFailed = function (failureThreshold) {
-        return this.getBuildFailStreak() >= failureThreshold;
+        return this.getPipelineFailStreak() >= failureThreshold;
     };
     Branch.prototype.getName = function () {
         return this.name;

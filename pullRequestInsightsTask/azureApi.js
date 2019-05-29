@@ -36,6 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var WebApi_1 = require("azure-devops-node-api/WebApi");
+var pipeline_1 = require("./pipeline");
 var AzureApi = /** @class */ (function () {
     function AzureApi(teamFoundationUri, accessKey) {
         this.connection = this.createConnection(teamFoundationUri, accessKey);
@@ -44,10 +45,9 @@ var AzureApi = /** @class */ (function () {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.checkForGitApi()];
+                    case 0: return [4 /*yield*/, this.connection.getGitApi()];
                     case 1:
-                        _a.sent();
-                        this.gitApi.createThread(thread, repositoryId, pullRequestId, projectName);
+                        (_a.sent()).createThread(thread, repositoryId, pullRequestId, projectName);
                         return [2 /*return*/];
                 }
             });
@@ -55,24 +55,62 @@ var AzureApi = /** @class */ (function () {
     };
     AzureApi.prototype.getBuild = function (project, buildId) {
         return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.checkForBuildApi()];
+            var _a, _b;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
+                    case 0:
+                        _a = pipeline_1.Build.bind;
+                        return [4 /*yield*/, this.getBuildData(project, buildId)];
                     case 1:
-                        _a.sent();
-                        return [2 /*return*/, this.buildApi.getBuild(project, buildId)];
+                        _b = [void 0, _c.sent()];
+                        return [4 /*yield*/, this.getBuildTimeline(project, buildId)];
+                    case 2: 
+                    //return (await this.connection.getBuildApi()).getBuild(project, buildId);
+                    return [2 /*return*/, new (_a.apply(pipeline_1.Build, _b.concat([_c.sent()])))()];
                 }
             });
         });
     };
     AzureApi.prototype.getBuilds = function (project, definitions, reason, status, maxNumber, branchName) {
         return __awaiter(this, void 0, void 0, function () {
+            var builds, rawBuildsData, numberBuild, id, _a, _b, _c, _d;
+            return __generator(this, function (_e) {
+                switch (_e.label) {
+                    case 0:
+                        builds = [];
+                        return [4 /*yield*/, this.connection.getBuildApi()];
+                    case 1: return [4 /*yield*/, (_e.sent()).getBuilds(project, definitions, undefined, undefined, undefined, undefined, undefined, reason, status, undefined, undefined, undefined, maxNumber, undefined, undefined, undefined, undefined, branchName)];
+                    case 2:
+                        rawBuildsData = _e.sent();
+                        numberBuild = 0;
+                        _e.label = 3;
+                    case 3:
+                        if (!(numberBuild < rawBuildsData.length)) return [3 /*break*/, 7];
+                        id = Number(rawBuildsData[numberBuild].id);
+                        _a = builds;
+                        _b = numberBuild;
+                        _c = pipeline_1.Build.bind;
+                        return [4 /*yield*/, this.getBuildData(project, id)];
+                    case 4:
+                        _d = [void 0, _e.sent()];
+                        return [4 /*yield*/, this.getBuildTimeline(project, id)];
+                    case 5:
+                        _a[_b] = new (_c.apply(pipeline_1.Build, _d.concat([_e.sent()])))();
+                        _e.label = 6;
+                    case 6:
+                        numberBuild++;
+                        return [3 /*break*/, 3];
+                    case 7: return [2 /*return*/, builds];
+                }
+            });
+        });
+    };
+    AzureApi.prototype.getBuildData = function (project, buildId) {
+        return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.checkForBuildApi()];
-                    case 1:
-                        _a.sent();
-                        return [2 /*return*/, this.buildApi.getBuilds(project, definitions, undefined, undefined, undefined, undefined, undefined, reason, status, undefined, undefined, undefined, maxNumber, undefined, undefined, undefined, undefined, branchName)];
+                    case 0: return [4 /*yield*/, this.connection.getBuildApi()];
+                    case 1: return [2 /*return*/, (_a.sent()).getBuild(project, buildId)];
                 }
             });
         });
@@ -81,44 +119,18 @@ var AzureApi = /** @class */ (function () {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.checkForBuildApi()];
-                    case 1:
-                        _a.sent();
-                        return [2 /*return*/, this.buildApi.getBuildTimeline(project, buildId)];
+                    case 0: return [4 /*yield*/, this.connection.getBuildApi()];
+                    case 1: return [2 /*return*/, (_a.sent()).getBuildTimeline(project, buildId)];
                 }
             });
         });
     };
-    AzureApi.prototype.checkForGitApi = function () {
+    AzureApi.prototype.getRelease = function (project, releaseId) {
         return __awaiter(this, void 0, void 0, function () {
-            var _a;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
-                    case 0:
-                        if (!!this.gitApi) return [3 /*break*/, 2];
-                        _a = this;
-                        return [4 /*yield*/, this.connection.getGitApi()];
-                    case 1:
-                        _a.gitApi = _b.sent();
-                        _b.label = 2;
-                    case 2: return [2 /*return*/];
-                }
-            });
-        });
-    };
-    AzureApi.prototype.checkForBuildApi = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            var _a;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
-                    case 0:
-                        if (!!this.buildApi) return [3 /*break*/, 2];
-                        _a = this;
-                        return [4 /*yield*/, this.connection.getBuildApi()];
-                    case 1:
-                        _a.buildApi = _b.sent();
-                        _b.label = 2;
-                    case 2: return [2 /*return*/];
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.connection.getReleaseApi()];
+                    case 1: return [2 /*return*/, (_a.sent()).getRelease(project, releaseId)];
                 }
             });
         });

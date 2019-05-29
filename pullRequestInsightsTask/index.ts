@@ -2,11 +2,12 @@ import tl = require('azure-pipelines-task-lib/task');
 import { AzureApi } from './azureApi';
 import * as azureGitInterfaces from "azure-devops-node-api/interfaces/GitInterfaces";
 import { EnvironmentConfigurations } from './environmentConfigurations';
-import { Build } from './pipeline';
+import { Build, PipelineFactory, IPipeline } from './pipeline';
 let fs = require('fs');
 import messages from './user_messages.json';
 import * as azureBuildInterfaces from "azure-devops-node-api/interfaces/BuildInterfaces";
 import { Branch } from './branch';
+
 
 async function run() {
     try {
@@ -16,22 +17,23 @@ async function run() {
         const desiredBuildStatus: number = azureBuildInterfaces.BuildStatus.Completed;
         let configurations: EnvironmentConfigurations = new EnvironmentConfigurations();
         let azureApi: AzureApi = new AzureApi(configurations.getTeamURI(), configurations.getAccessKey());
+        let pipelineFactory: PipelineFactory = new PipelineFactory();
         tl.debug("past creating azure api");
         let currentProject: string = configurations.getProjectName();
-        let currentBuildId: number = configurations.getBuildId();
-        let currentBuild: Build = new Build(await azureApi.getBuild(currentProject, currentBuildId));
+        let currentPipelineId: number = configurations.getCurrentPipelineId();
+        let currentPipeline: IPipeline = await pipelineFactory.create(azureApi, configurations.getHostType(), currentProject, currentPipelineId);
 
         if (!configurations.getPullRequestId()){
-            tl.debug(messages.notInPullRequestMessage)
+            tl.debug(messages.notInPullRequestMessage);
         }
-        else if (!currentBuild.willFail(await azureApi.getBuildTimeline(currentProject, currentBuildId))){
+        else if (!currentPipeline.isFailure()){
             tl.debug(messages.noFailureMessage);
         }
         else {
-            let retrievedBuilds: Array<azureBuildInterfaces.Build> = await azureApi.getBuilds(currentProject, new Array(currentBuild.getDefinitionId()), desiredBuildReasons, desiredBuildStatus, numberBuildsToQuery, configurations.getTargetBranch());
-            let targetBranch: Branch = new Branch(configurations.getTargetBranch(), convertBuildData(retrievedBuilds));
+            let retrievedBuilds: Array<Build> = await azureApi.getBuilds(currentProject, new Array(currentPipeline.getDefinitionId()), desiredBuildReasons, desiredBuildStatus, numberBuildsToQuery, configurations.getTargetBranch());
+            let targetBranch: Branch = new Branch(configurations.getTargetBranch(), retrievedBuilds); //convertBuildData(retrievedBuilds));
             if (targetBranch.tooManyBuildsFailed(pastFailureThreshold)){
-                postBuildFailuresComment(azureApi, targetBranch, configurations.getPullRequestId(), configurations.getRepository(), configurations.getProjectName());
+                postFailuresComment(azureApi, targetBranch, configurations.getPullRequestId(), configurations.getRepository(), configurations.getProjectName());
             }
         }   
     }
@@ -40,18 +42,18 @@ async function run() {
     }
 }
 
-function convertBuildData(retrievedBuildsData: azureBuildInterfaces.Build[]): Build[] {
-    let builds: Array<Build> = [];
-    for (let numberBuild = 0; numberBuild < retrievedBuildsData.length; numberBuild++){
-        builds[numberBuild] = new Build(retrievedBuildsData[numberBuild]);
-    }
-    return builds;
-}
+// function convertBuildData(retrievedBuildsData: azureBuildInterfaces.Build[]): Build[] {
+//     let builds: Array<Build> = [];
+//     for (let numberBuild = 0; numberBuild < retrievedBuildsData.length; numberBuild++){
+//         builds[numberBuild] = new Build();
+//     }
+//     return builds;
+// }
 
-function postBuildFailuresComment(azureApi: AzureApi, targetBranch: Branch, pullRequestId: number, repository: string, project: string): void {
-    let mostRecentTargetFailedBuild = targetBranch.getMostRecentFailedBuild();
+function postFailuresComment(azureApi: AzureApi, targetBranch: Branch, pullRequestId: number, repository: string, project: string): void {
+    let mostRecentTargetFailedBuild = targetBranch.getMostRecentFailedPipeline();
     if (mostRecentTargetFailedBuild !== null){
-       let thread: azureGitInterfaces.CommentThread = {comments: new Array({content: format(messages.buildFailureComment, mostRecentTargetFailedBuild.getLink(),  String(targetBranch.getBuildFailStreak()),  targetBranch.getName())})};
+       let thread: azureGitInterfaces.CommentThread = {comments: new Array({content: format(messages.buildFailureComment, mostRecentTargetFailedBuild.getLink(),  String(targetBranch.getPipelineFailStreak()),  targetBranch.getName())})};
        azureApi.postNewCommentThread(thread, pullRequestId, repository, project);
        tl.debug(messages.commentCompletedMessage);
     }

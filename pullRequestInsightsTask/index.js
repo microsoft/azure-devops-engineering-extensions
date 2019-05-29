@@ -48,18 +48,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var tl = require("azure-pipelines-task-lib/task");
 var azureApi_1 = require("./azureApi");
 var environmentConfigurations_1 = require("./environmentConfigurations");
-var build_1 = require("./build");
 var fs = require('fs');
 var user_messages_json_1 = __importDefault(require("./user_messages.json"));
 var azureBuildInterfaces = __importStar(require("azure-devops-node-api/interfaces/BuildInterfaces"));
 var branch_1 = require("./branch");
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var pastFailureThreshold, numberBuildsToQuery, desiredBuildReasons, desiredBuildStatus, configurations, azureApi, currentProject, currentBuildId, currentBuild, _a, _b, _c, retrievedBuilds, targetBranch, err_1;
-        return __generator(this, function (_d) {
-            switch (_d.label) {
+        var pastFailureThreshold, numberBuildsToQuery, desiredBuildReasons, desiredBuildStatus, configurations, azureApi, currentProject, currentBuildId, currentBuild, retrievedBuilds, targetBranch, err_1;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
                 case 0:
-                    _d.trys.push([0, 7, , 8]);
+                    _a.trys.push([0, 6, , 7]);
                     pastFailureThreshold = 2;
                     numberBuildsToQuery = 10;
                     desiredBuildReasons = azureBuildInterfaces.BuildReason.BatchedCI + azureBuildInterfaces.BuildReason.IndividualCI;
@@ -69,49 +68,45 @@ function run() {
                     tl.debug("past creating azure api");
                     currentProject = configurations.getProjectName();
                     currentBuildId = configurations.getBuildId();
-                    _a = build_1.Build.bind;
                     return [4 /*yield*/, azureApi.getBuild(currentProject, currentBuildId)];
                 case 1:
-                    currentBuild = new (_a.apply(build_1.Build, [void 0, _d.sent()]))();
+                    currentBuild = _a.sent();
                     if (!!configurations.getPullRequestId()) return [3 /*break*/, 2];
                     tl.debug(user_messages_json_1.default.notInPullRequestMessage);
-                    return [3 /*break*/, 6];
+                    return [3 /*break*/, 5];
                 case 2:
-                    _c = (_b = currentBuild).willFail;
-                    return [4 /*yield*/, azureApi.getBuildTimeline(currentProject, currentBuildId)];
-                case 3:
-                    if (!!_c.apply(_b, [_d.sent()])) return [3 /*break*/, 4];
+                    if (!!currentBuild.isFailure()) return [3 /*break*/, 3];
                     tl.debug(user_messages_json_1.default.noFailureMessage);
-                    return [3 /*break*/, 6];
-                case 4: return [4 /*yield*/, azureApi.getBuilds(currentProject, new Array(currentBuild.getDefinitionId()), desiredBuildReasons, desiredBuildStatus, numberBuildsToQuery, configurations.getTargetBranch())];
-                case 5:
-                    retrievedBuilds = _d.sent();
-                    targetBranch = new branch_1.Branch(configurations.getTargetBranch(), convertBuildData(retrievedBuilds));
+                    return [3 /*break*/, 5];
+                case 3: return [4 /*yield*/, azureApi.getBuilds(currentProject, new Array(currentBuild.getDefinitionId()), desiredBuildReasons, desiredBuildStatus, numberBuildsToQuery, configurations.getTargetBranch())];
+                case 4:
+                    retrievedBuilds = _a.sent();
+                    targetBranch = new branch_1.Branch(configurations.getTargetBranch(), retrievedBuilds);
                     if (targetBranch.tooManyBuildsFailed(pastFailureThreshold)) {
                         postBuildFailuresComment(azureApi, targetBranch, configurations.getPullRequestId(), configurations.getRepository(), configurations.getProjectName());
                     }
-                    _d.label = 6;
-                case 6: return [3 /*break*/, 8];
-                case 7:
-                    err_1 = _d.sent();
+                    _a.label = 5;
+                case 5: return [3 /*break*/, 7];
+                case 6:
+                    err_1 = _a.sent();
                     console.log("error!", err_1);
-                    return [3 /*break*/, 8];
-                case 8: return [2 /*return*/];
+                    return [3 /*break*/, 7];
+                case 7: return [2 /*return*/];
             }
         });
     });
 }
-function convertBuildData(retrievedBuildsData) {
-    var builds = [];
-    for (var numberBuild = 0; numberBuild < retrievedBuildsData.length; numberBuild++) {
-        builds[numberBuild] = new build_1.Build(retrievedBuildsData[numberBuild]);
-    }
-    return builds;
-}
+// function convertBuildData(retrievedBuildsData: azureBuildInterfaces.Build[]): Build[] {
+//     let builds: Array<Build> = [];
+//     for (let numberBuild = 0; numberBuild < retrievedBuildsData.length; numberBuild++){
+//         builds[numberBuild] = new Build();
+//     }
+//     return builds;
+// }
 function postBuildFailuresComment(azureApi, targetBranch, pullRequestId, repository, project) {
-    var mostRecentTargetFailedBuild = targetBranch.getMostRecentFailedBuild();
+    var mostRecentTargetFailedBuild = targetBranch.getMostRecentFailedPipeline();
     if (mostRecentTargetFailedBuild !== null) {
-        var thread = { comments: new Array({ content: format(user_messages_json_1.default.buildFailureComment, mostRecentTargetFailedBuild.getLink(), String(targetBranch.getBuildFailStreak()), targetBranch.getName()) }) };
+        var thread = { comments: new Array({ content: format(user_messages_json_1.default.buildFailureComment, mostRecentTargetFailedBuild.getLink(), String(targetBranch.getPipelineFailStreak()), targetBranch.getName()) }) };
         azureApi.postNewCommentThread(thread, pullRequestId, repository, project);
         tl.debug(user_messages_json_1.default.commentCompletedMessage);
     }
