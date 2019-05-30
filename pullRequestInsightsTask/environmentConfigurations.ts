@@ -1,5 +1,5 @@
 import tl = require('azure-pipelines-task-lib/task');
-import { AzureApi } from './azureApi';
+import { AbstractAzureApi } from './AbstractAzureApi';
 
 export class EnvironmentConfigurations{
     private static readonly TEAM_FOUNDATION_KEY = "SYSTEM_TEAMFOUNDATIONCOLLECTIONURI";
@@ -41,7 +41,7 @@ export class EnvironmentConfigurations{
         return this.loadFromEnvironment(EnvironmentConfigurations.PROJECT_KEY);
     }
 
-    public async getTargetBranch(apiCaller: AzureApi): Promise<string> {
+    public async getTargetBranch(apiCaller: AbstractAzureApi): Promise<string> {
         let targetBranch = this.tryKeys(EnvironmentConfigurations.PULL_REQUEST_TARGET_BRANCH_KEYS);
         if (!targetBranch){
             targetBranch = (await apiCaller.getPullRequestData(this.getRepository(), this.getPullRequestId())).targetRefName;

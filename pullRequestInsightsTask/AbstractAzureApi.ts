@@ -3,27 +3,12 @@ import * as azureGitInterfaces from "azure-devops-node-api/interfaces/GitInterfa
 import * as azureBuildInterfaces from "azure-devops-node-api/interfaces/BuildInterfaces";
 import * as azureReleaseInterfaces from "azure-devops-node-api/interfaces/ReleaseInterfaces";
 import { WebApi, getPersonalAccessTokenHandler } from 'azure-devops-node-api/WebApi';
-import {Build, Release, IPipeline} from "./pipeline";
-import { EnvironmentConfigurations } from './environmentConfigurations';
+import { IPipeline } from "./IPipeline";
+import { EnvironmentConfigurations } from './EnvironmentConfigurations';
+import { Build } from './Build';
+import { Release } from './Release';
 
-export class AzureApiFactory{
-    private static readonly BUILD = "build";
-    private static readonly RELEASE = "release";
-    public async create(configurations: EnvironmentConfigurations): Promise<AzureApi>{
-     let type: string = configurations.getHostType();
-     tl.debug("host type: " + type);
-        if (type === AzureApiFactory.BUILD){
-            return new BuildAzureApi(configurations.getTeamURI(), configurations.getAccessKey()); 
-        }
-        if (type === AzureApiFactory.RELEASE){
-            return new ReleaseAzureApi(configurations.getTeamURI(), configurations.getAccessKey()); 
-       }
-       throw(new Error(`ERROR: CANNOT RUN FOR HOST TYPE ${type}`));
-    }
-}
-
-
-export abstract class AzureApi{
+export abstract class AbstractAzureApi{
     private connection: WebApi;
 
     constructor (uri: string, accessKey: string) {
@@ -90,37 +75,6 @@ export abstract class AzureApi{
     }
 }
 
-
-export class ReleaseAzureApi extends AzureApi{
-
-    constructor (uri: string, accessKey: string) {
-        super(uri, accessKey);
-     }
- 
-     public async getCurrentPipeline(configurations: EnvironmentConfigurations): Promise<IPipeline>{
-         return this.getRelease(configurations.getProjectName(), configurations.getReleaseId()); 
-     }
- 
-     public async getMostRecentPipelinesOfCurrentType(project: string, definition: number, reason?: azureBuildInterfaces.BuildReason, status?: azureBuildInterfaces.BuildStatus, maxNumber?: number, branchName?: string): Promise<IPipeline[]>{
-        return this.getBuilds(project, definition, reason, status, maxNumber, branchName);
-     }
-}
-
-
-export class BuildAzureApi extends AzureApi{ 
-
-    constructor (uri: string, accessKey: string) {
-       super(uri, accessKey);
-    }
-
-    public async getCurrentPipeline(configurations: EnvironmentConfigurations): Promise<IPipeline>{
-        return this.getBuild(configurations.getProjectName(), configurations.getBuildId()); 
-    }
-
-    public async getMostRecentPipelinesOfCurrentType(project: string, definition: number, reason?: azureBuildInterfaces.BuildReason, status?: azureBuildInterfaces.BuildStatus, maxNumber?: number, branchName?: string): Promise<IPipeline[]>{
-        return this.getBuilds(project, definition, reason, status, maxNumber, branchName);
-    }
-}
 
 
 

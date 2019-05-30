@@ -1,12 +1,13 @@
 import tl = require('azure-pipelines-task-lib/task');
-import { AzureApi, AzureApiFactory } from './azureApi';
 import * as azureGitInterfaces from "azure-devops-node-api/interfaces/GitInterfaces";
-import { EnvironmentConfigurations } from './environmentConfigurations';
-import { Build, IPipeline } from './pipeline';
+import { EnvironmentConfigurations } from './EnvironmentConfigurations';
 let fs = require('fs');
 import messages from './user_messages.json';
 import * as azureBuildInterfaces from "azure-devops-node-api/interfaces/BuildInterfaces";
-import { Branch } from './branch';
+import { Branch } from './Branch';
+import { IPipeline } from './IPipeline';
+import { AzureApiFactory } from './AzureApiFactory';
+import { AbstractAzureApi } from './AbstractAzureApi';
 
 async function run() {
     try {
@@ -43,7 +44,7 @@ async function run() {
     }
 }
 
-function postFailuresComment(azureApi: AzureApi, targetBranch: Branch, pullRequestId: number, repository: string, project: string, type: string): void {
+function postFailuresComment(azureApi: AbstractAzureApi, targetBranch: Branch, pullRequestId: number, repository: string, project: string, type: string): void {
     let mostRecentTargetFailedPipeline = targetBranch.getMostRecentFailedPipeline();
     if (mostRecentTargetFailedPipeline !== null){
        let thread: azureGitInterfaces.CommentThread = {comments: new Array({content: format(messages.failureComment, mostRecentTargetFailedPipeline.getLink(),  String(targetBranch.getPipelineFailStreak()),  targetBranch.getName(), type)})};

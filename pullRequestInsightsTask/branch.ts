@@ -1,4 +1,4 @@
-import { Build, IPipeline } from "./pipeline";
+import { IPipeline } from "./IPipeline";
 import tl = require('azure-pipelines-task-lib/task');
 
 export class Branch{

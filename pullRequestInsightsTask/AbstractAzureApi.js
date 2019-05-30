@@ -1,17 +1,4 @@
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -55,58 +42,34 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var tl = require("azure-pipelines-task-lib/task");
 var azureReleaseInterfaces = __importStar(require("azure-devops-node-api/interfaces/ReleaseInterfaces"));
 var WebApi_1 = require("azure-devops-node-api/WebApi");
-var pipeline_1 = require("./pipeline");
-var AzureApiFactory = /** @class */ (function () {
-    function AzureApiFactory() {
-    }
-    AzureApiFactory.prototype.create = function (configurations) {
-        return __awaiter(this, void 0, void 0, function () {
-            var type;
-            return __generator(this, function (_a) {
-                type = configurations.getHostType();
-                tl.debug("host type: " + type);
-                if (type === AzureApiFactory.BUILD) {
-                    return [2 /*return*/, new BuildAzureApi(configurations.getTeamURI(), configurations.getAccessKey())];
-                }
-                if (type === AzureApiFactory.RELEASE) {
-                    return [2 /*return*/, new ReleaseAzureApi(configurations.getTeamURI(), configurations.getAccessKey())];
-                }
-                throw (new Error("ERROR: CANNOT RUN FOR HOST TYPE " + type));
-            });
-        });
-    };
-    AzureApiFactory.BUILD = "build";
-    AzureApiFactory.RELEASE = "release";
-    return AzureApiFactory;
-}());
-exports.AzureApiFactory = AzureApiFactory;
-var AzureApi = /** @class */ (function () {
-    function AzureApi(uri, accessKey) {
+var Build_1 = require("./Build");
+var Release_1 = require("./Release");
+var AbstractAzureApi = /** @class */ (function () {
+    function AbstractAzureApi(uri, accessKey) {
         this.connection = this.createConnection(uri, accessKey);
     }
-    AzureApi.prototype.getConnection = function () {
+    AbstractAzureApi.prototype.getConnection = function () {
         return this.connection;
     };
-    AzureApi.prototype.getBuild = function (project, buildId) {
+    AbstractAzureApi.prototype.getBuild = function (project, buildId) {
         return __awaiter(this, void 0, void 0, function () {
             var _a, _b;
             return __generator(this, function (_c) {
                 switch (_c.label) {
                     case 0:
-                        _a = pipeline_1.Build.bind;
+                        _a = Build_1.Build.bind;
                         return [4 /*yield*/, this.getBuildData(project, buildId)];
                     case 1:
                         _b = [void 0, _c.sent()];
                         return [4 /*yield*/, this.getBuildTimeline(project, buildId)];
-                    case 2: return [2 /*return*/, new (_a.apply(pipeline_1.Build, _b.concat([_c.sent()])))()];
+                    case 2: return [2 /*return*/, new (_a.apply(Build_1.Build, _b.concat([_c.sent()])))()];
                 }
             });
         });
     };
-    AzureApi.prototype.getBuilds = function (project, definition, reason, status, maxNumber, branchName) {
+    AbstractAzureApi.prototype.getBuilds = function (project, definition, reason, status, maxNumber, branchName) {
         return __awaiter(this, void 0, void 0, function () {
             var builds, rawBuildsData, numberBuild, id, _a, _b, _c, _d;
             return __generator(this, function (_e) {
@@ -124,11 +87,11 @@ var AzureApi = /** @class */ (function () {
                         id = Number(rawBuildsData[numberBuild].id);
                         _a = builds;
                         _b = numberBuild;
-                        _c = pipeline_1.Build.bind;
+                        _c = Build_1.Build.bind;
                         _d = [void 0, rawBuildsData[numberBuild]];
                         return [4 /*yield*/, this.getBuildTimeline(project, id)];
                     case 4:
-                        _a[_b] = new (_c.apply(pipeline_1.Build, _d.concat([_e.sent()])))();
+                        _a[_b] = new (_c.apply(Build_1.Build, _d.concat([_e.sent()])))();
                         _e.label = 5;
                     case 5:
                         numberBuild++;
@@ -138,20 +101,20 @@ var AzureApi = /** @class */ (function () {
             });
         });
     };
-    AzureApi.prototype.getRelease = function (project, releaseId) {
+    AbstractAzureApi.prototype.getRelease = function (project, releaseId) {
         return __awaiter(this, void 0, void 0, function () {
             var _a;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
-                        _a = pipeline_1.Release.bind;
+                        _a = Release_1.Release.bind;
                         return [4 /*yield*/, this.getReleaseData(project, releaseId)];
-                    case 1: return [2 /*return*/, new (_a.apply(pipeline_1.Release, [void 0, _b.sent()]))()];
+                    case 1: return [2 /*return*/, new (_a.apply(Release_1.Release, [void 0, _b.sent()]))()];
                 }
             });
         });
     };
-    AzureApi.prototype.getReleases = function (project, definition, reason, status, maxNumber, branchName) {
+    AbstractAzureApi.prototype.getReleases = function (project, definition, reason, status, maxNumber, branchName) {
         return __awaiter(this, void 0, void 0, function () {
             var releases, rawReleasesData, numberRelease;
             return __generator(this, function (_a) {
@@ -163,14 +126,14 @@ var AzureApi = /** @class */ (function () {
                     case 2:
                         rawReleasesData = _a.sent();
                         for (numberRelease = 0; numberRelease < rawReleasesData.length; numberRelease++) {
-                            releases[numberRelease] = new pipeline_1.Release(rawReleasesData[numberRelease]);
+                            releases[numberRelease] = new Release_1.Release(rawReleasesData[numberRelease]);
                         }
                         return [2 /*return*/, releases];
                 }
             });
         });
     };
-    AzureApi.prototype.postNewCommentThread = function (thread, pullRequestId, repositoryId, projectName) {
+    AbstractAzureApi.prototype.postNewCommentThread = function (thread, pullRequestId, repositoryId, projectName) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -182,7 +145,7 @@ var AzureApi = /** @class */ (function () {
             });
         });
     };
-    AzureApi.prototype.getPullRequestData = function (repositoryId, pullRequestId) {
+    AbstractAzureApi.prototype.getPullRequestData = function (repositoryId, pullRequestId) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -192,7 +155,7 @@ var AzureApi = /** @class */ (function () {
             });
         });
     };
-    AzureApi.prototype.getBuildData = function (project, buildId) {
+    AbstractAzureApi.prototype.getBuildData = function (project, buildId) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -202,7 +165,7 @@ var AzureApi = /** @class */ (function () {
             });
         });
     };
-    AzureApi.prototype.getBuildTimeline = function (project, buildId) {
+    AbstractAzureApi.prototype.getBuildTimeline = function (project, buildId) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -212,7 +175,7 @@ var AzureApi = /** @class */ (function () {
             });
         });
     };
-    AzureApi.prototype.getReleaseData = function (project, releaseId) {
+    AbstractAzureApi.prototype.getReleaseData = function (project, releaseId) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -222,57 +185,13 @@ var AzureApi = /** @class */ (function () {
             });
         });
     };
-    AzureApi.prototype.createConnection = function (uri, accessToken) {
+    AbstractAzureApi.prototype.createConnection = function (uri, accessToken) {
         var creds = WebApi_1.getPersonalAccessTokenHandler(accessToken);
         return new WebApi_1.WebApi(uri, creds);
     };
-    return AzureApi;
+    return AbstractAzureApi;
 }());
-exports.AzureApi = AzureApi;
-var ReleaseAzureApi = /** @class */ (function (_super) {
-    __extends(ReleaseAzureApi, _super);
-    function ReleaseAzureApi(uri, accessKey) {
-        return _super.call(this, uri, accessKey) || this;
-    }
-    ReleaseAzureApi.prototype.getCurrentPipeline = function (configurations) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                return [2 /*return*/, this.getRelease(configurations.getProjectName(), configurations.getReleaseId())];
-            });
-        });
-    };
-    ReleaseAzureApi.prototype.getMostRecentPipelinesOfCurrentType = function (project, definition, reason, status, maxNumber, branchName) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                return [2 /*return*/, this.getBuilds(project, definition, reason, status, maxNumber, branchName)];
-            });
-        });
-    };
-    return ReleaseAzureApi;
-}(AzureApi));
-exports.ReleaseAzureApi = ReleaseAzureApi;
-var BuildAzureApi = /** @class */ (function (_super) {
-    __extends(BuildAzureApi, _super);
-    function BuildAzureApi(uri, accessKey) {
-        return _super.call(this, uri, accessKey) || this;
-    }
-    BuildAzureApi.prototype.getCurrentPipeline = function (configurations) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                return [2 /*return*/, this.getBuild(configurations.getProjectName(), configurations.getBuildId())];
-            });
-        });
-    };
-    BuildAzureApi.prototype.getMostRecentPipelinesOfCurrentType = function (project, definition, reason, status, maxNumber, branchName) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                return [2 /*return*/, this.getBuilds(project, definition, reason, status, maxNumber, branchName)];
-            });
-        });
-    };
-    return BuildAzureApi;
-}(AzureApi));
-exports.BuildAzureApi = BuildAzureApi;
+exports.AbstractAzureApi = AbstractAzureApi;
 //     public async postNewCommentThread (thread: azureGitInterfaces.GitPullRequestCommentThread, pullRequestId: number, repositoryId: string, projectName: string): Promise<void>{
 //         (await this.getConnection().getGitApi()).createThread(thread, repositoryId, pullRequestId, projectName);
 //     }
