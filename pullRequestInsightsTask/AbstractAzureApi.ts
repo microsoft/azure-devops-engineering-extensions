@@ -1,6 +1,6 @@
 import tl = require('azure-pipelines-task-lib/task');
-import * as azureGitInterfaces from "azure-devops-node-api/interfaces/GitInterfaces";
 import * as azureBuildInterfaces from "azure-devops-node-api/interfaces/BuildInterfaces";
+import * as azureGitInterfaces from "azure-devops-node-api/interfaces/GitInterfaces";
 import * as azureReleaseInterfaces from "azure-devops-node-api/interfaces/ReleaseInterfaces";
 import { WebApi, getPersonalAccessTokenHandler } from 'azure-devops-node-api/WebApi';
 import { IPipeline } from "./IPipeline";
