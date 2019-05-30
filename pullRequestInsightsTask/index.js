@@ -54,11 +54,11 @@ var azureBuildInterfaces = __importStar(require("azure-devops-node-api/interface
 var branch_1 = require("./branch");
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var pastFailureThreshold, numberBuildsToQuery, desiredBuildReasons, desiredBuildStatus, configurations, azureApiFactory, azureApi, currentProject, currentPipeline, retrievedPipelines, targetBranch, err_1;
+        var pastFailureThreshold, numberBuildsToQuery, desiredBuildReasons, desiredBuildStatus, configurations, azureApiFactory, azureApi, currentProject, currentPipeline, targetBranchName, retrievedPipelines, targetBranch, err_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    _a.trys.push([0, 7, , 8]);
+                    _a.trys.push([0, 8, , 9]);
                     tl.debug("starting!");
                     pastFailureThreshold = 2;
                     numberBuildsToQuery = 10;
@@ -73,27 +73,31 @@ function run() {
                     return [4 /*yield*/, azureApi.getCurrentPipeline(configurations)];
                 case 2:
                     currentPipeline = _a.sent();
+                    tl.debug("pull request id: " + configurations.getPullRequestId());
                     if (!!configurations.getPullRequestId()) return [3 /*break*/, 3];
                     tl.debug(user_messages_json_1.default.notInPullRequestMessage);
-                    return [3 /*break*/, 6];
+                    return [3 /*break*/, 7];
                 case 3:
                     if (!!currentPipeline.isFailure()) return [3 /*break*/, 4];
                     tl.debug(user_messages_json_1.default.noFailureMessage);
-                    return [3 /*break*/, 6];
-                case 4: return [4 /*yield*/, azureApi.getMostRecentPipelinesOfCurrentType(currentProject, currentPipeline.getDefinitionId(), desiredBuildReasons, desiredBuildStatus, numberBuildsToQuery, configurations.getTargetBranch())];
+                    return [3 /*break*/, 7];
+                case 4: return [4 /*yield*/, configurations.getTargetBranch(azureApi)];
                 case 5:
+                    targetBranchName = _a.sent();
+                    return [4 /*yield*/, azureApi.getMostRecentPipelinesOfCurrentType(currentProject, currentPipeline.getDefinitionId(), desiredBuildReasons, desiredBuildStatus, numberBuildsToQuery, targetBranchName)];
+                case 6:
                     retrievedPipelines = _a.sent();
-                    targetBranch = new branch_1.Branch(configurations.getTargetBranch(), retrievedPipelines);
+                    targetBranch = new branch_1.Branch(targetBranchName, retrievedPipelines);
                     if (targetBranch.tooManyPipelinesFailed(pastFailureThreshold)) {
                         postFailuresComment(azureApi, targetBranch, configurations.getPullRequestId(), configurations.getRepository(), configurations.getProjectName());
                     }
-                    _a.label = 6;
-                case 6: return [3 /*break*/, 8];
-                case 7:
+                    _a.label = 7;
+                case 7: return [3 /*break*/, 9];
+                case 8:
                     err_1 = _a.sent();
                     console.log("error!", err_1);
-                    return [3 /*break*/, 8];
-                case 8: return [2 /*return*/];
+                    return [3 /*break*/, 9];
+                case 9: return [2 /*return*/];
             }
         });
     });

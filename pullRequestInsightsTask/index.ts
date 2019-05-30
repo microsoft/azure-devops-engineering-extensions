@@ -22,17 +22,19 @@ async function run() {
         let currentProject: string = configurations.getProjectName();
         let currentPipeline: IPipeline = await azureApi.getCurrentPipeline(configurations);
 
+        tl.debug("pull request id: " + configurations.getPullRequestId());
         if (!configurations.getPullRequestId()){
-            tl.debug(messages.notInPullRequestMessage);
+            tl.debug(this.format(messages.notInPullRequestMessage, configurations.getHostType()));
         }
         else if (!currentPipeline.isFailure()){
-            tl.debug(messages.noFailureMessage);
+            tl.debug(this.format(messages.noFailureMessage, configurations.getHostType()));
         }
         else {
-            let retrievedPipelines: IPipeline[] = await azureApi.getMostRecentPipelinesOfCurrentType(currentProject, currentPipeline.getDefinitionId(), desiredBuildReasons, desiredBuildStatus, numberBuildsToQuery, configurations.getTargetBranch());
-            let targetBranch: Branch = new Branch(configurations.getTargetBranch(), retrievedPipelines); //convertBuildData(retrievedBuilds));
+            let targetBranchName: string = await configurations.getTargetBranch(azureApi);
+            let retrievedPipelines: IPipeline[] = await azureApi.getMostRecentPipelinesOfCurrentType(currentProject, currentPipeline.getDefinitionId(), desiredBuildReasons, desiredBuildStatus, numberBuildsToQuery, targetBranchName);
+            let targetBranch: Branch = new Branch(targetBranchName, retrievedPipelines); //convertBuildData(retrievedBuilds));
             if (targetBranch.tooManyPipelinesFailed(pastFailureThreshold)){
-                postFailuresComment(azureApi, targetBranch, configurations.getPullRequestId(), configurations.getRepository(), configurations.getProjectName());
+                postFailuresComment(azureApi, targetBranch, configurations.getPullRequestId(), configurations.getRepository(), configurations.getProjectName(), configurations.getHostType());
             }
         }   
     }
@@ -41,10 +43,10 @@ async function run() {
     }
 }
 
-function postFailuresComment(azureApi: AzureApi, targetBranch: Branch, pullRequestId: number, repository: string, project: string): void {
+function postFailuresComment(azureApi: AzureApi, targetBranch: Branch, pullRequestId: number, repository: string, project: string, type: string): void {
     let mostRecentTargetFailedPipeline = targetBranch.getMostRecentFailedPipeline();
     if (mostRecentTargetFailedPipeline !== null){
-       let thread: azureGitInterfaces.CommentThread = {comments: new Array({content: format(messages.buildFailureComment, mostRecentTargetFailedPipeline.getLink(),  String(targetBranch.getPipelineFailStreak()),  targetBranch.getName())})};
+       let thread: azureGitInterfaces.CommentThread = {comments: new Array({content: format(messages.failureComment, mostRecentTargetFailedPipeline.getLink(),  String(targetBranch.getPipelineFailStreak()),  targetBranch.getName(), type)})};
        azureApi.postNewCommentThread(thread, pullRequestId, repository, project);
        tl.debug(messages.commentCompletedMessage);
     }

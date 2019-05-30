@@ -65,9 +65,14 @@ export abstract class AzureApi{
         return releases;
     }
 
-    public async postNewCommentThread (thread: azureGitInterfaces.GitPullRequestCommentThread, pullRequestId: number, repositoryId: string, projectName: string): Promise<void>{
+    public async postNewCommentThread(thread: azureGitInterfaces.GitPullRequestCommentThread, pullRequestId: number, repositoryId: string, projectName: string): Promise<void>{
         (await this.getConnection().getGitApi()).createThread(thread, repositoryId, pullRequestId, projectName);
     }
+
+    public async getPullRequestData(repositoryId: string, pullRequestId: number): Promise<azureGitInterfaces.GitPullRequest>{
+        return (await this.getConnection().getGitApi()).getPullRequest(repositoryId, pullRequestId);
+    }
+
     private async getBuildData(project: string, buildId: number): Promise<azureBuildInterfaces.Build>{
         return (await this.getConnection().getBuildApi()).getBuild(project, buildId);
     }

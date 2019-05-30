@@ -1,6 +1,6 @@
 {
-    "notInPullRequestMessage": "Nothing occured because this build is not being run from a pull request",
-    "noFailureMessage": "Nothing occured because the build has not failed any tasks",
+    "notInPullRequestMessage": "Nothing occured because this {0} is not being run from a pull request",
+    "noFailureMessage": "Nothing occured because the {0} has not failed any tasks",
     "commentCompletedMessage": "Comment was successfully posted",
-    "buildFailureComment": "Pipeline | Failing Since {0} \n Last {1} {2} builds, current pull request"
+    "failureComment": "Pipeline | Failing Since {0} \n Last {1} {2} {3}, current pull request"
 }
