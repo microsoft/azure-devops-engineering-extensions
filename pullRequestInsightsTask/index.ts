@@ -10,6 +10,7 @@ import { Branch } from './branch';
 
 async function run() {
     try {
+        tl.debug("starting!")
         const pastFailureThreshold: number = 2; 
         const numberBuildsToQuery: number = 10;
         const desiredBuildReasons: number = azureBuildInterfaces.BuildReason.BatchedCI + azureBuildInterfaces.BuildReason.IndividualCI;
@@ -18,7 +19,6 @@ async function run() {
         let azureApiFactory: AzureApiFactory = new AzureApiFactory();
         //let azureApi: AzureApi = new AzureApi(configurations.getTeamURI(), configurations.getAccessKey());
         let azureApi = await azureApiFactory.create(configurations); 
-        tl.debug("past creating azure api");
         let currentProject: string = configurations.getProjectName();
         let currentPipeline: IPipeline = await azureApi.getCurrentPipeline(configurations);
 

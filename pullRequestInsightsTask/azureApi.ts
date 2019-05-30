@@ -9,9 +9,9 @@ import { EnvironmentConfigurations } from './environmentConfigurations';
 export class AzureApiFactory{
     private static readonly BUILD = "build";
     private static readonly RELEASE = "release";
-
     public async create(configurations: EnvironmentConfigurations): Promise<AzureApi>{
      let type: string = configurations.getHostType();
+     tl.debug("host type: " + type);
         if (type === AzureApiFactory.BUILD){
             return new BuildAzureApi(configurations.getTeamURI(), configurations.getAccessKey()); 
         }
@@ -26,8 +26,8 @@ export class AzureApiFactory{
 export abstract class AzureApi{
     private connection: WebApi;
 
-    constructor (teamFoundationUri: string, accessKey: string) {
-        this.connection = this.createConnection(teamFoundationUri, accessKey);
+    constructor (uri: string, accessKey: string) {
+        this.connection = this.createConnection(uri, accessKey);
     }
 
     public async abstract getCurrentPipeline(configurations: EnvironmentConfigurations): Promise<IPipeline>;
@@ -79,17 +79,17 @@ export abstract class AzureApi{
         return (await this.getConnection().getReleaseApi()).getRelease(project, releaseId); 
     }
 
-    private createConnection(teamFoundationUri: string, accessToken: string): WebApi {
+    private createConnection(uri: string, accessToken: string): WebApi {
         let creds = getPersonalAccessTokenHandler(accessToken);
-        return new WebApi(teamFoundationUri, creds);
+        return new WebApi(uri, creds);
     }
 }
 
 
 export class ReleaseAzureApi extends AzureApi{
 
-    constructor (teamFoundationUri: string, accessKey: string) {
-        super(teamFoundationUri, accessKey);
+    constructor (uri: string, accessKey: string) {
+        super(uri, accessKey);
      }
  
      public async getCurrentPipeline(configurations: EnvironmentConfigurations): Promise<IPipeline>{
@@ -104,8 +104,8 @@ export class ReleaseAzureApi extends AzureApi{
 
 export class BuildAzureApi extends AzureApi{ 
 
-    constructor (teamFoundationUri: string, accessKey: string) {
-       super(teamFoundationUri, accessKey);
+    constructor (uri: string, accessKey: string) {
+       super(uri, accessKey);
     }
 
     public async getCurrentPipeline(configurations: EnvironmentConfigurations): Promise<IPipeline>{

@@ -59,6 +59,7 @@ function run() {
             switch (_a.label) {
                 case 0:
                     _a.trys.push([0, 7, , 8]);
+                    tl.debug("starting!");
                     pastFailureThreshold = 2;
                     numberBuildsToQuery = 10;
                     desiredBuildReasons = azureBuildInterfaces.BuildReason.BatchedCI + azureBuildInterfaces.BuildReason.IndividualCI;
@@ -68,7 +69,6 @@ function run() {
                     return [4 /*yield*/, azureApiFactory.create(configurations)];
                 case 1:
                     azureApi = _a.sent();
-                    tl.debug("past creating azure api");
                     currentProject = configurations.getProjectName();
                     return [4 /*yield*/, azureApi.getCurrentPipeline(configurations)];
                 case 2:

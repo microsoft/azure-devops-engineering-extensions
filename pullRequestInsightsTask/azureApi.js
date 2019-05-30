@@ -55,6 +55,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+var tl = require("azure-pipelines-task-lib/task");
 var azureReleaseInterfaces = __importStar(require("azure-devops-node-api/interfaces/ReleaseInterfaces"));
 var WebApi_1 = require("azure-devops-node-api/WebApi");
 var pipeline_1 = require("./pipeline");
@@ -66,6 +67,7 @@ var AzureApiFactory = /** @class */ (function () {
             var type;
             return __generator(this, function (_a) {
                 type = configurations.getHostType();
+                tl.debug("host type: " + type);
                 if (type === AzureApiFactory.BUILD) {
                     return [2 /*return*/, new BuildAzureApi(configurations.getTeamURI(), configurations.getAccessKey())];
                 }
@@ -82,8 +84,8 @@ var AzureApiFactory = /** @class */ (function () {
 }());
 exports.AzureApiFactory = AzureApiFactory;
 var AzureApi = /** @class */ (function () {
-    function AzureApi(teamFoundationUri, accessKey) {
-        this.connection = this.createConnection(teamFoundationUri, accessKey);
+    function AzureApi(uri, accessKey) {
+        this.connection = this.createConnection(uri, accessKey);
     }
     AzureApi.prototype.getConnection = function () {
         return this.connection;
@@ -210,17 +212,17 @@ var AzureApi = /** @class */ (function () {
             });
         });
     };
-    AzureApi.prototype.createConnection = function (teamFoundationUri, accessToken) {
+    AzureApi.prototype.createConnection = function (uri, accessToken) {
         var creds = WebApi_1.getPersonalAccessTokenHandler(accessToken);
-        return new WebApi_1.WebApi(teamFoundationUri, creds);
+        return new WebApi_1.WebApi(uri, creds);
     };
     return AzureApi;
 }());
 exports.AzureApi = AzureApi;
 var ReleaseAzureApi = /** @class */ (function (_super) {
     __extends(ReleaseAzureApi, _super);
-    function ReleaseAzureApi(teamFoundationUri, accessKey) {
-        return _super.call(this, teamFoundationUri, accessKey) || this;
+    function ReleaseAzureApi(uri, accessKey) {
+        return _super.call(this, uri, accessKey) || this;
     }
     ReleaseAzureApi.prototype.getCurrentPipeline = function (configurations) {
         return __awaiter(this, void 0, void 0, function () {
@@ -241,8 +243,8 @@ var ReleaseAzureApi = /** @class */ (function (_super) {
 exports.ReleaseAzureApi = ReleaseAzureApi;
 var BuildAzureApi = /** @class */ (function (_super) {
     __extends(BuildAzureApi, _super);
-    function BuildAzureApi(teamFoundationUri, accessKey) {
-        return _super.call(this, teamFoundationUri, accessKey) || this;
+    function BuildAzureApi(uri, accessKey) {
+        return _super.call(this, uri, accessKey) || this;
     }
     BuildAzureApi.prototype.getCurrentPipeline = function (configurations) {
         return __awaiter(this, void 0, void 0, function () {
