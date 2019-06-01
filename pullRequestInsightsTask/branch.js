@@ -9,7 +9,6 @@ var Branch = /** @class */ (function () {
     Branch.prototype.getPipelineFailStreak = function () {
         var count = 0;
         for (var numberPipeline = 0; numberPipeline < this.pipelines.length; numberPipeline++) {
-            //    if (this.pipelines[numberPipeline].hasFailed()){
             if (this.pipelines[numberPipeline].isFailure()) {
                 count++;
             }
@@ -23,8 +22,6 @@ var Branch = /** @class */ (function () {
     Branch.prototype.getMostRecentFailedPipeline = function () {
         for (var _i = 0, _a = this.pipelines; _i < _a.length; _i++) {
             var pipeline = _a[_i];
-            // tl.debug(pipeline.getId() + " : " + String(pipeline.hasFailed()));
-            // if (pipeline.hasFailed()){
             tl.debug(pipeline.getId() + " : " + String(pipeline.isFailure()));
             if (pipeline.isFailure()) {
                 return pipeline;

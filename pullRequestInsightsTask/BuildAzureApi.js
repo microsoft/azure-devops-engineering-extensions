@@ -49,6 +49,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var AbstractAzureApi_1 = require("./AbstractAzureApi");
+var Build_1 = require("./Build");
 var BuildAzureApi = /** @class */ (function (_super) {
     __extends(BuildAzureApi, _super);
     function BuildAzureApi(uri, accessKey) {
@@ -65,6 +66,74 @@ var BuildAzureApi = /** @class */ (function (_super) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 return [2 /*return*/, this.getBuilds(project, definition, reason, status, maxNumber, branchName)];
+            });
+        });
+    };
+    BuildAzureApi.prototype.getBuild = function (project, buildId) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _a, _b;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
+                    case 0:
+                        _a = Build_1.Build.bind;
+                        return [4 /*yield*/, this.getBuildData(project, buildId)];
+                    case 1:
+                        _b = [void 0, _c.sent()];
+                        return [4 /*yield*/, this.getBuildTimeline(project, buildId)];
+                    case 2: return [2 /*return*/, new (_a.apply(Build_1.Build, _b.concat([_c.sent()])))()];
+                }
+            });
+        });
+    };
+    BuildAzureApi.prototype.getBuilds = function (project, definition, reason, status, maxNumber, branchName) {
+        return __awaiter(this, void 0, void 0, function () {
+            var builds, rawBuildsData, numberBuild, id, _a, _b, _c, _d;
+            return __generator(this, function (_e) {
+                switch (_e.label) {
+                    case 0:
+                        builds = [];
+                        return [4 /*yield*/, this.getConnection().getBuildApi()];
+                    case 1: return [4 /*yield*/, (_e.sent()).getBuilds(project, Array(definition), undefined, undefined, undefined, undefined, undefined, reason, status, undefined, undefined, undefined, maxNumber, undefined, undefined, undefined, undefined, branchName)];
+                    case 2:
+                        rawBuildsData = _e.sent();
+                        numberBuild = 0;
+                        _e.label = 3;
+                    case 3:
+                        if (!(numberBuild < rawBuildsData.length)) return [3 /*break*/, 6];
+                        id = Number(rawBuildsData[numberBuild].id);
+                        _a = builds;
+                        _b = numberBuild;
+                        _c = Build_1.Build.bind;
+                        _d = [void 0, rawBuildsData[numberBuild]];
+                        return [4 /*yield*/, this.getBuildTimeline(project, id)];
+                    case 4:
+                        _a[_b] = new (_c.apply(Build_1.Build, _d.concat([_e.sent()])))();
+                        _e.label = 5;
+                    case 5:
+                        numberBuild++;
+                        return [3 /*break*/, 3];
+                    case 6: return [2 /*return*/, builds];
+                }
+            });
+        });
+    };
+    BuildAzureApi.prototype.getBuildData = function (project, buildId) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.getConnection().getBuildApi()];
+                    case 1: return [2 /*return*/, (_a.sent()).getBuild(project, buildId)];
+                }
+            });
+        });
+    };
+    BuildAzureApi.prototype.getBuildTimeline = function (project, buildId) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.getConnection().getBuildApi()];
+                    case 1: return [2 /*return*/, (_a.sent()).getBuildTimeline(project, buildId)];
+                }
             });
         });
     };

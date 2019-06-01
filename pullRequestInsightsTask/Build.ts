@@ -1,7 +1,5 @@
 import { IPipeline } from "./IPipeline";
-import * as azureGitInterfaces from "azure-devops-node-api/interfaces/GitInterfaces";
 import * as azureBuildInterfaces from "azure-devops-node-api/interfaces/BuildInterfaces";
-import * as azureReleaseInterfaces from "azure-devops-node-api/interfaces/ReleaseInterfaces";
 
 export class Build implements IPipeline{
 

@@ -14,7 +14,6 @@ export class Branch{
     public getPipelineFailStreak(): number{
         let count: number = 0;
         for (let numberPipeline = 0; numberPipeline < this.pipelines.length; numberPipeline++){
-        //    if (this.pipelines[numberPipeline].hasFailed()){
             if (this.pipelines[numberPipeline].isFailure()){
                 count++;
             }
@@ -28,8 +27,6 @@ export class Branch{
 
     public getMostRecentFailedPipeline(): IPipeline | null{
         for (let pipeline of this.pipelines){
-           // tl.debug(pipeline.getId() + " : " + String(pipeline.hasFailed()));
-           // if (pipeline.hasFailed()){
             tl.debug(pipeline.getId() + " : " + String(pipeline.isFailure()));
            if (pipeline.isFailure()){
                 return pipeline; 

@@ -4,13 +4,18 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/jest": "^24.0.13",
+    "@types/sinon": "^7.0.12",
     "azure-devops-node-api": "^8.0.0",
-    "azure-pipelines-task-lib": "^2.8.0"
+    "azure-pipelines-task-lib": "^2.8.0",
+    "jest": "^20.0.4",
+    "sinon": "^7.3.2",
+    "ts-mockito": "^2.3.1"
   },
   "devDependencies": {
     "@types/node": "^12.0.2",

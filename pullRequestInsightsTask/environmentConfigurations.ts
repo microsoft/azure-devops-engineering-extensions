@@ -30,9 +30,12 @@ export class EnvironmentConfigurations{
     }
 
     public getPullRequestId(): number {
-        let pullRequestId = Number(this.tryKeys(EnvironmentConfigurations.PULL_REQUEST_ID_KEYS));
-        if (!pullRequestId && this.getBuildSourceBranch().split(EnvironmentConfigurations.SEPERATOR)[1] === EnvironmentConfigurations.PULL_KEY){
-            pullRequestId = Number(this.getBuildSourceBranch().split(EnvironmentConfigurations.SEPERATOR)[2]);
+        let pullRequestId: number = Number(this.tryKeys(EnvironmentConfigurations.PULL_REQUEST_ID_KEYS));
+        console.log(pullRequestId)
+      //  let sourceBranch: string[] = "t/t".split(EnvironmentConfigurations.SEPERATOR) 
+        let sourceBranch: string[] = this.getBuildSourceBranch().split(EnvironmentConfigurations.SEPERATOR);
+        if (!pullRequestId && sourceBranch[1] === EnvironmentConfigurations.PULL_KEY){
+            pullRequestId = Number(sourceBranch[2]);
         }
       return pullRequestId;
     }
@@ -69,6 +72,7 @@ export class EnvironmentConfigurations{
         let result: string;
         for (let key of keys){
            result = this.loadFromEnvironment(key);
+           console.log("result " + result)
            if (result){
                break;
            }

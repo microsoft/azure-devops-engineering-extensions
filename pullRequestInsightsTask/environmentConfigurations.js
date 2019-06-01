@@ -50,8 +50,11 @@ var EnvironmentConfigurations = /** @class */ (function () {
     };
     EnvironmentConfigurations.prototype.getPullRequestId = function () {
         var pullRequestId = Number(this.tryKeys(EnvironmentConfigurations.PULL_REQUEST_ID_KEYS));
-        if (!pullRequestId && this.getBuildSourceBranch().split(EnvironmentConfigurations.SEPERATOR)[1] === EnvironmentConfigurations.PULL_KEY) {
-            pullRequestId = Number(this.getBuildSourceBranch().split(EnvironmentConfigurations.SEPERATOR)[2]);
+        console.log(pullRequestId);
+        //  let sourceBranch: string[] = "t/t".split(EnvironmentConfigurations.SEPERATOR) 
+        var sourceBranch = this.getBuildSourceBranch().split(EnvironmentConfigurations.SEPERATOR);
+        if (!pullRequestId && sourceBranch[1] === EnvironmentConfigurations.PULL_KEY) {
+            pullRequestId = Number(sourceBranch[2]);
         }
         return pullRequestId;
     };
@@ -92,6 +95,7 @@ var EnvironmentConfigurations = /** @class */ (function () {
         for (var _i = 0, keys_1 = keys; _i < keys_1.length; _i++) {
             var key = keys_1[_i];
             result = this.loadFromEnvironment(key);
+            console.log("result " + result);
             if (result) {
                 break;
             }
