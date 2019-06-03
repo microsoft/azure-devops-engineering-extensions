@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import { Branch } from '../Branch';
 import { IPipeline } from '../IPipeline';
 
-describe('Branch', () => {
+describe('Branch Tests', () => {
     
     let failedBuildOne: IPipeline;
     let successfulBuildTwo: IPipeline;
@@ -30,41 +30,41 @@ describe('Branch', () => {
     test("Counts pipeline failure streak of multiple fails", ()=>{
         branch = new Branch("", [failedBuildOne, failedBuildOne, failedBuildOne, failedBuildOne, successfulBuildTwo, successfulBuildTwo]);
         expect(branch.getPipelineFailStreak()).toEqual(4); 
-    })
+    });
 
     test("Does not count any pipeline failure streak when first pipeline does not fail", ()=>{
         branch = new Branch("", [successfulBuildTwo, failedBuildOne, failedBuildOne, failedBuildOne, failedBuildOne]);
         expect(branch.getPipelineFailStreak()).toEqual(0); 
-    })
+    });
 
     test("Does not count any pipeline failure streak when no pipelines fail", ()=>{
         branch = new Branch("", [successfulBuildTwo, successfulBuildTwo, successfulBuildTwo]);
         expect(branch.getPipelineFailStreak()).toEqual(0); 
-    })
+    });
 
     test("Gets most recently failed pipeline", ()=> {
         branch = new Branch("", [failedBuildOne, failedBuildThree, successfulBuildTwo]);
         expect(branch.getMostRecentFailedPipeline()).toEqual(failedBuildOne);
         expect(branch.getMostRecentFailedPipeline()).not.toEqual(failedBuildThree);
-    })
+    });
 
     test("Gets most recently failed pipeline when first few succeed", ()=> {
         branch = new Branch("", [successfulBuildTwo, successfulBuildFour, failedBuildOne]);
         expect(branch.getMostRecentFailedPipeline()).toEqual(failedBuildOne);
-    })
+    });
 
     test("Gets no pipeline when no pipelines fail", ()=> {
         branch = new Branch("", [successfulBuildFour, successfulBuildTwo]);
         expect(branch.getMostRecentFailedPipeline()).toBeNull();
-    })
+    });
 
     test("Too many pipelines failed when when failure streak of pipelines is larger than threshold", () => {
         branch = new Branch("", [failedBuildOne, failedBuildOne, failedBuildOne, failedBuildOne, successfulBuildTwo, successfulBuildTwo]);
         expect(branch.tooManyPipelinesFailed(2)).toBe(true);
-    })
+    });
 
     test("Too many pipelines failed is false when failure streak of pipelines is shorter than threshold", () => {
         branch = new Branch("", [failedBuildOne, failedBuildOne, successfulBuildTwo, successfulBuildTwo]);
         expect(branch.tooManyPipelinesFailed(2)).toBe(true);
-    })
+    });
 })

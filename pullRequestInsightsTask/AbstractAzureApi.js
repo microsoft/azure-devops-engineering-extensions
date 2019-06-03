@@ -55,12 +55,12 @@ var AbstractAzureApi = /** @class */ (function () {
             });
         });
     };
-    AbstractAzureApi.prototype.getPullRequestData = function (repositoryId, pullRequestId) {
+    AbstractAzureApi.prototype.getPullRequestData = function (repositoryId, pullRequestId, projectName) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.getConnection().getGitApi()];
-                    case 1: return [2 /*return*/, (_a.sent()).getPullRequest(repositoryId, pullRequestId)];
+                    case 1: return [2 /*return*/, (_a.sent()).getPullRequest(repositoryId, pullRequestId, projectName)];
                 }
             });
         });

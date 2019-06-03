@@ -31,10 +31,15 @@ async function run() {
             tl.debug(this.format(messages.noFailureMessage, configurations.getHostType()));
         }
         else {
+            tl.debug("past checks to see if task should run")
             let targetBranchName: string = await configurations.getTargetBranch(azureApi);
+            tl.debug("target branch: " + targetBranchName);
             let retrievedPipelines: IPipeline[] = await azureApi.getMostRecentPipelinesOfCurrentType(currentProject, currentPipeline.getDefinitionId(), desiredBuildReasons, desiredBuildStatus, numberBuildsToQuery, targetBranchName);
+            tl.debug("past retrieving pipelines");
             let targetBranch: Branch = new Branch(targetBranchName, retrievedPipelines); //convertBuildData(retrievedBuilds));
+            tl.debug("past making target branch")
             if (targetBranch.tooManyPipelinesFailed(pastFailureThreshold)){
+                tl.debug("too many failures = true");
                 postFailuresComment(azureApi, targetBranch, configurations.getPullRequestId(), configurations.getRepository(), configurations.getProjectName(), configurations.getHostType());
             }
         }   

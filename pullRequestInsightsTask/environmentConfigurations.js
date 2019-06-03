@@ -50,11 +50,12 @@ var EnvironmentConfigurations = /** @class */ (function () {
     };
     EnvironmentConfigurations.prototype.getPullRequestId = function () {
         var pullRequestId = Number(this.tryKeys(EnvironmentConfigurations.PULL_REQUEST_ID_KEYS));
-        console.log(pullRequestId);
-        //  let sourceBranch: string[] = "t/t".split(EnvironmentConfigurations.SEPERATOR) 
         var sourceBranch = this.getBuildSourceBranch().split(EnvironmentConfigurations.SEPERATOR);
         if (!pullRequestId && sourceBranch[1] === EnvironmentConfigurations.PULL_KEY) {
             pullRequestId = Number(sourceBranch[2]);
+        }
+        if (pullRequestId === undefined || isNaN(pullRequestId)) {
+            return null;
         }
         return pullRequestId;
     };
@@ -67,13 +68,17 @@ var EnvironmentConfigurations = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        targetBranch = this.tryKeys(EnvironmentConfigurations.PULL_REQUEST_TARGET_BRANCH_KEYS);
+                        targetBranch = this.tryKeys(EnvironmentConfigurations.TARGET_BRANCH_KEYS);
                         if (!!targetBranch) return [3 /*break*/, 2];
-                        return [4 /*yield*/, apiCaller.getPullRequestData(this.getRepository(), this.getPullRequestId())];
+                        return [4 /*yield*/, apiCaller.getPullRequestData(this.getRepository(), this.getPullRequestId(), this.getProjectName())];
                     case 1:
                         targetBranch = (_a.sent()).targetRefName;
                         _a.label = 2;
-                    case 2: return [2 /*return*/, targetBranch];
+                    case 2:
+                        if (!targetBranch) {
+                            return [2 /*return*/, null];
+                        }
+                        return [2 /*return*/, targetBranch];
                 }
             });
         });
@@ -95,7 +100,7 @@ var EnvironmentConfigurations = /** @class */ (function () {
         for (var _i = 0, keys_1 = keys; _i < keys_1.length; _i++) {
             var key = keys_1[_i];
             result = this.loadFromEnvironment(key);
-            console.log("result " + result);
+            //  console.log("result " + result)
             if (result) {
                 break;
             }
@@ -114,7 +119,7 @@ var EnvironmentConfigurations = /** @class */ (function () {
     EnvironmentConfigurations.BUILD_ID_KEY = "BUILD_BUILDID";
     EnvironmentConfigurations.RELEASE_ID_KEY = "RELEASE_RELEASEID";
     EnvironmentConfigurations.HOST_KEY = "SYSTEM_HOSTTYPE";
-    EnvironmentConfigurations.PULL_REQUEST_TARGET_BRANCH_KEYS = ["SYSTEM_PULLREQUEST_TARGETBRANCH", "BUILD_TARGETBRANCH"];
+    EnvironmentConfigurations.TARGET_BRANCH_KEYS = ["SYSTEM_PULLREQUEST_TARGETBRANCH", "BUILD_TARGETBRANCH"];
     EnvironmentConfigurations.BUILD_SOURCE_BRANCH_KEY = "BUILD_SOURCEBRANCH";
     EnvironmentConfigurations.PULL_KEY = "pull";
     EnvironmentConfigurations.SEPERATOR = "/";

@@ -11,7 +11,7 @@ export class EnvironmentConfigurations{
     private static readonly BUILD_ID_KEY = "BUILD_BUILDID";
     private static readonly RELEASE_ID_KEY = "RELEASE_RELEASEID";
     private static readonly HOST_KEY = "SYSTEM_HOSTTYPE";
-    private static readonly PULL_REQUEST_TARGET_BRANCH_KEYS = ["SYSTEM_PULLREQUEST_TARGETBRANCH", "BUILD_TARGETBRANCH"];
+    private static readonly TARGET_BRANCH_KEYS = ["SYSTEM_PULLREQUEST_TARGETBRANCH", "BUILD_TARGETBRANCH"];
     private static readonly BUILD_SOURCE_BRANCH_KEY = "BUILD_SOURCEBRANCH"; 
     private static readonly PULL_KEY = "pull";
     private static readonly SEPERATOR = "/";
@@ -31,11 +31,12 @@ export class EnvironmentConfigurations{
 
     public getPullRequestId(): number {
         let pullRequestId: number = Number(this.tryKeys(EnvironmentConfigurations.PULL_REQUEST_ID_KEYS));
-        console.log(pullRequestId)
-      //  let sourceBranch: string[] = "t/t".split(EnvironmentConfigurations.SEPERATOR) 
         let sourceBranch: string[] = this.getBuildSourceBranch().split(EnvironmentConfigurations.SEPERATOR);
         if (!pullRequestId && sourceBranch[1] === EnvironmentConfigurations.PULL_KEY){
             pullRequestId = Number(sourceBranch[2]);
+        }
+        if (pullRequestId === undefined || isNaN(pullRequestId)){
+            return null;
         }
       return pullRequestId;
     }
@@ -45,9 +46,12 @@ export class EnvironmentConfigurations{
     }
 
     public async getTargetBranch(apiCaller: AbstractAzureApi): Promise<string> {
-        let targetBranch = this.tryKeys(EnvironmentConfigurations.PULL_REQUEST_TARGET_BRANCH_KEYS);
+        let targetBranch = this.tryKeys(EnvironmentConfigurations.TARGET_BRANCH_KEYS);
         if (!targetBranch){
-            targetBranch = (await apiCaller.getPullRequestData(this.getRepository(), this.getPullRequestId())).targetRefName;
+            targetBranch = (await apiCaller.getPullRequestData(this.getRepository(), this.getPullRequestId(), this.getProjectName())).targetRefName;
+        }
+        if (!targetBranch){
+            return null; 
         }
         return targetBranch;
     }
@@ -72,7 +76,7 @@ export class EnvironmentConfigurations{
         let result: string;
         for (let key of keys){
            result = this.loadFromEnvironment(key);
-           console.log("result " + result)
+         //  console.log("result " + result)
            if (result){
                break;
            }

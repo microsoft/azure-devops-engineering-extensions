@@ -81,14 +81,20 @@ function run() {
                     if (!!currentPipeline.isFailure()) return [3 /*break*/, 4];
                     tl.debug(this.format(user_messages_json_1.default.noFailureMessage, configurations.getHostType()));
                     return [3 /*break*/, 7];
-                case 4: return [4 /*yield*/, configurations.getTargetBranch(azureApi)];
+                case 4:
+                    tl.debug("past checks to see if task should run");
+                    return [4 /*yield*/, configurations.getTargetBranch(azureApi)];
                 case 5:
                     targetBranchName = _a.sent();
+                    tl.debug("target branch: " + targetBranchName);
                     return [4 /*yield*/, azureApi.getMostRecentPipelinesOfCurrentType(currentProject, currentPipeline.getDefinitionId(), desiredBuildReasons, desiredBuildStatus, numberBuildsToQuery, targetBranchName)];
                 case 6:
                     retrievedPipelines = _a.sent();
+                    tl.debug("past retrieving pipelines");
                     targetBranch = new Branch_1.Branch(targetBranchName, retrievedPipelines);
+                    tl.debug("past making target branch");
                     if (targetBranch.tooManyPipelinesFailed(pastFailureThreshold)) {
+                        tl.debug("too many failures = true");
                         postFailuresComment(azureApi, targetBranch, configurations.getPullRequestId(), configurations.getRepository(), configurations.getProjectName(), configurations.getHostType());
                     }
                     _a.label = 7;

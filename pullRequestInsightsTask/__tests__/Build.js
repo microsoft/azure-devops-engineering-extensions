@@ -9,8 +9,10 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var azureBuildInterfaces = __importStar(require("azure-devops-node-api/interfaces/BuildInterfaces"));
 var Build_1 = require("../Build");
-describe('Build', function () {
+describe('Build Tests', function () {
     var build;
+    var mockBuildData;
+    var mockBuildTimeline;
     var failedTask = {
         result: azureBuildInterfaces.TaskResult.Failed,
         state: azureBuildInterfaces.TimelineRecordState.Completed
@@ -19,35 +21,43 @@ describe('Build', function () {
         result: azureBuildInterfaces.TaskResult.Succeeded,
         state: azureBuildInterfaces.TimelineRecordState.Completed
     };
+    function fillMockBuildData(buildStatus, buildResult) {
+        mockBuildData = {
+            status: buildStatus,
+            result: buildResult
+        };
+    }
+    function fillMockBuildTimeline(buildRecords) {
+        mockBuildTimeline = {
+            records: buildRecords
+        };
+    }
     test('Complete failed build is failure', function () {
-        var mockBuild = {
-            result: azureBuildInterfaces.BuildResult.Failed,
-            status: azureBuildInterfaces.BuildStatus.Completed,
-        };
-        var mockTimeLine = {
-            records: [failedTask]
-        };
-        build = new Build_1.Build(mockBuild, mockTimeLine);
+        fillMockBuildData(azureBuildInterfaces.BuildStatus.Completed, azureBuildInterfaces.BuildResult.Failed);
+        fillMockBuildTimeline([failedTask]);
+        build = new Build_1.Build(mockBuildData, mockBuildTimeline);
         expect(build.isFailure()).toBe(true);
     });
     test('Incomplete failed build is failure', function () {
-        var mockBuild = {
-            status: azureBuildInterfaces.BuildStatus.InProgress,
-        };
-        var mockTimeLine = {
-            records: [succeededTask, failedTask, succeededTask]
-        };
-        build = new Build_1.Build(mockBuild, mockTimeLine);
+        fillMockBuildData(azureBuildInterfaces.BuildStatus.InProgress);
+        fillMockBuildTimeline([succeededTask, failedTask, succeededTask]);
+        build = new Build_1.Build(mockBuildData, mockBuildTimeline);
         expect(build.isFailure()).toBe(true);
     });
     test('Incomplete build without current failures is not failure', function () {
-        var mockBuild = {
-            status: azureBuildInterfaces.BuildStatus.InProgress,
+        fillMockBuildData(azureBuildInterfaces.BuildStatus.InProgress);
+        fillMockBuildTimeline([succeededTask, succeededTask]);
+        build = new Build_1.Build(mockBuildData, mockBuildTimeline);
+        expect(build.isFailure()).toBe(false);
+    });
+    test('Build with incomplete failed task is not a failure', function () {
+        fillMockBuildData(azureBuildInterfaces.BuildStatus.InProgress);
+        var inProgressTask = {
+            result: azureBuildInterfaces.TaskResult.Failed,
+            state: azureBuildInterfaces.TimelineRecordState.InProgress
         };
-        var mockTimeLine = {
-            records: [succeededTask, succeededTask]
-        };
-        build = new Build_1.Build(mockBuild, mockTimeLine);
+        fillMockBuildTimeline([succeededTask, inProgressTask, succeededTask]);
+        build = new Build_1.Build(mockBuildData, mockBuildTimeline);
         expect(build.isFailure()).toBe(false);
     });
 });

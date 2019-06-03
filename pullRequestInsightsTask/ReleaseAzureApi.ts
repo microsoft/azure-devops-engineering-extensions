@@ -4,6 +4,7 @@ import { AbstractAzureApi } from "./AbstractAzureApi";
 import { EnvironmentConfigurations } from "./EnvironmentConfigurations";
 import { IPipeline } from "./IPipeline";
 import { Release } from "./Release";
+import tl = require('azure-pipelines-task-lib/task');
 
 export class ReleaseAzureApi extends AbstractAzureApi{
 
@@ -21,6 +22,7 @@ export class ReleaseAzureApi extends AbstractAzureApi{
 
      
     public async getRelease(project: string, releaseId: number): Promise<IPipeline>{
+        tl.debug("sending for release with project name: " + project + " and release id: " + releaseId);
         return new Release(await this.getReleaseData(project, releaseId)); 
     }
 

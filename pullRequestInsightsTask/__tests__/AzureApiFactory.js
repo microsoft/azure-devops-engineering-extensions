@@ -43,7 +43,7 @@ var AzureApiFactory_1 = require("../AzureApiFactory");
 var EnvironmentConfigurations_1 = require("../EnvironmentConfigurations");
 var sinon_1 = __importDefault(require("sinon"));
 var HostTypeError_1 = require("../HostTypeError");
-describe("AzureApiFactory", function () {
+describe("AzureApiFactory Tests", function () {
     var azureApiFactory;
     var configurations;
     beforeEach(function () {

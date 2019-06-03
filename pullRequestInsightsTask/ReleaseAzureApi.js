@@ -58,6 +58,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var azureReleaseInterfaces = __importStar(require("azure-devops-node-api/interfaces/ReleaseInterfaces"));
 var AbstractAzureApi_1 = require("./AbstractAzureApi");
 var Release_1 = require("./Release");
+var tl = require("azure-pipelines-task-lib/task");
 var ReleaseAzureApi = /** @class */ (function (_super) {
     __extends(ReleaseAzureApi, _super);
     function ReleaseAzureApi(uri, accessKey) {
@@ -83,6 +84,7 @@ var ReleaseAzureApi = /** @class */ (function (_super) {
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
+                        tl.debug("sending for release with project name: " + project + " and release id: " + releaseId);
                         _a = Release_1.Release.bind;
                         return [4 /*yield*/, this.getReleaseData(project, releaseId)];
                     case 1: return [2 /*return*/, new (_a.apply(Release_1.Release, [void 0, _b.sent()]))()];

@@ -10,7 +10,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var Build_1 = require("../Build");
 var sinon = __importStar(require("sinon"));
 var Branch_1 = require("../Branch");
-describe('Branch', function () {
+describe('Branch Tests', function () {
     var failedBuildOne;
     var successfulBuildTwo;
     var failedBuildThree;

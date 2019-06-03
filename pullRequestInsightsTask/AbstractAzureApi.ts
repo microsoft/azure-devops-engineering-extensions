@@ -1,12 +1,8 @@
 import tl = require('azure-pipelines-task-lib/task');
-import * as azureBuildInterfaces from "azure-devops-node-api/interfaces/BuildInterfaces";
 import * as azureGitInterfaces from "azure-devops-node-api/interfaces/GitInterfaces";
-import * as azureReleaseInterfaces from "azure-devops-node-api/interfaces/ReleaseInterfaces";
 import { WebApi, getPersonalAccessTokenHandler } from 'azure-devops-node-api/WebApi';
 import { IPipeline } from "./IPipeline";
 import { EnvironmentConfigurations } from './EnvironmentConfigurations';
-import { Build } from './Build';
-import { Release } from './Release';
 
 export abstract class AbstractAzureApi{
     private connection: WebApi;
@@ -27,8 +23,8 @@ export abstract class AbstractAzureApi{
         (await this.getConnection().getGitApi()).createThread(thread, repositoryId, pullRequestId, projectName);
     }
 
-    public async getPullRequestData(repositoryId: string, pullRequestId: number): Promise<azureGitInterfaces.GitPullRequest>{
-        return (await this.getConnection().getGitApi()).getPullRequest(repositoryId, pullRequestId);
+    public async getPullRequestData(repositoryId: string, pullRequestId: number, projectName: string): Promise<azureGitInterfaces.GitPullRequest>{
+        return (await this.getConnection().getGitApi()).getPullRequest(repositoryId, pullRequestId, projectName);
     }
 
     private createConnection(uri: string, accessToken: string): WebApi {

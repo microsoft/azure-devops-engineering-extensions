@@ -3,7 +3,7 @@ import { EnvironmentConfigurations } from "../EnvironmentConfigurations";
 import sinon from "sinon";
 import { HostTypeError } from "../HostTypeError";
 
-describe("AzureApiFactory", () => {
+describe("AzureApiFactory Tests", () => {
     
     let azureApiFactory: AzureApiFactory;
     let configurations: EnvironmentConfigurations;
@@ -18,5 +18,5 @@ describe("AzureApiFactory", () => {
     test("AzureApiFactory throws error when hostType is not build or release", async () => {
         sinon.stub(configurations, "getHostType").returns("other");
         expect(azureApiFactory.create(configurations)).rejects.toThrow(HostTypeError);
-    }) 
+    });
 });
