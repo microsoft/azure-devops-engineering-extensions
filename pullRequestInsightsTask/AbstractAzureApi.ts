@@ -13,7 +13,7 @@ export abstract class AbstractAzureApi{
 
     public async abstract getCurrentPipeline(configurations: EnvironmentConfigurations): Promise<IPipeline>;
 
-    public async abstract getMostRecentPipelinesOfCurrentType(project: string, definition?: number, reason?: number, status?: number, maxNumber?: number, branchName?: string): Promise<IPipeline[]>;
+    public async abstract getMostRecentPipelinesOfCurrentType(project: string, currentPipeline: IPipeline, maxNumber: number, branchName: string): Promise<IPipeline[]>;
 
     protected getConnection(): WebApi{
         return this.connection;

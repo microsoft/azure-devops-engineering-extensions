@@ -1,4 +1,3 @@
-import * as azureBuildInterfaces from "azure-devops-node-api/interfaces/BuildInterfaces";
 import * as azureReleaseInterfaces from "azure-devops-node-api/interfaces/ReleaseInterfaces";
 import { AbstractAzureApi } from "./AbstractAzureApi";
 import { EnvironmentConfigurations } from "./EnvironmentConfigurations";
@@ -8,6 +7,8 @@ import tl = require('azure-pipelines-task-lib/task');
 
 export class ReleaseAzureApi extends AbstractAzureApi{
 
+    static readonly DESIRED_RELEASE_ENVIRONMENT_STATUS: number = azureReleaseInterfaces.EnvironmentStatus.Succeeded + azureReleaseInterfaces.EnvironmentStatus.PartiallySucceeded + azureReleaseInterfaces.EnvironmentStatus.Rejected;
+
     constructor (uri: string, accessKey: string) {
         super(uri, accessKey);
      }
@@ -16,8 +17,9 @@ export class ReleaseAzureApi extends AbstractAzureApi{
          return this.getRelease(configurations.getProjectName(), configurations.getReleaseId()); 
      }
  
-     public async getMostRecentPipelinesOfCurrentType(project: string, definition: number, reason?: azureBuildInterfaces.BuildReason, status?: azureBuildInterfaces.BuildStatus, maxNumber?: number, branchName?: string): Promise<IPipeline[]>{
-        return this.getReleases(project, definition, reason, status, maxNumber, branchName);
+     public async getMostRecentPipelinesOfCurrentType(project: string, currentPipeline: IPipeline, maxNumber: number, branchName: string): Promise<IPipeline[]>{
+         tl.debug("project: " + project + ", definition id: " + currentPipeline.getDefinitionId() + ", environment definition id: " + (currentPipeline as Release).getEnvironmentDefinitionId() + ", desired status: " + ReleaseAzureApi.DESIRED_RELEASE_ENVIRONMENT_STATUS + ", number: " + maxNumber + ", branchName: " + branchName)
+        return this.getReleases(project, currentPipeline.getDefinitionId(), (currentPipeline as Release).getEnvironmentDefinitionId(), ReleaseAzureApi.DESIRED_RELEASE_ENVIRONMENT_STATUS, maxNumber, branchName);
      }
 
      
@@ -26,9 +28,9 @@ export class ReleaseAzureApi extends AbstractAzureApi{
         return new Release(await this.getReleaseData(project, releaseId)); 
     }
 
-    public async getReleases(project: string, definition?: number, reason?: number, status?: number, maxNumber?: number, branchName?: string):  Promise<IPipeline[]>{
+    public async getReleases(project: string, definition?: number, environmentDefinition?: number, environmentStatus?: number, maxNumber?: number, branchName?: string):  Promise<IPipeline[]>{
         let releases: Array<IPipeline> = []; 
-        let rawReleasesData: azureReleaseInterfaces.Release[] = await (await this.getConnection().getReleaseApi()).getReleases(project, definition, undefined, undefined, undefined, status, undefined, undefined, undefined, undefined, maxNumber, undefined, azureReleaseInterfaces.ReleaseExpands.Environments, undefined, undefined, undefined, branchName);  
+        let rawReleasesData: azureReleaseInterfaces.Release[] = await (await this.getConnection().getReleaseApi()).getReleases(project, definition, environmentDefinition, undefined, undefined, undefined, environmentStatus, undefined, undefined, undefined, 50, undefined, azureReleaseInterfaces.ReleaseExpands.Environments, undefined, undefined, undefined, branchName);  
         for (let numberRelease = 0; numberRelease < rawReleasesData.length; numberRelease++){
             releases[numberRelease] = new Release(rawReleasesData[numberRelease]);
         }

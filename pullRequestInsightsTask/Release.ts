@@ -3,7 +3,6 @@ import { IPipeline } from "./IPipeline";
 
 export class Release implements IPipeline{
 
-    private static readonly DESIRED_DEPLOYMENT_REASON = azureReleaseInterfaces.DeploymentReason.Automated;
     private releaseData: azureReleaseInterfaces.Release;
     private environmentData: azureReleaseInterfaces.ReleaseEnvironment;
 
@@ -13,13 +12,11 @@ export class Release implements IPipeline{
     }
 
 
-    private getSelectedDeployment(DeploymentAttempts: azureReleaseInterfaces.DeploymentAttempt[]): azureReleaseInterfaces.DeploymentAttempt {
-        for (let deployment of DeploymentAttempts){
-            if (deployment.reason === Release.DESIRED_DEPLOYMENT_REASON){
-                return deployment; 
-            }
+    private getSelectedDeployment(deploymentAttempts: azureReleaseInterfaces.DeploymentAttempt[]): azureReleaseInterfaces.DeploymentAttempt {
+        if (deploymentAttempts.length > 0){
+            return deploymentAttempts[0];
         }
-        throw(new Error("no deployment attempt available"));
+        throw(new Error("no deployment attempts available for release with id " + this.getId()));
     }
 
     public getDefinitionId(): number{
@@ -57,6 +54,10 @@ export class Release implements IPipeline{
 
     public getId(): number{
         return Number(this.releaseData.id);
+    }
+
+    public getDisplayName(): string{
+        return this.releaseData.name;
     }
 
     private taskFailed(task: azureReleaseInterfaces.ReleaseTask): boolean{

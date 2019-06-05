@@ -71,10 +71,11 @@ var ReleaseAzureApi = /** @class */ (function (_super) {
             });
         });
     };
-    ReleaseAzureApi.prototype.getMostRecentPipelinesOfCurrentType = function (project, definition, reason, status, maxNumber, branchName) {
+    ReleaseAzureApi.prototype.getMostRecentPipelinesOfCurrentType = function (project, currentPipeline, maxNumber, branchName) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                return [2 /*return*/, this.getReleases(project, definition, reason, status, maxNumber, branchName)];
+                tl.debug("project: " + project + ", definition id: " + currentPipeline.getDefinitionId() + ", environment definition id: " + currentPipeline.getEnvironmentDefinitionId() + ", desired status: " + ReleaseAzureApi.DESIRED_RELEASE_ENVIRONMENT_STATUS + ", number: " + maxNumber + ", branchName: " + branchName);
+                return [2 /*return*/, this.getReleases(project, currentPipeline.getDefinitionId(), currentPipeline.getEnvironmentDefinitionId(), ReleaseAzureApi.DESIRED_RELEASE_ENVIRONMENT_STATUS, maxNumber, branchName)];
             });
         });
     };
@@ -92,7 +93,7 @@ var ReleaseAzureApi = /** @class */ (function (_super) {
             });
         });
     };
-    ReleaseAzureApi.prototype.getReleases = function (project, definition, reason, status, maxNumber, branchName) {
+    ReleaseAzureApi.prototype.getReleases = function (project, definition, environmentDefinition, environmentStatus, maxNumber, branchName) {
         return __awaiter(this, void 0, void 0, function () {
             var releases, rawReleasesData, numberRelease;
             return __generator(this, function (_a) {
@@ -100,7 +101,7 @@ var ReleaseAzureApi = /** @class */ (function (_super) {
                     case 0:
                         releases = [];
                         return [4 /*yield*/, this.getConnection().getReleaseApi()];
-                    case 1: return [4 /*yield*/, (_a.sent()).getReleases(project, definition, undefined, undefined, undefined, status, undefined, undefined, undefined, undefined, maxNumber, undefined, azureReleaseInterfaces.ReleaseExpands.Environments, undefined, undefined, undefined, branchName)];
+                    case 1: return [4 /*yield*/, (_a.sent()).getReleases(project, definition, environmentDefinition, undefined, undefined, undefined, environmentStatus, undefined, undefined, undefined, 50, undefined, azureReleaseInterfaces.ReleaseExpands.Environments, undefined, undefined, undefined, branchName)];
                     case 2:
                         rawReleasesData = _a.sent();
                         for (numberRelease = 0; numberRelease < rawReleasesData.length; numberRelease++) {
@@ -121,6 +122,7 @@ var ReleaseAzureApi = /** @class */ (function (_super) {
             });
         });
     };
+    ReleaseAzureApi.DESIRED_RELEASE_ENVIRONMENT_STATUS = azureReleaseInterfaces.EnvironmentStatus.Succeeded + azureReleaseInterfaces.EnvironmentStatus.PartiallySucceeded + azureReleaseInterfaces.EnvironmentStatus.Rejected;
     return ReleaseAzureApi;
 }(AbstractAzureApi_1.AbstractAzureApi));
 exports.ReleaseAzureApi = ReleaseAzureApi;

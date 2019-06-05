@@ -13,14 +13,11 @@ var Release = /** @class */ (function () {
         this.releaseData = releaseData;
         this.environmentData = releaseData.environments[0];
     }
-    Release.prototype.getSelectedDeployment = function (DeploymentAttempts) {
-        for (var _i = 0, DeploymentAttempts_1 = DeploymentAttempts; _i < DeploymentAttempts_1.length; _i++) {
-            var deployment = DeploymentAttempts_1[_i];
-            if (deployment.reason === Release.DESIRED_DEPLOYMENT_REASON) {
-                return deployment;
-            }
+    Release.prototype.getSelectedDeployment = function (deploymentAttempts) {
+        if (deploymentAttempts.length > 0) {
+            return deploymentAttempts[0];
         }
-        throw (new Error("no deployment attempt available"));
+        throw (new Error("no deployment attempts available for release with id " + this.getId()));
     };
     Release.prototype.getDefinitionId = function () {
         return Number(this.releaseData.releaseDefinition.id);
@@ -56,10 +53,12 @@ var Release = /** @class */ (function () {
     Release.prototype.getId = function () {
         return Number(this.releaseData.id);
     };
+    Release.prototype.getName = function () {
+        return this.releaseData.name;
+    };
     Release.prototype.taskFailed = function (task) {
         return task.status === azureReleaseInterfaces.TaskStatus.Failed || task.status === azureReleaseInterfaces.TaskStatus.Failure;
     };
-    Release.DESIRED_DEPLOYMENT_REASON = azureReleaseInterfaces.DeploymentReason.Automated;
     return Release;
 }());
 exports.Release = Release;

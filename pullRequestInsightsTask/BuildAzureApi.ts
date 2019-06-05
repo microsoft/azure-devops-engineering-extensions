@@ -6,6 +6,9 @@ import { Build } from "./Build";
 
 export class BuildAzureApi extends AbstractAzureApi{ 
 
+    static readonly DESIRED_BUILD_REASON: number = azureBuildInterfaces.BuildReason.BatchedCI + azureBuildInterfaces.BuildReason.IndividualCI;
+    static readonly DESIRED_BUILD_STATUS: number = azureBuildInterfaces.BuildStatus.Completed;
+
     constructor (uri: string, accessKey: string) {
        super(uri, accessKey);
     }
@@ -14,8 +17,8 @@ export class BuildAzureApi extends AbstractAzureApi{
         return this.getBuild(configurations.getProjectName(), configurations.getBuildId()); 
     }
 
-    public async getMostRecentPipelinesOfCurrentType(project: string, definition: number, reason?: azureBuildInterfaces.BuildReason, status?: azureBuildInterfaces.BuildStatus, maxNumber?: number, branchName?: string): Promise<IPipeline[]>{
-        return this.getBuilds(project, definition, reason, status, maxNumber, branchName);
+    public async getMostRecentPipelinesOfCurrentType(project: string, currentPipeline: IPipeline, maxNumber: number, branchName: string): Promise<IPipeline[]>{
+        return this.getBuilds(project, currentPipeline.getDefinitionId(), BuildAzureApi.DESIRED_BUILD_REASON, BuildAzureApi.DESIRED_BUILD_STATUS, maxNumber, branchName);
     }
 
     public async getBuild(project: string, buildId: number): Promise<IPipeline>{

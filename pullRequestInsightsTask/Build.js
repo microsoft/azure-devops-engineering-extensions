@@ -15,13 +15,6 @@ var Build = /** @class */ (function () {
         this.buildData = buildData;
         this.timelineData = timelineData;
     }
-    // public async loadData(): Promise<void> {
-    //     this.buildData = await this.apiCaller.getBuild(this.project, this.id);
-    //     this.timelineData = await this.apiCaller.getBuildTimeline(this.project, this.id);
-    // }
-    // public hasFailed() : boolean{
-    //     return this.buildData.result === azureBuildInterfaces.BuildResult.Failed;
-    // }
     Build.prototype.isFailure = function () {
         if (this.isComplete()) {
             return this.buildData.result === azureBuildInterfaces.BuildResult.Failed;
@@ -47,6 +40,9 @@ var Build = /** @class */ (function () {
     };
     Build.prototype.getId = function () {
         return Number(this.buildData.id);
+    };
+    Build.prototype.getName = function () {
+        return this.buildData.buildNumber;
     };
     Build.prototype.taskFailed = function (task) {
         return task.state === azureBuildInterfaces.TimelineRecordState.Completed && task.result === azureBuildInterfaces.TaskResult.Failed;

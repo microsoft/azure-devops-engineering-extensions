@@ -4,5 +4,6 @@ export interface IPipeline{
     isComplete: ()=> boolean;
     getLink: ()=> string;
     getId: ()=> number;
+    getDisplayName: ()=> string;
 }
 

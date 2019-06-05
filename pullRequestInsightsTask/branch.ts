@@ -5,6 +5,7 @@ export class Branch{
 
     private pipelines: IPipeline[]; 
     private name: string;
+    private static readonly NAME_SEPERATOR = "/";
 
     constructor(name: string, pipelines: IPipeline[]){
         this.pipelines = pipelines;
@@ -39,8 +40,13 @@ export class Branch{
         return this.getPipelineFailStreak() >= failureThreshold;
     }
 
-    public getName(): string{
+    public getFullName(): string{
         return this.name;
+    }
+
+    public getTruncatedName(): string{
+        let seperatedName = this.name.split(Branch.NAME_SEPERATOR);
+        return seperatedName.slice(2).join("");
     }
 
 }

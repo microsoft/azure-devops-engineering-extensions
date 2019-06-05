@@ -15,15 +15,6 @@ export class Build implements IPipeline{
         this.timelineData = timelineData;
     }
 
-    // public async loadData(): Promise<void> {
-    //     this.buildData = await this.apiCaller.getBuild(this.project, this.id);
-    //     this.timelineData = await this.apiCaller.getBuildTimeline(this.project, this.id);
-    // }
-
-    // public hasFailed() : boolean{
-    //     return this.buildData.result === azureBuildInterfaces.BuildResult.Failed;
-    // }
-
     public isFailure() : boolean {
         if (this.isComplete()){
             return this.buildData.result === azureBuildInterfaces.BuildResult.Failed;
@@ -52,6 +43,10 @@ export class Build implements IPipeline{
 
     public getId(): number{
         return Number(this.buildData.id); 
+    }
+
+    public getDisplayName(): string{
+        return this.buildData.buildNumber;
     }
 
     private taskFailed(task: azureBuildInterfaces.TimelineRecord): boolean{
