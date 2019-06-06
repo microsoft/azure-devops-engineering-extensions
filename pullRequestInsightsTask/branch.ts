@@ -5,6 +5,7 @@ export class Branch{
 
     private pipelines: IPipeline[]; 
     private name: string;
+    private static readonly NAME_SEPERATOR = "/";
 
     constructor(name: string, pipelines: IPipeline[]){
         this.pipelines = pipelines;
@@ -14,7 +15,6 @@ export class Branch{
     public getPipelineFailStreak(): number{
         let count: number = 0;
         for (let numberPipeline = 0; numberPipeline < this.pipelines.length; numberPipeline++){
-        //    if (this.pipelines[numberPipeline].hasFailed()){
             if (this.pipelines[numberPipeline].isFailure()){
                 count++;
             }
@@ -28,8 +28,6 @@ export class Branch{
 
     public getMostRecentFailedPipeline(): IPipeline | null{
         for (let pipeline of this.pipelines){
-           // tl.debug(pipeline.getId() + " : " + String(pipeline.hasFailed()));
-           // if (pipeline.hasFailed()){
             tl.debug(pipeline.getId() + " : " + String(pipeline.isFailure()));
            if (pipeline.isFailure()){
                 return pipeline; 
@@ -42,8 +40,13 @@ export class Branch{
         return this.getPipelineFailStreak() >= failureThreshold;
     }
 
-    public getName(): string{
+    public getFullName(): string{
         return this.name;
+    }
+
+    public getTruncatedName(): string{
+        let seperatedName = this.name.split(Branch.NAME_SEPERATOR);
+        return seperatedName.slice(2).join("");
     }
 
 }

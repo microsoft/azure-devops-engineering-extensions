@@ -10,23 +10,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var azureReleaseInterfaces = __importStar(require("azure-devops-node-api/interfaces/ReleaseInterfaces"));
 var Release = /** @class */ (function () {
     function Release(releaseData) {
-        // this.apiCaller = apiCaller;
-        // this.project = project;
-        // this.id = id;
         this.releaseData = releaseData;
         this.environmentData = releaseData.environments[0];
     }
-    // public async loadData(): Promise<void> {
-    //     this.releaseData = await this.apiCaller.getRelease(this.project, this.id);
-    // }
-    Release.prototype.getSelectedDeployment = function (DeploymentAttempts) {
-        for (var _i = 0, DeploymentAttempts_1 = DeploymentAttempts; _i < DeploymentAttempts_1.length; _i++) {
-            var deployment = DeploymentAttempts_1[_i];
-            if (deployment.reason === Release.DESIRED_DEPLOYMENT_REASON) {
-                return deployment;
-            }
+    Release.prototype.getSelectedDeployment = function (deploymentAttempts) {
+        if (deploymentAttempts.length > 0) {
+            return deploymentAttempts[0];
         }
-        throw (new Error("no deployment attempt available"));
+        throw (new Error("no deployment attempts available for release with id " + this.getId()));
     };
     Release.prototype.getDefinitionId = function () {
         return Number(this.releaseData.releaseDefinition.id);
@@ -35,13 +26,20 @@ var Release = /** @class */ (function () {
         return Number(this.environmentData.definitionEnvironmentId);
     };
     Release.prototype.isFailure = function () {
+        var selectedDeployment = this.getSelectedDeployment(this.environmentData.deploySteps);
         if (this.isComplete()) {
-            //return this.selectDeployment(this.environmentData.deploySteps) === azureReleaseInterfaces.DeploymentStatus.Failed;
+            return selectedDeployment.status === azureReleaseInterfaces.DeploymentStatus.Failed;
         }
-        for (var _i = 0, _a = this.getSelectedDeployment(this.environmentData.deploySteps).tasks; _i < _a.length; _i++) {
-            var task = _a[_i];
-            if (this.taskFailed(task)) {
-                return true;
+        for (var _i = 0, _a = selectedDeployment.releaseDeployPhases; _i < _a.length; _i++) {
+            var phase = _a[_i];
+            for (var _b = 0, _c = phase.deploymentJobs; _b < _c.length; _b++) {
+                var job = _c[_b];
+                for (var _d = 0, _e = job.tasks; _d < _e.length; _d++) {
+                    var task = _e[_d];
+                    if (this.taskFailed(task)) {
+                        return true;
+                    }
+                }
             }
         }
         return false;
@@ -55,13 +53,12 @@ var Release = /** @class */ (function () {
     Release.prototype.getId = function () {
         return Number(this.releaseData.id);
     };
+    Release.prototype.getName = function () {
+        return this.releaseData.name;
+    };
     Release.prototype.taskFailed = function (task) {
         return task.status === azureReleaseInterfaces.TaskStatus.Failed || task.status === azureReleaseInterfaces.TaskStatus.Failure;
     };
-    // private apiCaller: AzureApi;
-    // private project: string;
-    // private id: number;
-    Release.DESIRED_DEPLOYMENT_REASON = azureReleaseInterfaces.DeploymentReason.Automated;
     return Release;
 }());
 exports.Release = Release;

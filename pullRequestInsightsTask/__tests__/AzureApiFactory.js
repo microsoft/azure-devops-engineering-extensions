@@ -34,41 +34,29 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+var _this = this;
 Object.defineProperty(exports, "__esModule", { value: true });
-var WebApi_1 = require("azure-devops-node-api/WebApi");
-var AbstractAzureApi = /** @class */ (function () {
-    function AbstractAzureApi(uri, accessKey) {
-        this.connection = this.createConnection(uri, accessKey);
-    }
-    AbstractAzureApi.prototype.getConnection = function () {
-        return this.connection;
-    };
-    AbstractAzureApi.prototype.postNewCommentThread = function (thread, pullRequestId, repositoryId, projectName) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.getConnection().getGitApi()];
-                    case 1:
-                        (_a.sent()).createThread(thread, repositoryId, pullRequestId, projectName);
-                        return [2 /*return*/];
-                }
-            });
+var AzureApiFactory_1 = require("../AzureApiFactory");
+var EnvironmentConfigurations_1 = require("../EnvironmentConfigurations");
+var sinon_1 = __importDefault(require("sinon"));
+var HostTypeError_1 = require("../HostTypeError");
+describe("AzureApiFactory Tests", function () {
+    var azureApiFactory;
+    var configurations;
+    beforeEach(function () {
+        azureApiFactory = new AzureApiFactory_1.AzureApiFactory();
+        configurations = new EnvironmentConfigurations_1.EnvironmentConfigurations();
+        sinon_1.default.stub(configurations, "getAccessKey").returns("fakeKey");
+        sinon_1.default.stub(configurations, "getTeamURI").returns("fakeURI");
+    });
+    test("AzureApiFactory throws error when hostType is not build or release", function () { return __awaiter(_this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            sinon_1.default.stub(configurations, "getHostType").returns("other");
+            expect(azureApiFactory.create(configurations)).rejects.toThrow(HostTypeError_1.HostTypeError);
+            return [2 /*return*/];
         });
-    };
-    AbstractAzureApi.prototype.getPullRequestData = function (repositoryId, pullRequestId, projectName) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.getConnection().getGitApi()];
-                    case 1: return [2 /*return*/, (_a.sent()).getPullRequest(repositoryId, pullRequestId, projectName)];
-                }
-            });
-        });
-    };
-    AbstractAzureApi.prototype.createConnection = function (uri, accessToken) {
-        var creds = WebApi_1.getPersonalAccessTokenHandler(accessToken);
-        return new WebApi_1.WebApi(uri, creds);
-    };
-    return AbstractAzureApi;
-}());
-exports.AbstractAzureApi = AbstractAzureApi;
+    }); });
+});

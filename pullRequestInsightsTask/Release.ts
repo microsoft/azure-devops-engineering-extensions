@@ -3,32 +3,22 @@ import { IPipeline } from "./IPipeline";
 
 export class Release implements IPipeline{
 
-    // private apiCaller: AzureApi;
-    // private project: string;
-    // private id: number;
-    private static readonly DESIRED_DEPLOYMENT_REASON = azureReleaseInterfaces.DeploymentReason.Automated;
     private releaseData: azureReleaseInterfaces.Release;
     private environmentData: azureReleaseInterfaces.ReleaseEnvironment;
 
     constructor(releaseData: azureReleaseInterfaces.Release){
-        // this.apiCaller = apiCaller;
-        // this.project = project;
-        // this.id = id;
         this.releaseData = releaseData;
         this.environmentData = releaseData.environments[0];
     }
 
-    // public async loadData(): Promise<void> {
-    //     this.releaseData = await this.apiCaller.getRelease(this.project, this.id);
-    // }
-    private getSelectedDeployment(DeploymentAttempts: azureReleaseInterfaces.DeploymentAttempt[]): azureReleaseInterfaces.DeploymentAttempt {
-        for (let deployment of DeploymentAttempts){
-            if (deployment.reason === Release.DESIRED_DEPLOYMENT_REASON){
-                return deployment; 
-            }
+
+    private getSelectedDeployment(deploymentAttempts: azureReleaseInterfaces.DeploymentAttempt[]): azureReleaseInterfaces.DeploymentAttempt {
+        if (deploymentAttempts.length > 0){
+            return deploymentAttempts[0];
         }
-        throw(new Error("no deployment attempt available"));
+        throw(new Error("no deployment attempts available for release with id " + this.getId()));
     }
+
     public getDefinitionId(): number{
         return Number(this.releaseData.releaseDefinition.id); 
     }
@@ -38,12 +28,17 @@ export class Release implements IPipeline{
     }
 
     public isFailure() : boolean{
+        let selectedDeployment = this.getSelectedDeployment(this.environmentData.deploySteps);
         if (this.isComplete()){
-            //return this.selectDeployment(this.environmentData.deploySteps) === azureReleaseInterfaces.DeploymentStatus.Failed;
+            return selectedDeployment.status === azureReleaseInterfaces.DeploymentStatus.Failed;
         }
-        for (let task of this.getSelectedDeployment(this.environmentData.deploySteps).tasks){
-            if (this.taskFailed(task)){
-                return true;
+        for (let phase of selectedDeployment.releaseDeployPhases){
+            for (let job of phase.deploymentJobs){
+                for (let task of job.tasks){
+                    if (this.taskFailed(task)){
+                        return true;
+                    }
+                }
             }
         }
         return false;
@@ -59,6 +54,10 @@ export class Release implements IPipeline{
 
     public getId(): number{
         return Number(this.releaseData.id);
+    }
+
+    public getDisplayName(): string{
+        return this.releaseData.name;
     }
 
     private taskFailed(task: azureReleaseInterfaces.ReleaseTask): boolean{

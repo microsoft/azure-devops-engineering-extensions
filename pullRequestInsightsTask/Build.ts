@@ -1,7 +1,5 @@
 import { IPipeline } from "./IPipeline";
-import * as azureGitInterfaces from "azure-devops-node-api/interfaces/GitInterfaces";
 import * as azureBuildInterfaces from "azure-devops-node-api/interfaces/BuildInterfaces";
-import * as azureReleaseInterfaces from "azure-devops-node-api/interfaces/ReleaseInterfaces";
 
 export class Build implements IPipeline{
 
@@ -16,15 +14,6 @@ export class Build implements IPipeline{
         this.buildData = buildData;
         this.timelineData = timelineData;
     }
-
-    // public async loadData(): Promise<void> {
-    //     this.buildData = await this.apiCaller.getBuild(this.project, this.id);
-    //     this.timelineData = await this.apiCaller.getBuildTimeline(this.project, this.id);
-    // }
-
-    // public hasFailed() : boolean{
-    //     return this.buildData.result === azureBuildInterfaces.BuildResult.Failed;
-    // }
 
     public isFailure() : boolean {
         if (this.isComplete()){
@@ -54,6 +43,10 @@ export class Build implements IPipeline{
 
     public getId(): number{
         return Number(this.buildData.id); 
+    }
+
+    public getDisplayName(): string{
+        return this.buildData.buildNumber;
     }
 
     private taskFailed(task: azureBuildInterfaces.TimelineRecord): boolean{

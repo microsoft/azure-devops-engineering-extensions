@@ -2,5 +2,5 @@
     "notInPullRequestMessage": "Nothing occured because this {0} is not being run from a pull request",
     "noFailureMessage": "Nothing occured because the {0} has not failed any tasks",
     "commentCompletedMessage": "Comment was successfully posted",
-    "failureComment": "Pipeline | Failing Since {0} \n Last {1} {2} {3}, current pull request"
+    "failureComment":"|[{0}]({1}) | \n |---------| \n |Failing last {2} {3} {4}s| \n |Latest run from {5}: [{6}]({7})|"
 }

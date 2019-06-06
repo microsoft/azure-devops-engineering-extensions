@@ -37,24 +37,16 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 var tl = require("azure-pipelines-task-lib/task");
 var EnvironmentConfigurations_1 = require("./EnvironmentConfigurations");
 var fs = require('fs');
 var user_messages_json_1 = __importDefault(require("./user_messages.json"));
-var azureBuildInterfaces = __importStar(require("azure-devops-node-api/interfaces/BuildInterfaces"));
 var Branch_1 = require("./Branch");
 var AzureApiFactory_1 = require("./AzureApiFactory");
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var pastFailureThreshold, numberBuildsToQuery, desiredBuildReasons, desiredBuildStatus, configurations, azureApiFactory, azureApi, currentProject, currentPipeline, targetBranchName, retrievedPipelines, targetBranch, err_1;
+        var pastFailureThreshold, numberBuildsToQuery, configurations, azureApiFactory, azureApi, currentProject, currentPipeline, targetBranchName, retrievedPipelines, targetBranch, err_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -62,8 +54,6 @@ function run() {
                     tl.debug("starting!");
                     pastFailureThreshold = 2;
                     numberBuildsToQuery = 10;
-                    desiredBuildReasons = azureBuildInterfaces.BuildReason.BatchedCI + azureBuildInterfaces.BuildReason.IndividualCI;
-                    desiredBuildStatus = azureBuildInterfaces.BuildStatus.Completed;
                     configurations = new EnvironmentConfigurations_1.EnvironmentConfigurations();
                     azureApiFactory = new AzureApiFactory_1.AzureApiFactory();
                     return [4 /*yield*/, azureApiFactory.create(configurations)];
@@ -81,15 +71,21 @@ function run() {
                     if (!!currentPipeline.isFailure()) return [3 /*break*/, 4];
                     tl.debug(this.format(user_messages_json_1.default.noFailureMessage, configurations.getHostType()));
                     return [3 /*break*/, 7];
-                case 4: return [4 /*yield*/, configurations.getTargetBranch(azureApi)];
+                case 4:
+                    tl.debug("past checks to see if task should run");
+                    return [4 /*yield*/, configurations.getTargetBranch(azureApi)];
                 case 5:
                     targetBranchName = _a.sent();
-                    return [4 /*yield*/, azureApi.getMostRecentPipelinesOfCurrentType(currentProject, currentPipeline.getDefinitionId(), desiredBuildReasons, desiredBuildStatus, numberBuildsToQuery, targetBranchName)];
+                    tl.debug("target branch: " + targetBranchName);
+                    return [4 /*yield*/, azureApi.getMostRecentPipelinesOfCurrentType(currentProject, currentPipeline, numberBuildsToQuery, targetBranchName)];
                 case 6:
                     retrievedPipelines = _a.sent();
+                    tl.debug("past retrieving pipelines and got: " + retrievedPipelines.length + " pipelines");
                     targetBranch = new Branch_1.Branch(targetBranchName, retrievedPipelines);
+                    tl.debug("past making target branch");
                     if (targetBranch.tooManyPipelinesFailed(pastFailureThreshold)) {
-                        postFailuresComment(azureApi, targetBranch, configurations.getPullRequestId(), configurations.getRepository(), configurations.getProjectName(), configurations.getHostType());
+                        tl.debug("too many failures = true");
+                        postFailuresComment(azureApi, currentPipeline, targetBranch, configurations.getPullRequestId(), configurations.getRepository(), configurations.getProjectName(), configurations.getHostType());
                     }
                     _a.label = 7;
                 case 7: return [3 /*break*/, 9];
@@ -102,10 +98,10 @@ function run() {
         });
     });
 }
-function postFailuresComment(azureApi, targetBranch, pullRequestId, repository, project, type) {
+function postFailuresComment(azureApi, currentPipeline, targetBranch, pullRequestId, repository, project, type) {
     var mostRecentTargetFailedPipeline = targetBranch.getMostRecentFailedPipeline();
     if (mostRecentTargetFailedPipeline !== null) {
-        var thread = { comments: new Array({ content: format(user_messages_json_1.default.failureComment, mostRecentTargetFailedPipeline.getLink(), String(targetBranch.getPipelineFailStreak()), targetBranch.getName(), type) }) };
+        var thread = { comments: new Array({ content: format(user_messages_json_1.default.failureComment, currentPipeline.getName(), currentPipeline.getLink(), String(targetBranch.getPipelineFailStreak()), targetBranch.getTruncatedName(), type, targetBranch.getTruncatedName(), mostRecentTargetFailedPipeline.getName(), mostRecentTargetFailedPipeline.getLink()) }) };
         azureApi.postNewCommentThread(thread, pullRequestId, repository, project);
         tl.debug(user_messages_json_1.default.commentCompletedMessage);
     }

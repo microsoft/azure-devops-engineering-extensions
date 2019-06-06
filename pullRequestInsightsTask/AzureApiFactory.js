@@ -38,22 +38,27 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var tl = require("azure-pipelines-task-lib/task");
 var BuildAzureApi_1 = require("./BuildAzureApi");
 var ReleaseAzureApi_1 = require("./ReleaseAzureApi");
+var HostTypeError_1 = require("./HostTypeError");
 var AzureApiFactory = /** @class */ (function () {
     function AzureApiFactory() {
     }
+    // private static readonly apiSourceByHostType: { [id: string]: any}  = [
+    //     { "build": (configurations: EnvironmentConfigurations) => new BuildAzureApi(configurations.getTeamURI(), configurations.getAccessKey()) },
+    //     { "release": (configurations: EnvironmentConfigurations) => new ReleaseAzureApi(configurations.getTeamURI(), configurations.getAccessKey()) }
+    // ];
     AzureApiFactory.prototype.create = function (configurations) {
         return __awaiter(this, void 0, void 0, function () {
             var type;
             return __generator(this, function (_a) {
                 type = configurations.getHostType();
                 tl.debug("host type: " + type);
-                if (type === AzureApiFactory.BUILD) {
+                if (type.toLowerCase() === AzureApiFactory.BUILD) {
                     return [2 /*return*/, new BuildAzureApi_1.BuildAzureApi(configurations.getTeamURI(), configurations.getAccessKey())];
                 }
-                if (type === AzureApiFactory.RELEASE) {
+                if (type.toLowerCase() === AzureApiFactory.RELEASE) {
                     return [2 /*return*/, new ReleaseAzureApi_1.ReleaseAzureApi(configurations.getTeamURI(), configurations.getAccessKey())];
                 }
-                throw (new Error("ERROR: CANNOT RUN FOR HOST TYPE " + type));
+                throw (new HostTypeError_1.HostTypeError("ERROR: CANNOT RUN TASK FOR HOST TYPE " + type));
             });
         });
     };
