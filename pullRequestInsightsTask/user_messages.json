@@ -2,5 +2,5 @@
     "notInPullRequestMessage": "Nothing occured because this {0} is not being run from a pull request",
     "noFailureMessage": "Nothing occured because the {0} has not failed any tasks",
     "commentCompletedMessage": "Comment was successfully posted",
-    "failureComment":"|Build Iteration: {0}| \n |---------| \n |[{1}]({2}) | \n |Failing last {3} {4} {5}s| \n |Latest run from {6}: [{7}]({8})|"
+    "failureComment":"|Build Iteration: {0}| | |\n|---|---|---|\n|[{1}]({2})|Failing last {3} {4} {5}s|Latest run from {6}: [{7}]({8})|"
 }

@@ -101,13 +101,24 @@ function run() {
     });
 }
 function postFailuresComment(azureApi, currentPipeline, targetBranch, configurations, currentPullRequest) {
-    var mostRecentTargetFailedPipeline = targetBranch.getMostRecentFailedPipeline();
-    if (mostRecentTargetFailedPipeline !== null) {
-        currentPullRequest.deactivateOldComments(azureApi);
-        var thread = { comments: new Array({ content: format(user_messages_json_1.default.failureComment, configurations.getBuildIteration(), currentPipeline.getName(), currentPipeline.getLink(), String(targetBranch.getPipelineFailStreak()), targetBranch.getTruncatedName(), configurations.getHostType(), targetBranch.getTruncatedName(), mostRecentTargetFailedPipeline.getName(), mostRecentTargetFailedPipeline.getLink()) }) };
-        azureApi.postNewCommentThread(thread, configurations.getPullRequestId(), configurations.getRepository(), configurations.getProjectName());
-        tl.debug(user_messages_json_1.default.commentCompletedMessage);
-    }
+    return __awaiter(this, void 0, void 0, function () {
+        var mostRecentTargetFailedPipeline, thread;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    mostRecentTargetFailedPipeline = targetBranch.getMostRecentFailedPipeline();
+                    if (!(mostRecentTargetFailedPipeline !== null)) return [3 /*break*/, 2];
+                    return [4 /*yield*/, currentPullRequest.manageFailureComments(azureApi, configurations.getBuildIteration())];
+                case 1:
+                    _a.sent();
+                    thread = { comments: new Array({ content: format(user_messages_json_1.default.failureComment, configurations.getBuildIteration(), currentPipeline.getName(), currentPipeline.getLink(), String(targetBranch.getPipelineFailStreak()), targetBranch.getTruncatedName(), configurations.getHostType(), targetBranch.getTruncatedName(), mostRecentTargetFailedPipeline.getName(), mostRecentTargetFailedPipeline.getLink()) }) };
+                    azureApi.postNewCommentThread(thread, configurations.getPullRequestId(), configurations.getRepository(), configurations.getProjectName());
+                    tl.debug(user_messages_json_1.default.commentCompletedMessage);
+                    _a.label = 2;
+                case 2: return [2 /*return*/];
+            }
+        });
+    });
 }
 function format(text) {
     var args = [];
