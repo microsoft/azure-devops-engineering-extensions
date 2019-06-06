@@ -45,7 +45,7 @@ var Release = /** @class */ (function () {
         return false;
     };
     Release.prototype.isComplete = function () {
-        return this.getSelectedDeployment(this.environmentData.deploySteps).status !== azureReleaseInterfaces.DeploymentStatus.InProgress;
+        return Release.COMPLETE_STATUSES.includes(this.getSelectedDeployment(this.environmentData.deploySteps).status);
     };
     Release.prototype.getLink = function () {
         return String(this.releaseData._links.web.href);
@@ -56,9 +56,13 @@ var Release = /** @class */ (function () {
     Release.prototype.getName = function () {
         return this.releaseData.name;
     };
+    Release.prototype.getEnvironmentName = function () {
+        return this.environmentData.name;
+    };
     Release.prototype.taskFailed = function (task) {
         return task.status === azureReleaseInterfaces.TaskStatus.Failed || task.status === azureReleaseInterfaces.TaskStatus.Failure;
     };
+    Release.COMPLETE_STATUSES = [azureReleaseInterfaces.DeploymentStatus.PartiallySucceeded, azureReleaseInterfaces.DeploymentStatus.Succeeded, azureReleaseInterfaces.DeploymentStatus.Failed];
     return Release;
 }());
 exports.Release = Release;

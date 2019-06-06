@@ -101,7 +101,7 @@ var ReleaseAzureApi = /** @class */ (function (_super) {
                     case 0:
                         releases = [];
                         return [4 /*yield*/, this.getConnection().getReleaseApi()];
-                    case 1: return [4 /*yield*/, (_a.sent()).getReleases(project, definition, environmentDefinition, undefined, undefined, undefined, environmentStatus, undefined, undefined, undefined, 50, undefined, azureReleaseInterfaces.ReleaseExpands.Environments, undefined, undefined, undefined, branchName)];
+                    case 1: return [4 /*yield*/, (_a.sent()).getReleases(project, definition, environmentDefinition, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, azureReleaseInterfaces.ReleaseExpands.Environments, undefined, undefined, undefined, branchName)];
                     case 2:
                         rawReleasesData = _a.sent();
                         for (numberRelease = 0; numberRelease < rawReleasesData.length; numberRelease++) {

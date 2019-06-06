@@ -7,6 +7,7 @@ import { Branch } from './Branch';
 import { IPipeline } from './IPipeline';
 import { AzureApiFactory } from './AzureApiFactory';
 import { AbstractAzureApi } from './AbstractAzureApi';
+import { PullRequest } from './PullRequest';
 
 
 async function run() {
@@ -29,7 +30,8 @@ async function run() {
             tl.debug(this.format(messages.noFailureMessage, configurations.getHostType()));
         }
         else {
-            tl.debug("past checks to see if task should run")
+            let currentPullRequest: PullRequest = new PullRequest(configurations.getPullRequestId(), configurations.getRepository(), configurations.getProjectName());
+            tl.debug("past checks to see if task should run");
             let targetBranchName: string = await configurations.getTargetBranch(azureApi);
             tl.debug("target branch: " + targetBranchName);
             let retrievedPipelines: IPipeline[] = await azureApi.getMostRecentPipelinesOfCurrentType(currentProject, currentPipeline, numberBuildsToQuery, targetBranchName);
@@ -38,7 +40,7 @@ async function run() {
             tl.debug("past making target branch")
             if (targetBranch.tooManyPipelinesFailed(pastFailureThreshold)){
                 tl.debug("too many failures = true");
-                postFailuresComment(azureApi, currentPipeline, targetBranch, configurations.getPullRequestId(), configurations.getRepository(), configurations.getProjectName(), configurations.getHostType());
+                postFailuresComment(azureApi, currentPipeline, targetBranch, configurations, currentPullRequest);
             }
         }   
     }
@@ -47,11 +49,12 @@ async function run() {
     }
 }
 
-function postFailuresComment(azureApi: AbstractAzureApi, currentPipeline: IPipeline, targetBranch: Branch, pullRequestId: number, repository: string, project: string, type: string): void {
+function postFailuresComment(azureApi: AbstractAzureApi, currentPipeline: IPipeline, targetBranch: Branch, configurations: EnvironmentConfigurations, currentPullRequest: PullRequest): void {
     let mostRecentTargetFailedPipeline = targetBranch.getMostRecentFailedPipeline();
     if (mostRecentTargetFailedPipeline !== null){
-       let thread: azureGitInterfaces.CommentThread = {comments: new Array({content: format(messages.failureComment, currentPipeline.getDisplayName(), currentPipeline.getLink(), String(targetBranch.getPipelineFailStreak()),  targetBranch.getTruncatedName(), type, targetBranch.getTruncatedName(), mostRecentTargetFailedPipeline.getName(), mostRecentTargetFailedPipeline.getLink())})};
-       azureApi.postNewCommentThread(thread, pullRequestId, repository, project);
+        currentPullRequest.deactivateOldComments(azureApi);
+       let thread: azureGitInterfaces.CommentThread = {comments: new Array({content: format(messages.failureComment, configurations.getBuildIteration(), currentPipeline.getName(), currentPipeline.getLink(), String(targetBranch.getPipelineFailStreak()),  targetBranch.getTruncatedName(), configurations.getHostType(), targetBranch.getTruncatedName(), mostRecentTargetFailedPipeline.getName(), mostRecentTargetFailedPipeline.getLink())})};
+       azureApi.postNewCommentThread(thread, configurations.getPullRequestId(), configurations.getRepository(), configurations.getProjectName());
        tl.debug(messages.commentCompletedMessage);
     }
 }

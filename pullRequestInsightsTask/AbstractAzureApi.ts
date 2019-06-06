@@ -4,7 +4,7 @@ import { WebApi, getPersonalAccessTokenHandler } from 'azure-devops-node-api/Web
 import { IPipeline } from "./IPipeline";
 import { EnvironmentConfigurations } from './EnvironmentConfigurations';
 
-export abstract class AbstractAzureApi{
+export abstract class AbstractAzureApi {
     private connection: WebApi;
 
     constructor (uri: string, accessKey: string) {
@@ -15,15 +15,23 @@ export abstract class AbstractAzureApi{
 
     public async abstract getMostRecentPipelinesOfCurrentType(project: string, currentPipeline: IPipeline, maxNumber: number, branchName: string): Promise<IPipeline[]>;
 
-    protected getConnection(): WebApi{
+    protected getConnection(): WebApi {
         return this.connection;
     }
 
-    public async postNewCommentThread(thread: azureGitInterfaces.GitPullRequestCommentThread, pullRequestId: number, repositoryId: string, projectName: string): Promise<void>{
+    public async postNewCommentThread(thread: azureGitInterfaces.GitPullRequestCommentThread, pullRequestId: number, repositoryId: string, projectName: string): Promise<void> {
         (await this.getConnection().getGitApi()).createThread(thread, repositoryId, pullRequestId, projectName);
     }
 
-    public async getPullRequestData(repositoryId: string, pullRequestId: number, projectName: string): Promise<azureGitInterfaces.GitPullRequest>{
+    public async getCommentThreads(pullRequestId: number, repositoryId: string, projectName: string): Promise<azureGitInterfaces.GitPullRequestCommentThread[]> {
+        return (await this.getConnection().getGitApi()).getThreads(repositoryId, pullRequestId, projectName);
+    }
+
+    public async updateCommentThread(thread: azureGitInterfaces.GitPullRequestCommentThread, pullRequestId: number, repositoryId: string, projectName: string, threadId: number): Promise<void> {
+        (await this.getConnection().getGitApi()).updateThread(thread, repositoryId, pullRequestId, threadId, projectName);
+    }
+
+    public async getPullRequestData(repositoryId: string, pullRequestId: number, projectName: string): Promise<azureGitInterfaces.GitPullRequest> {
         return (await this.getConnection().getGitApi()).getPullRequest(repositoryId, pullRequestId, projectName);
     }
 

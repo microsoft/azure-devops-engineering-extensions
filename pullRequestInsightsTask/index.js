@@ -44,9 +44,10 @@ var fs = require('fs');
 var user_messages_json_1 = __importDefault(require("./user_messages.json"));
 var Branch_1 = require("./Branch");
 var AzureApiFactory_1 = require("./AzureApiFactory");
+var PullRequest_1 = require("./PullRequest");
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var pastFailureThreshold, numberBuildsToQuery, configurations, azureApiFactory, azureApi, currentProject, currentPipeline, targetBranchName, retrievedPipelines, targetBranch, err_1;
+        var pastFailureThreshold, numberBuildsToQuery, configurations, azureApiFactory, azureApi, currentProject, currentPipeline, currentPullRequest, targetBranchName, retrievedPipelines, targetBranch, err_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -72,6 +73,7 @@ function run() {
                     tl.debug(this.format(user_messages_json_1.default.noFailureMessage, configurations.getHostType()));
                     return [3 /*break*/, 7];
                 case 4:
+                    currentPullRequest = new PullRequest_1.PullRequest(configurations.getPullRequestId(), configurations.getRepository(), configurations.getProjectName());
                     tl.debug("past checks to see if task should run");
                     return [4 /*yield*/, configurations.getTargetBranch(azureApi)];
                 case 5:
@@ -85,7 +87,7 @@ function run() {
                     tl.debug("past making target branch");
                     if (targetBranch.tooManyPipelinesFailed(pastFailureThreshold)) {
                         tl.debug("too many failures = true");
-                        postFailuresComment(azureApi, currentPipeline, targetBranch, configurations.getPullRequestId(), configurations.getRepository(), configurations.getProjectName(), configurations.getHostType());
+                        postFailuresComment(azureApi, currentPipeline, targetBranch, configurations, currentPullRequest);
                     }
                     _a.label = 7;
                 case 7: return [3 /*break*/, 9];
@@ -98,11 +100,12 @@ function run() {
         });
     });
 }
-function postFailuresComment(azureApi, currentPipeline, targetBranch, pullRequestId, repository, project, type) {
+function postFailuresComment(azureApi, currentPipeline, targetBranch, configurations, currentPullRequest) {
     var mostRecentTargetFailedPipeline = targetBranch.getMostRecentFailedPipeline();
     if (mostRecentTargetFailedPipeline !== null) {
-        var thread = { comments: new Array({ content: format(user_messages_json_1.default.failureComment, currentPipeline.getName(), currentPipeline.getLink(), String(targetBranch.getPipelineFailStreak()), targetBranch.getTruncatedName(), type, targetBranch.getTruncatedName(), mostRecentTargetFailedPipeline.getName(), mostRecentTargetFailedPipeline.getLink()) }) };
-        azureApi.postNewCommentThread(thread, pullRequestId, repository, project);
+        currentPullRequest.deactivateOldComments(azureApi);
+        var thread = { comments: new Array({ content: format(user_messages_json_1.default.failureComment, configurations.getBuildIteration(), currentPipeline.getName(), currentPipeline.getLink(), String(targetBranch.getPipelineFailStreak()), targetBranch.getTruncatedName(), configurations.getHostType(), targetBranch.getTruncatedName(), mostRecentTargetFailedPipeline.getName(), mostRecentTargetFailedPipeline.getLink()) }) };
+        azureApi.postNewCommentThread(thread, configurations.getPullRequestId(), configurations.getRepository(), configurations.getProjectName());
         tl.debug(user_messages_json_1.default.commentCompletedMessage);
     }
 }

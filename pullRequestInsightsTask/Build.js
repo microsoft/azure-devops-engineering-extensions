@@ -10,8 +10,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var azureBuildInterfaces = __importStar(require("azure-devops-node-api/interfaces/BuildInterfaces"));
 var Build = /** @class */ (function () {
     function Build(buildData, timelineData) {
-        // this.apiCaller = apiCaller;
-        // this.project = project;
         this.buildData = buildData;
         this.timelineData = timelineData;
     }

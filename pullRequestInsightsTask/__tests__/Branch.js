@@ -24,6 +24,7 @@ describe('Branch Tests', function () {
         var builds = [failedBuildOne, successfulBuildTwo, failedBuildThree, successfulBuildFour];
         for (var buildNumber = 0; buildNumber < builds.length; buildNumber++) {
             sinon.stub(builds[buildNumber], "getId").returns(buildNumber);
+            sinon.stub(builds[buildNumber], "isComplete").returns(true);
         }
         sinon.stub(failedBuildOne, "isFailure").returns(true);
         sinon.stub(failedBuildThree, "isFailure").returns(true);

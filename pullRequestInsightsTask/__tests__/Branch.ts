@@ -20,6 +20,7 @@ describe('Branch Tests', () => {
         let builds: IPipeline[] = [failedBuildOne, successfulBuildTwo, failedBuildThree, successfulBuildFour]
         for (let buildNumber = 0; buildNumber < builds.length; buildNumber++){
             sinon.stub(builds[buildNumber], "getId").returns(buildNumber);
+            sinon.stub(builds[buildNumber], "isComplete").returns(true);
         }
         sinon.stub(failedBuildOne, "isFailure").returns(true);
         sinon.stub(failedBuildThree, "isFailure").returns(true);

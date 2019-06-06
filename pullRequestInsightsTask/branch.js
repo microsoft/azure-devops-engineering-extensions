@@ -12,7 +12,7 @@ var Branch = /** @class */ (function () {
             if (this.pipelines[numberPipeline].isFailure()) {
                 count++;
             }
-            else {
+            else if (this.pipelines[numberPipeline].isComplete()) {
                 break;
             }
         }
