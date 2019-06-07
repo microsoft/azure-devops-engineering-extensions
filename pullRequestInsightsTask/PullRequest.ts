@@ -19,19 +19,6 @@ export class PullRequest {
         this.projectName = projectName;
     }
 
-
-    public async manageFailureComments(apiCaller: AbstractAzureApi, currentBuildIteration: string): Promise<void> {
-        // let currentServiceComments = this.getCurrentServiceComments(await apiCaller.getCommentThreads(this.id, this.repository, this.projectName));
-        // let currentIterationCommentThread: azureGitInterfaces.GitPullRequestCommentThread = this.getCurrentIterationCommentThread(currentServiceComments, currentBuildIteration);
-        // let currentIterationCommentId: number;
-        // if (currentIterationCommentThread && currentIterationCommentThread.id){
-        //     currentIterationCommentId = currentIterationCommentThread.id;
-        //     this.editCommentThread(apiCaller, currentIterationCommentThread);
-        // }
-        // tl.debug("current build iteration: " + currentBuildIteration + " and comment id for this iteration: " + currentIterationCommentId);
-        // this.deactivateOldComments(apiCaller, currentIterationCommentId);
-    }
-
     public async addNewComment(apiCaller: AbstractAzureApi, commentContent: string): Promise<azureGitInterfaces.GitPullRequestCommentThread>{
         let thread: azureGitInterfaces.CommentThread = {comments: new Array({content: commentContent})};
         tl.debug(messages.commentCompletedMessage);
@@ -48,15 +35,16 @@ export class PullRequest {
         }
     }
 
-    public editCommentThread(apiCaller: AbstractAzureApi, thread: azureGitInterfaces.GitPullRequestCommentThread): void {
+    public editCommentThread(apiCaller: AbstractAzureApi, thread: azureGitInterfaces.GitPullRequestCommentThread, contentToAdd: string): void {
         tl.debug("editing comment")
-        for (let numberComment = 0; numberComment < thread.comments.length; numberComment++){
-            if (this.commentIsFromService(thread.comments[numberComment].content, messages.failureCommentHeading) && this.getBuildIterationFromServiceComment(thread.comments[numberComment].content)){
-                thread.comments[numberComment] = {content: thread.comments[numberComment].content + this.format(messages.failureCommentRow, "t", "t", "t", "t")};
-                tl.debug("new comment = " + thread.comments[numberComment].content);
+           for (let comment of thread.comments){
+            if (this.commentIsFromService(comment.content, messages.failureCommentHeading)){
+                let updatedContent: string = comment.content + contentToAdd;
+                apiCaller.updateComment({content: updatedContent}, this.id, this.repository, this.projectName, thread.id, comment.id);
+                tl.debug("new comment = " + updatedContent);
+                break;
             }
         }
-        apiCaller.updateCommentThread({comments: thread.comments}, this.id, this.repository, this.projectName, thread.id);
     }
 
     public async getCurrentIterationCommentThread(apiCaller: AbstractAzureApi, currentBuildIteration: string): Promise<azureGitInterfaces.GitPullRequestCommentThread | null> {
@@ -71,17 +59,10 @@ export class PullRequest {
         return null;
     }
 
-    private  format(text: string, ...args: string[]): string {
-        return text.replace(/{(\d+)}/g, (match, num) => {
-          return typeof args[num] !== 'undefined' ? args[num] : match;
-        });
-      }
-
     private getBuildIterationFromServiceComment(serviceCommentContent: string){
         let splitContent = serviceCommentContent.split("\|")
         splitContent.shift();
         if (splitContent.length > 0){
-           // tl.debug((splitContent[0].split(" ").slice(2)).join(" "));
             return (splitContent[0].split(" ").slice(2)).join(" ");  
         }
         return null;
@@ -101,19 +82,12 @@ export class PullRequest {
     }
 
     private commentIsFromService(commentContent: string, commentFormatString: string): boolean {
-        // tl.debug("regex = " + this.convertCommentFormatToRegex(commentFormatString) + " actual comment " + commentContent);
        return this.convertCommentFormatToRegex(commentFormatString).test(commentContent);
     }
 
     private convertCommentFormatToRegex(commentFormatString: string): RegExp {
         let regex: string = commentFormatString.split("\n")[0];
         regex = regex.replace(/{(\d+)}/g, ".*").replace(/\|/g, '\\|'); 
-        // tl.debug("format string regex: " + new RegExp(regex));
         return new RegExp(regex);
     }
-
-
-
-
-
 }

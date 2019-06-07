@@ -19,8 +19,8 @@ export abstract class AbstractAzureApi {
         return this.connection;
     }
 
-    public async postNewCommentThread(thread: azureGitInterfaces.GitPullRequestCommentThread, pullRequestId: number, repositoryId: string, projectName: string): Promise<void> {
-        (await this.getConnection().getGitApi()).createThread(thread, repositoryId, pullRequestId, projectName);
+    public async postNewCommentThread(thread: azureGitInterfaces.GitPullRequestCommentThread, pullRequestId: number, repositoryId: string, projectName: string): Promise<azureGitInterfaces.GitPullRequestCommentThread> {
+        return await (await this.getConnection().getGitApi()).createThread(thread, repositoryId, pullRequestId, projectName);
     }
 
     public async getCommentThreads(pullRequestId: number, repositoryId: string, projectName: string): Promise<azureGitInterfaces.GitPullRequestCommentThread[]> {
@@ -29,6 +29,10 @@ export abstract class AbstractAzureApi {
 
     public async updateCommentThread(thread: azureGitInterfaces.GitPullRequestCommentThread, pullRequestId: number, repositoryId: string, projectName: string, threadId: number): Promise<void> {
         (await this.getConnection().getGitApi()).updateThread(thread, repositoryId, pullRequestId, threadId, projectName);
+    }
+
+    public async updateComment(comment: azureGitInterfaces.Comment, pullRequestId: number, repositoryId: string, projectName: string, threadId: number, commentId: number): Promise<void> {
+        (await this.getConnection().getGitApi()).updateComment(comment, repositoryId, pullRequestId, threadId, commentId, projectName);
     }
 
     public async getPullRequestData(repositoryId: string, pullRequestId: number, projectName: string): Promise<azureGitInterfaces.GitPullRequest> {

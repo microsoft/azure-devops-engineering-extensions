@@ -48,9 +48,8 @@ var AbstractAzureApi = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.getConnection().getGitApi()];
-                    case 1:
-                        (_a.sent()).createThread(thread, repositoryId, pullRequestId, projectName);
-                        return [2 /*return*/];
+                    case 1: return [4 /*yield*/, (_a.sent()).createThread(thread, repositoryId, pullRequestId, projectName)];
+                    case 2: return [2 /*return*/, _a.sent()];
                 }
             });
         });
@@ -72,6 +71,18 @@ var AbstractAzureApi = /** @class */ (function () {
                     case 0: return [4 /*yield*/, this.getConnection().getGitApi()];
                     case 1:
                         (_a.sent()).updateThread(thread, repositoryId, pullRequestId, threadId, projectName);
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    AbstractAzureApi.prototype.updateComment = function (comment, pullRequestId, repositoryId, projectName, threadId, commentId) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.getConnection().getGitApi()];
+                    case 1:
+                        (_a.sent()).updateComment(comment, repositoryId, pullRequestId, threadId, commentId, projectName);
                         return [2 /*return*/];
                 }
             });

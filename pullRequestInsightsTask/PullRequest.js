@@ -54,13 +54,6 @@ var PullRequest = /** @class */ (function () {
         this.repository = repository;
         this.projectName = projectName;
     }
-    PullRequest.prototype.manageFailureComments = function (apiCaller, currentBuildIteration) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                return [2 /*return*/];
-            });
-        });
-    };
     PullRequest.prototype.addNewComment = function (apiCaller, commentContent) {
         return __awaiter(this, void 0, void 0, function () {
             var thread;
@@ -93,15 +86,20 @@ var PullRequest = /** @class */ (function () {
             });
         });
     };
-    PullRequest.prototype.editCommentThread = function (apiCaller, thread) {
+    PullRequest.prototype.editCommentThread = function (apiCaller, thread, contentToAdd) {
         tl.debug("editing comment");
-        for (var numberComment = 0; numberComment < thread.comments.length; numberComment++) {
-            if (this.commentIsFromService(thread.comments[numberComment].content, user_messages_json_1.default.failureCommentHeading) && this.getBuildIterationFromServiceComment(thread.comments[numberComment].content)) {
-                thread.comments[numberComment] = { content: thread.comments[numberComment].content + this.format(user_messages_json_1.default.failureCommentRow, "t", "t", "t", "t") };
-                tl.debug("new comment = " + thread.comments[numberComment].content);
+        // for (let numberComment = 0; numberComment < thread.comments.length; numberComment++){
+        for (var _i = 0, _a = thread.comments; _i < _a.length; _i++) {
+            var comment = _a[_i];
+            //  if (this.commentIsFromService(thread.comments[numberComment].content, messages.failureCommentHeading)){
+            if (this.commentIsFromService(comment.content, user_messages_json_1.default.failureCommentHeading)) {
+                //thread.comments[numberComment] = {content: thread.comments[numberComment].content + contentToAdd};//thread.comments[numberComment].content + this.format(messages.failureCommentRow, "t", "t", "t", "t")};
+                var updatedContent = comment.content + contentToAdd;
+                apiCaller.updateComment({ content: updatedContent }, this.id, this.repository, this.projectName, thread.id, comment.id);
+                tl.debug("new comment = " + updatedContent);
             }
         }
-        apiCaller.updateCommentThread({ comments: thread.comments }, this.id, this.repository, this.projectName, thread.id);
+        //   apiCaller.updateCommentThread({comments: thread.comments}, this.id, this.repository, this.projectName, thread.id);
     };
     PullRequest.prototype.getCurrentIterationCommentThread = function (apiCaller, currentBuildIteration) {
         return __awaiter(this, void 0, void 0, function () {
@@ -134,20 +132,10 @@ var PullRequest = /** @class */ (function () {
             });
         });
     };
-    PullRequest.prototype.format = function (text) {
-        var args = [];
-        for (var _i = 1; _i < arguments.length; _i++) {
-            args[_i - 1] = arguments[_i];
-        }
-        return text.replace(/{(\d+)}/g, function (match, num) {
-            return typeof args[num] !== 'undefined' ? args[num] : match;
-        });
-    };
     PullRequest.prototype.getBuildIterationFromServiceComment = function (serviceCommentContent) {
         var splitContent = serviceCommentContent.split("\|");
         splitContent.shift();
         if (splitContent.length > 0) {
-            // tl.debug((splitContent[0].split(" ").slice(2)).join(" "));
             return (splitContent[0].split(" ").slice(2)).join(" ");
         }
         return null;
@@ -167,13 +155,11 @@ var PullRequest = /** @class */ (function () {
         return currentServiceThreads;
     };
     PullRequest.prototype.commentIsFromService = function (commentContent, commentFormatString) {
-        // tl.debug("regex = " + this.convertCommentFormatToRegex(commentFormatString) + " actual comment " + commentContent);
         return this.convertCommentFormatToRegex(commentFormatString).test(commentContent);
     };
     PullRequest.prototype.convertCommentFormatToRegex = function (commentFormatString) {
         var regex = commentFormatString.split("\n")[0];
         regex = regex.replace(/{(\d+)}/g, ".*").replace(/\|/g, '\\|');
-        // tl.debug("format string regex: " + new RegExp(regex));
         return new RegExp(regex);
     };
     PullRequest.COMMENT = user_messages_json_1.default.failureComment;

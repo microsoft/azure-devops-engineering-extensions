@@ -21,13 +21,14 @@ async function run() {
         let azureApi = await azureApiFactory.create(configurations); 
         let currentProject: string = configurations.getProjectName();
         let currentPipeline: IPipeline = await azureApi.getCurrentPipeline(configurations);
+        let type: string = configurations.getHostType();
 
         tl.debug("pull request id: " + configurations.getPullRequestId());
         if (!configurations.getPullRequestId()){
-            tl.debug(this.format(messages.notInPullRequestMessage, configurations.getHostType()));
+            tl.debug(this.format(messages.notInPullRequestMessage, type));
         }
         else if (!currentPipeline.isFailure()){
-            tl.debug(this.format(messages.noFailureMessage, configurations.getHostType()));
+            tl.debug(this.format(messages.noFailureMessage, type));
         }
         else {
             let pullRequest: PullRequest = new PullRequest(configurations.getPullRequestId(), configurations.getRepository(), configurations.getProjectName());
@@ -42,12 +43,13 @@ async function run() {
                 tl.debug("too many failures = true");
                 let currentIterationCommentThread: azureGitInterfaces.GitPullRequestCommentThread = await pullRequest.getCurrentIterationCommentThread(azureApi, configurations.getBuildIteration());
                 let currentIterationCommentThreadId: number;
+                let currentPipelineCommentContent: string = format(messages.failureCommentRow, currentPipeline.getName(), currentPipeline.getLink(), String(targetBranch.getPipelineFailStreak()), targetBranch.getTruncatedName(), type, targetBranch.getTruncatedName(), targetBranch.getMostRecentFailedPipeline().getName(), targetBranch.getMostRecentFailedPipeline().getLink());
                 if (currentIterationCommentThread) {
                     currentIterationCommentThreadId = currentIterationCommentThread.id;
-                    pullRequest.editCommentThread(azureApi, currentIterationCommentThread);
+                    pullRequest.editCommentThread(azureApi, currentIterationCommentThread, currentPipelineCommentContent);
                 }
                 else {
-                    currentIterationCommentThreadId = (await pullRequest.addNewComment(azureApi, "")).id;
+                    currentIterationCommentThreadId = (await pullRequest.addNewComment(azureApi, format(messages.failureCommentHeading, configurations.getBuildIteration()) + currentPipelineCommentContent)).id;
                 }
                 pullRequest.deactivateOldComments(azureApi, currentIterationCommentThreadId);
             }
@@ -58,16 +60,11 @@ async function run() {
     }
 }
 
-// async function postFailuresComment(azureApi: AbstractAzureApi, currentPipeline: IPipeline, targetBranch: Branch, configurations: EnvironmentConfigurations, currentPullRequest: PullRequest): Promise<void> {
-//     let mostRecentTargetFailedPipeline = targetBranch.getMostRecentFailedPipeline();
-//     if (mostRecentTargetFailedPipeline !== null){
-//        await currentPullRequest.manageFailureComments(azureApi, configurations.getBuildIteration());
-//        let commentContent: string = format(messages.failureCommentHeading,  configurations.getBuildIteration()) + format(messages.failureCommentRow, currentPipeline.getName(), currentPipeline.getLink(), String(targetBranch.getPipelineFailStreak()),  targetBranch.getTruncatedName(), configurations.getHostType(), targetBranch.getTruncatedName(), mostRecentTargetFailedPipeline.getName(), mostRecentTargetFailedPipeline.getLink());
-//        let thread: azureGitInterfaces.CommentThread = {comments: new Array({content: commentContent})};
-//        //let thread: azureGitInterfaces.CommentThread = {comments: new Array({content: format(messages.failureComment, configurations.getBuildIteration(), currentPipeline.getName(), currentPipeline.getLink(), String(targetBranch.getPipelineFailStreak()),  targetBranch.getTruncatedName(), configurations.getHostType(), targetBranch.getTruncatedName(), mostRecentTargetFailedPipeline.getName(), mostRecentTargetFailedPipeline.getLink())})};
-//       // azureApi.postNewCommentThread(thread, configurations.getPullRequestId(), configurations.getRepository(), configurations.getProjectName());
-//        tl.debug(messages.commentCompletedMessage);
-//     }
-// }
+function  format(text: string, ...args: string[]): string {
+    return text.replace(/{(\d+)}/g, (match, num) => {
+      return typeof args[num] !== 'undefined' ? args[num] : match;
+    });
+  }
+
 
 run();
