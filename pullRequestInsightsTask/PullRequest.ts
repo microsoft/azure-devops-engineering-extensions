@@ -2,6 +2,9 @@ import * as azureGitInterfaces from "azure-devops-node-api/interfaces/GitInterfa
 import messages from './user_messages.json';
 import { AbstractAzureApi } from "./AbstractAzureApi.js";
 import tl = require('azure-pipelines-task-lib/task');
+import { IPipeline } from "./IPipeline.js";
+import { EnvironmentConfigurations } from "./EnvironmentConfigurations.js";
+import { Branch } from "./Branch.js";
 
 export class PullRequest {
 
@@ -18,11 +21,21 @@ export class PullRequest {
 
 
     public async manageFailureComments(apiCaller: AbstractAzureApi, currentBuildIteration: string): Promise<void> {
-        let currentServiceComments = this.getCurrentServiceComments(await apiCaller.getCommentThreads(this.id, this.repository, this.projectName));
-        let currentIterationCommentId: number = this.getCurrentIterationCommentId(currentServiceComments, currentBuildIteration);
-        tl.debug("current build iteration: " + currentBuildIteration + " and comment id for this iteration: " + currentIterationCommentId);
-        this.deactivateOldComments(apiCaller, currentIterationCommentId);
-        this.editComment(apiCaller, currentIterationCommentId);
+        // let currentServiceComments = this.getCurrentServiceComments(await apiCaller.getCommentThreads(this.id, this.repository, this.projectName));
+        // let currentIterationCommentThread: azureGitInterfaces.GitPullRequestCommentThread = this.getCurrentIterationCommentThread(currentServiceComments, currentBuildIteration);
+        // let currentIterationCommentId: number;
+        // if (currentIterationCommentThread && currentIterationCommentThread.id){
+        //     currentIterationCommentId = currentIterationCommentThread.id;
+        //     this.editCommentThread(apiCaller, currentIterationCommentThread);
+        // }
+        // tl.debug("current build iteration: " + currentBuildIteration + " and comment id for this iteration: " + currentIterationCommentId);
+        // this.deactivateOldComments(apiCaller, currentIterationCommentId);
+    }
+
+    public async addNewComment(apiCaller: AbstractAzureApi, commentContent: string): Promise<azureGitInterfaces.GitPullRequestCommentThread>{
+        let thread: azureGitInterfaces.CommentThread = {comments: new Array({content: commentContent})};
+        tl.debug(messages.commentCompletedMessage);
+        return apiCaller.postNewCommentThread(thread, this.id, this.repository, this.projectName);
     }
 
     public async deactivateOldComments(apiCaller: AbstractAzureApi, currentIterationCommentId: number): Promise<void> {
@@ -35,27 +48,40 @@ export class PullRequest {
         }
     }
 
-    public editComment(apiCaller: AbstractAzureApi, currentIterationCommentId: number): void {
-
+    public editCommentThread(apiCaller: AbstractAzureApi, thread: azureGitInterfaces.GitPullRequestCommentThread): void {
+        tl.debug("editing comment")
+        for (let numberComment = 0; numberComment < thread.comments.length; numberComment++){
+            if (this.commentIsFromService(thread.comments[numberComment].content, messages.failureCommentHeading) && this.getBuildIterationFromServiceComment(thread.comments[numberComment].content)){
+                thread.comments[numberComment] = {content: thread.comments[numberComment].content + this.format(messages.failureCommentRow, "t", "t", "t", "t")};
+                tl.debug("new comment = " + thread.comments[numberComment].content);
+            }
+        }
+        apiCaller.updateCommentThread({comments: thread.comments}, this.id, this.repository, this.projectName, thread.id);
     }
 
-    public getCurrentIterationCommentId(commentThreads: azureGitInterfaces.GitPullRequestCommentThread[], currentBuildIteration: string): number | null {
-        for (let commentThread of this.getCurrentServiceComments(commentThreads)){
+    public async getCurrentIterationCommentThread(apiCaller: AbstractAzureApi, currentBuildIteration: string): Promise<azureGitInterfaces.GitPullRequestCommentThread | null> {
+        for (let commentThread of this.getCurrentServiceComments(await apiCaller.getCommentThreads(this.id, this.repository, this.projectName))){
             for (let comment of commentThread.comments){
                 if (this.getBuildIterationFromServiceComment(comment.content) === currentBuildIteration){
                     tl.debug("current iteration comment content: " + comment.content)
-                    return commentThread.id;
+                    return commentThread;
                 }
             }
         }
         return null;
     }
 
+    private  format(text: string, ...args: string[]): string {
+        return text.replace(/{(\d+)}/g, (match, num) => {
+          return typeof args[num] !== 'undefined' ? args[num] : match;
+        });
+      }
 
     private getBuildIterationFromServiceComment(serviceCommentContent: string){
         let splitContent = serviceCommentContent.split("\|")
         splitContent.shift();
         if (splitContent.length > 0){
+           // tl.debug((splitContent[0].split(" ").slice(2)).join(" "));
             return (splitContent[0].split(" ").slice(2)).join(" ");  
         }
         return null;

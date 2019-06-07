@@ -56,20 +56,18 @@ var PullRequest = /** @class */ (function () {
     }
     PullRequest.prototype.manageFailureComments = function (apiCaller, currentBuildIteration) {
         return __awaiter(this, void 0, void 0, function () {
-            var currentServiceComments, _a, currentIterationCommentId;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
-                    case 0:
-                        _a = this.getCurrentServiceComments;
-                        return [4 /*yield*/, apiCaller.getCommentThreads(this.id, this.repository, this.projectName)];
-                    case 1:
-                        currentServiceComments = _a.apply(this, [_b.sent()]);
-                        currentIterationCommentId = this.getCurrentIterationCommentId(currentServiceComments, currentBuildIteration);
-                        tl.debug("current build iteration: " + currentBuildIteration + " and comment id for this iteration: " + currentIterationCommentId);
-                        this.deactivateOldComments(apiCaller, currentIterationCommentId);
-                        this.editComment(apiCaller, currentIterationCommentId);
-                        return [2 /*return*/];
-                }
+            return __generator(this, function (_a) {
+                return [2 /*return*/];
+            });
+        });
+    };
+    PullRequest.prototype.addNewComment = function (apiCaller, commentContent) {
+        return __awaiter(this, void 0, void 0, function () {
+            var thread;
+            return __generator(this, function (_a) {
+                thread = { comments: new Array({ content: commentContent }) };
+                tl.debug(user_messages_json_1.default.commentCompletedMessage);
+                return [2 /*return*/, apiCaller.postNewCommentThread(thread, this.id, this.repository, this.projectName)];
             });
         });
     };
@@ -95,25 +93,61 @@ var PullRequest = /** @class */ (function () {
             });
         });
     };
-    PullRequest.prototype.editComment = function (apiCaller, currentIterationCommentId) {
-    };
-    PullRequest.prototype.getCurrentIterationCommentId = function (commentThreads, currentBuildIteration) {
-        for (var _i = 0, _a = this.getCurrentServiceComments(commentThreads); _i < _a.length; _i++) {
-            var commentThread = _a[_i];
-            for (var _b = 0, _c = commentThread.comments; _b < _c.length; _b++) {
-                var comment = _c[_b];
-                if (this.getBuildIterationFromServiceComment(comment.content) === currentBuildIteration) {
-                    tl.debug("current iteration comment content: " + comment.content);
-                    return commentThread.id;
-                }
+    PullRequest.prototype.editCommentThread = function (apiCaller, thread) {
+        tl.debug("editing comment");
+        for (var numberComment = 0; numberComment < thread.comments.length; numberComment++) {
+            if (this.commentIsFromService(thread.comments[numberComment].content, user_messages_json_1.default.failureCommentHeading) && this.getBuildIterationFromServiceComment(thread.comments[numberComment].content)) {
+                thread.comments[numberComment] = { content: thread.comments[numberComment].content + this.format(user_messages_json_1.default.failureCommentRow, "t", "t", "t", "t") };
+                tl.debug("new comment = " + thread.comments[numberComment].content);
             }
         }
-        return null;
+        apiCaller.updateCommentThread({ comments: thread.comments }, this.id, this.repository, this.projectName, thread.id);
+    };
+    PullRequest.prototype.getCurrentIterationCommentThread = function (apiCaller, currentBuildIteration) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _i, _a, _b, commentThread, _c, _d, comment;
+            return __generator(this, function (_e) {
+                switch (_e.label) {
+                    case 0:
+                        _i = 0;
+                        _b = this.getCurrentServiceComments;
+                        return [4 /*yield*/, apiCaller.getCommentThreads(this.id, this.repository, this.projectName)];
+                    case 1:
+                        _a = _b.apply(this, [_e.sent()]);
+                        _e.label = 2;
+                    case 2:
+                        if (!(_i < _a.length)) return [3 /*break*/, 4];
+                        commentThread = _a[_i];
+                        for (_c = 0, _d = commentThread.comments; _c < _d.length; _c++) {
+                            comment = _d[_c];
+                            if (this.getBuildIterationFromServiceComment(comment.content) === currentBuildIteration) {
+                                tl.debug("current iteration comment content: " + comment.content);
+                                return [2 /*return*/, commentThread];
+                            }
+                        }
+                        _e.label = 3;
+                    case 3:
+                        _i++;
+                        return [3 /*break*/, 2];
+                    case 4: return [2 /*return*/, null];
+                }
+            });
+        });
+    };
+    PullRequest.prototype.format = function (text) {
+        var args = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            args[_i - 1] = arguments[_i];
+        }
+        return text.replace(/{(\d+)}/g, function (match, num) {
+            return typeof args[num] !== 'undefined' ? args[num] : match;
+        });
     };
     PullRequest.prototype.getBuildIterationFromServiceComment = function (serviceCommentContent) {
         var splitContent = serviceCommentContent.split("\|");
         splitContent.shift();
         if (splitContent.length > 0) {
+            // tl.debug((splitContent[0].split(" ").slice(2)).join(" "));
             return (splitContent[0].split(" ").slice(2)).join(" ");
         }
         return null;
