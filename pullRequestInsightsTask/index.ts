@@ -30,7 +30,6 @@ async function run() {
         }
         else {
             let pullRequest: PullRequest = new PullRequest(configurations.getPullRequestId(), configurations.getRepository(), configurations.getProjectName());
-            tl.debug("past checks to see if task should run");
             let targetBranchName: string = await configurations.getTargetBranch(azureApi);
             tl.debug("target branch: " + targetBranchName);
             let retrievedPipelines: IPipeline[] = await azureApi.getMostRecentPipelinesOfCurrentType(currentProject, currentPipeline, numberBuildsToQuery, targetBranchName);
@@ -40,9 +39,9 @@ async function run() {
             if (targetBranch.tooManyPipelinesFailed(pastFailureThreshold)){
                 tl.debug("too many failures = true");
                 let currentIterationCommentThread: azureGitInterfaces.GitPullRequestCommentThread = await pullRequest.getCurrentIterationCommentThread(azureApi, configurations.getBuildIteration());
-                let currentPipelineCommentContent: string = messages.failureCommentRow.format(currentPipeline.getName(), currentPipeline.getLink(), String(targetBranch.getPipelineFailStreak()), targetBranch.getTruncatedName(), type, targetBranch.getTruncatedName(), targetBranch.getMostRecentFailedPipeline().getName(), targetBranch.getMostRecentFailedPipeline().getLink());
+                let currentPipelineCommentContent: string = messages.failureCommentRow.format(currentPipeline.getDisplayName(), currentPipeline.getLink(), String(targetBranch.getPipelineFailStreak()), targetBranch.getTruncatedName(), type, targetBranch.getTruncatedName(), targetBranch.getMostRecentFailedPipeline().getDisplayName(), targetBranch.getMostRecentFailedPipeline().getLink());
                 if (currentIterationCommentThread) {
-                    pullRequest.editCommentThread(azureApi, currentIterationCommentThread, currentPipelineCommentContent);
+                    pullRequest.editMatchingCommentInThread(azureApi, currentIterationCommentThread, currentPipelineCommentContent, configurations.getBuildIteration());
                 }
                 else {
                     let currentIterationCommentThreadId: number = (await pullRequest.addNewComment(azureApi, messages.failureCommentHeading.format(configurations.getBuildIteration()) + currentPipelineCommentContent)).id;

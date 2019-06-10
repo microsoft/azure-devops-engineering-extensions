@@ -53,8 +53,8 @@ var Release = /** @class */ (function () {
     Release.prototype.getId = function () {
         return Number(this.releaseData.id);
     };
-    Release.prototype.getName = function () {
-        return this.releaseData.name;
+    Release.prototype.getDisplayName = function () {
+        return this.releaseData.name + "/" + this.getEnvironmentName();
     };
     Release.prototype.getEnvironmentName = function () {
         return this.environmentData.name;

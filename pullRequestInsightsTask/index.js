@@ -74,7 +74,6 @@ function run() {
                     return [3 /*break*/, 10];
                 case 4:
                     pullRequest = new PullRequest_1.PullRequest(configurations.getPullRequestId(), configurations.getRepository(), configurations.getProjectName());
-                    tl.debug("past checks to see if task should run");
                     return [4 /*yield*/, configurations.getTargetBranch(azureApi)];
                 case 5:
                     targetBranchName = _a.sent();
@@ -90,9 +89,9 @@ function run() {
                     return [4 /*yield*/, pullRequest.getCurrentIterationCommentThread(azureApi, configurations.getBuildIteration())];
                 case 7:
                     currentIterationCommentThread = _a.sent();
-                    currentPipelineCommentContent = user_messages_json_1.default.failureCommentRow.format(currentPipeline.getName(), currentPipeline.getLink(), String(targetBranch.getPipelineFailStreak()), targetBranch.getTruncatedName(), type, targetBranch.getTruncatedName(), targetBranch.getMostRecentFailedPipeline().getName(), targetBranch.getMostRecentFailedPipeline().getLink());
+                    currentPipelineCommentContent = user_messages_json_1.default.failureCommentRow.format(currentPipeline.getDisplayName(), currentPipeline.getLink(), String(targetBranch.getPipelineFailStreak()), targetBranch.getTruncatedName(), type, targetBranch.getTruncatedName(), targetBranch.getMostRecentFailedPipeline().getDisplayName(), targetBranch.getMostRecentFailedPipeline().getLink());
                     if (!currentIterationCommentThread) return [3 /*break*/, 8];
-                    pullRequest.editCommentThread(azureApi, currentIterationCommentThread, currentPipelineCommentContent);
+                    pullRequest.editMatchingCommentInThread(azureApi, currentIterationCommentThread, currentPipelineCommentContent, configurations.getBuildIteration());
                     return [3 /*break*/, 10];
                 case 8: return [4 /*yield*/, pullRequest.addNewComment(azureApi, user_messages_json_1.default.failureCommentHeading.format(configurations.getBuildIteration()) + currentPipelineCommentContent)];
                 case 9:
@@ -109,9 +108,4 @@ function run() {
         });
     });
 }
-// function  format(text: string, ...args: string[]): string {
-//     return text.replace(/{(\d+)}/g, (match, num) => {
-//       return typeof args[num] !== 'undefined' ? args[num] : match;
-//     });
-//   }
 run();

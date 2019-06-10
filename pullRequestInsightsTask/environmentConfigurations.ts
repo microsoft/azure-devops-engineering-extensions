@@ -17,7 +17,6 @@ export class EnvironmentConfigurations{
     private static readonly PULL_KEY = "pull";
     private static readonly SEPERATOR = "/";
 
-
     public getTeamURI(): string {
         return this.loadFromEnvironment(EnvironmentConfigurations.TEAM_FOUNDATION_KEY);
     }

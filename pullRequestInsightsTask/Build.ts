@@ -41,7 +41,7 @@ export class Build implements IPipeline{
         return Number(this.buildData.id); 
     }
 
-    public getName(): string {
+    public getDisplayName(): string {
         return this.buildData.buildNumber;
     }
 

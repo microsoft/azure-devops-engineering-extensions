@@ -39,7 +39,7 @@ var Build = /** @class */ (function () {
     Build.prototype.getId = function () {
         return Number(this.buildData.id);
     };
-    Build.prototype.getName = function () {
+    Build.prototype.getDisplayName = function () {
         return this.buildData.buildNumber;
     };
     Build.prototype.taskFailed = function (task) {

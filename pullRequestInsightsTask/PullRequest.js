@@ -86,11 +86,10 @@ var PullRequest = /** @class */ (function () {
             });
         });
     };
-    PullRequest.prototype.editCommentThread = function (apiCaller, thread, contentToAdd) {
-        tl.debug("editing comment");
+    PullRequest.prototype.editMatchingCommentInThread = function (apiCaller, thread, contentToAdd, currentBuildIteration) {
         for (var _i = 0, _a = thread.comments; _i < _a.length; _i++) {
             var comment = _a[_i];
-            if (this.commentIsFromService(comment.content, user_messages_json_1.default.failureCommentHeading)) {
+            if (this.commentIsFromService(comment.content, user_messages_json_1.default.failureCommentHeading) && this.getBuildIterationFromServiceComment(comment.content) === currentBuildIteration) {
                 var updatedContent = comment.content + contentToAdd;
                 apiCaller.updateComment({ content: updatedContent }, this.id, this.repository, this.projectName, thread.id, comment.id);
                 tl.debug("new comment = " + updatedContent);

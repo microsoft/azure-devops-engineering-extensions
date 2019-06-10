@@ -56,8 +56,8 @@ export class Release implements IPipeline{
         return Number(this.releaseData.id);
     }
 
-    public getName(): string {
-        return this.releaseData.name;
+    public getDisplayName(): string {
+        return this.releaseData.name + "/" + this.getEnvironmentName();
     }
 
     public getEnvironmentName(): string {

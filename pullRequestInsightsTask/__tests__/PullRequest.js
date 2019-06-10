@@ -57,11 +57,14 @@ describe("PullRequest Tests", function () {
     var pullRequest;
     var threads;
     var mockApi;
-    function makeThread(commentsContents, threadStatus, threadId) {
+    function makeThread(commentsContents, includeCommentIds, threadStatus, threadId) {
         var threadComments = [];
-        for (var _i = 0, commentsContents_1 = commentsContents; _i < commentsContents_1.length; _i++) {
-            var commentContent = commentsContents_1[_i];
-            threadComments.push({ content: commentContent });
+        for (var i = 0; i < commentsContents.length; i++) {
+            var comment = { content: commentsContents[i] };
+            if (includeCommentIds) {
+                comment.id = i;
+            }
+            threadComments.push(comment);
         }
         return {
             comments: threadComments,
@@ -73,15 +76,21 @@ describe("PullRequest Tests", function () {
         threads = threadsToGet;
         sinon_1.default.stub(mockApi, "getCommentThreads").resolves(threads);
     }
-    function makeCommentContentOfCorrectForm(buildIteration) {
-        return user_messages_json_1.default.failureCommentHeading.format(buildIteration) + user_messages_json_1.default.failureCommentRow.format("fake", "fake", "fake", "fake", "fake", "fake", "fake", "fake");
+    function makeCommentContentOfCorrectForm(buildIteration, pipelineName) {
+        if (!pipelineName) {
+            pipelineName = "fake";
+        }
+        return user_messages_json_1.default.failureCommentHeading.format(buildIteration) + user_messages_json_1.default.failureCommentRow.format(pipelineName, "fake", "fake", "fake", "fake", "fake", "fake", "fake");
+    }
+    function makeCommentContentRow(pipelineName) {
+        return user_messages_json_1.default.failureCommentRow.format(pipelineName, "fake", "fake", "fake", "fake", "fake", "fake", "fake");
     }
     beforeEach(function () {
         pullRequest = new PullRequest_1.PullRequest(2, "repo", "project");
         mockApi = ts_mockito_1.mock(ReleaseAzureApi_1.ReleaseAzureApi);
     });
     test("Does not find a comment thread when comments are of wrong format", function () {
-        setThreads([makeThread(["|jk jk hj| failure |", "fake comment"]), makeThread(["|jk jk hj| failure |", "fake comment"])]);
+        setThreads([makeThread(["|jk jk hj| failure |", "fake comment"], false), makeThread(["|jk jk hj| failure |", "fake comment"], false)]);
         expect(pullRequest.getCurrentIterationCommentThread(mockApi, "thisBuild")).toBeNull;
     });
     test("Finds comment thread when comment of same build iteration in correct format exists", function () { return __awaiter(_this, void 0, void 0, function () {
@@ -89,8 +98,8 @@ describe("PullRequest Tests", function () {
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
-                    expectedThread = makeThread([makeCommentContentOfCorrectForm("345")], 5);
-                    setThreads([makeThread(["|jk jk hj| failure |", "fake comment"]), expectedThread]);
+                    expectedThread = makeThread([makeCommentContentOfCorrectForm("345")], false, 5);
+                    setThreads([makeThread(["|jk jk hj| failure |", "fake comment"], false), expectedThread]);
                     _a = expect;
                     return [4 /*yield*/, pullRequest.getCurrentIterationCommentThread(mockApi, "345")];
                 case 1:
@@ -104,8 +113,8 @@ describe("PullRequest Tests", function () {
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
-                    expectedThread = makeThread([makeCommentContentOfCorrectForm("400")], 7);
-                    setThreads([makeThread(["fake comment"]), makeThread([makeCommentContentOfCorrectForm("345")], 5), expectedThread]);
+                    expectedThread = makeThread([makeCommentContentOfCorrectForm("400")], false, 7);
+                    setThreads([makeThread(["fake comment"], false), makeThread([makeCommentContentOfCorrectForm("345")], false, 5), expectedThread]);
                     _a = expect;
                     return [4 /*yield*/, pullRequest.getCurrentIterationCommentThread(mockApi, "400")];
                 case 1:
@@ -116,48 +125,99 @@ describe("PullRequest Tests", function () {
     }); });
     test("Calls to create new thread when adding comment", function () {
         var commentContent = makeCommentContentOfCorrectForm("500");
-        var expectedThread = makeThread([commentContent]);
-        var callback = sinon_1.default.spy(mockApi, "postNewCommentThread");
+        var expectedThread = makeThread([commentContent], false);
+        var callback = jest.spyOn(mockApi, "postNewCommentThread");
         pullRequest.addNewComment(mockApi, commentContent);
-        expect(callback.calledWith(expectedThread, 2, "repo", "project"));
+        expect(callback).toBeCalledWith({ comments: expectedThread.comments }, 2, "repo", "project");
     });
-    test("Only calls to deactivate comments that do not match current build iteration", function () {
-        var threadsToDeactivate = [makeThread([makeCommentContentOfCorrectForm("90")], azureGitInterfaces.CommentThreadStatus.Active, 6), makeThread([makeCommentContentOfCorrectForm("800")], azureGitInterfaces.CommentThreadStatus.Active, 8)];
-        var threadNotToDeactivate = [makeThread([makeCommentContentOfCorrectForm("750")], azureGitInterfaces.CommentThreadStatus.Active, 5)];
-        var callback = sinon_1.default.spy(mockApi, "updateCommentThread");
-        sinon_1.default.stub(mockApi, "getCommentThreads").resolves(threadNotToDeactivate.concat(threadsToDeactivate));
-        pullRequest.deactivateOldComments(mockApi, 5);
-        for (var _i = 0, threadsToDeactivate_1 = threadsToDeactivate; _i < threadsToDeactivate_1.length; _i++) {
-            var thread = threadsToDeactivate_1[_i];
-            expect(callback.calledWith({ status: azureGitInterfaces.CommentThreadStatus.Closed }, 2, "repo", "project", thread.id));
-        }
-        expect(callback.neverCalledWith({ status: azureGitInterfaces.CommentThreadStatus.Closed }, 2, "repo", "project", threadNotToDeactivate[0].id));
-    });
-    test("Only calls to deactivate comments that are active or undefined", function () {
-        var threadsToDeactivate = [makeThread([makeCommentContentOfCorrectForm("90")], azureGitInterfaces.CommentThreadStatus.Active, 6), makeThread([makeCommentContentOfCorrectForm("800")], undefined, 8)];
-        var threadsNotToDeactivate = [makeThread([makeCommentContentOfCorrectForm("750")], azureGitInterfaces.CommentThreadStatus.Active, 10), makeThread([makeCommentContentOfCorrectForm("750")], azureGitInterfaces.CommentThreadStatus.WontFix, 9)];
-        var callback = sinon_1.default.spy(mockApi, "updateCommentThread");
-        sinon_1.default.stub(mockApi, "getCommentThreads").resolves(threadsNotToDeactivate.concat(threadsToDeactivate));
-        pullRequest.deactivateOldComments(mockApi, 5);
-        for (var _i = 0, threadsToDeactivate_2 = threadsToDeactivate; _i < threadsToDeactivate_2.length; _i++) {
-            var thread = threadsToDeactivate_2[_i];
-            expect(callback.calledWith({ status: azureGitInterfaces.CommentThreadStatus.Closed }, 2, "repo", "project", thread.id));
-        }
-        for (var _a = 0, threadsNotToDeactivate_1 = threadsNotToDeactivate; _a < threadsNotToDeactivate_1.length; _a++) {
-            var thread = threadsNotToDeactivate_1[_a];
-            expect(callback.neverCalledWith({ status: azureGitInterfaces.CommentThreadStatus.Closed }, 2, "repo", "project", thread.id));
-        }
-    });
-    test("Calls to edit matching comment in matching thread", function () {
-        expect(5).toEqual(6);
-    });
-    test("Only edits one comment in matching comment thread", function () {
-        expect(5).toEqual(6);
-    });
-    test("Content for updated comment includes correct information", function () {
-        expect(5).toEqual(6);
-    });
-    test("Comment not from service is not edited", function () {
-        expect(5).toEqual(6);
+    test("Only calls to deactivate comments that do not match current build iteration", function () { return __awaiter(_this, void 0, void 0, function () {
+        var threadsToDeactivate, threadNotToDeactivate, callback, _a, _b, _c, _i, threadsToDeactivate_1, thread;
+        return __generator(this, function (_d) {
+            switch (_d.label) {
+                case 0:
+                    threadsToDeactivate = [makeThread([makeCommentContentOfCorrectForm("90")], false, azureGitInterfaces.CommentThreadStatus.Active, 16), makeThread([makeCommentContentOfCorrectForm("800")], false, azureGitInterfaces.CommentThreadStatus.Active, 18)];
+                    threadNotToDeactivate = [makeThread([makeCommentContentOfCorrectForm("750")], false, azureGitInterfaces.CommentThreadStatus.Active, 5)];
+                    callback = jest.spyOn(mockApi, "updateCommentThread");
+                    setThreads(threadNotToDeactivate.concat(threadsToDeactivate));
+                    _b = (_a = console).log;
+                    _c = "number threads: ";
+                    return [4 /*yield*/, mockApi.getCommentThreads(2, "repo", "project")];
+                case 1:
+                    _b.apply(_a, [_c + (_d.sent()).length]);
+                    return [4 /*yield*/, pullRequest.deactivateOldComments(mockApi, 5)];
+                case 2:
+                    _d.sent();
+                    for (_i = 0, threadsToDeactivate_1 = threadsToDeactivate; _i < threadsToDeactivate_1.length; _i++) {
+                        thread = threadsToDeactivate_1[_i];
+                        expect(callback).toBeCalledWith({ status: azureGitInterfaces.CommentThreadStatus.Closed }, 2, "repo", "project", thread.id);
+                    }
+                    expect(callback).not.toBeCalledWith({ status: azureGitInterfaces.CommentThreadStatus.Closed }, 2, "repo", "project", threadNotToDeactivate[0].id);
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+    test("Only calls to deactivate comments that are active or undefined", function () { return __awaiter(_this, void 0, void 0, function () {
+        var threadsToDeactivate, threadsNotToDeactivate, callback, _i, threadsToDeactivate_2, thread, _a, threadsNotToDeactivate_1, thread;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    threadsToDeactivate = [makeThread([makeCommentContentOfCorrectForm("90")], false, azureGitInterfaces.CommentThreadStatus.Active, 600), makeThread([makeCommentContentOfCorrectForm("800")], false, undefined, 800)];
+                    threadsNotToDeactivate = [makeThread([makeCommentContentOfCorrectForm("750")], false, azureGitInterfaces.CommentThreadStatus.Closed, 1000), makeThread([makeCommentContentOfCorrectForm("750")], false, azureGitInterfaces.CommentThreadStatus.WontFix, 900)];
+                    callback = jest.spyOn(mockApi, "updateCommentThread");
+                    setThreads(threadsNotToDeactivate.concat(threadsToDeactivate));
+                    return [4 /*yield*/, pullRequest.deactivateOldComments(mockApi, 5)];
+                case 1:
+                    _b.sent();
+                    for (_i = 0, threadsToDeactivate_2 = threadsToDeactivate; _i < threadsToDeactivate_2.length; _i++) {
+                        thread = threadsToDeactivate_2[_i];
+                        expect(callback).toBeCalledWith({ status: azureGitInterfaces.CommentThreadStatus.Closed }, 2, "repo", "project", thread.id);
+                    }
+                    for (_a = 0, threadsNotToDeactivate_1 = threadsNotToDeactivate; _a < threadsNotToDeactivate_1.length; _a++) {
+                        thread = threadsNotToDeactivate_1[_a];
+                        expect(callback).not.toBeCalledWith({ status: azureGitInterfaces.CommentThreadStatus.Closed }, 2, "repo", "project", thread.id);
+                    }
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+    test("Calls to edit only matching comment in matching thread", function () { return __awaiter(_this, void 0, void 0, function () {
+        var commentContentToAddTo, commentContentToAdd, commentContentNotToAddTo, threadToEdit, callback;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    commentContentToAddTo = makeCommentContentOfCorrectForm("500");
+                    commentContentToAdd = makeCommentContentRow("release-77");
+                    commentContentNotToAddTo = makeCommentContentOfCorrectForm("800");
+                    threadToEdit = makeThread([commentContentNotToAddTo, commentContentToAddTo], true, azureGitInterfaces.CommentThreadStatus.Active, 10);
+                    callback = jest.spyOn(mockApi, "updateComment");
+                    return [4 /*yield*/, pullRequest.editMatchingCommentInThread(mockApi, threadToEdit, commentContentToAdd, "500")];
+                case 1:
+                    _a.sent();
+                    expect(callback).toBeCalledWith({ content: commentContentToAddTo + commentContentToAdd }, 2, "repo", "project", 10, 1);
+                    expect(callback).not.toBeCalledWith({ content: commentContentNotToAddTo + commentContentToAdd }, 2, "repo", "project", 10, 0);
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+    test("Only edits one comment in matching comment thread", function () { return __awaiter(_this, void 0, void 0, function () {
+        var threadToEdit, callback;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    threadToEdit = makeThread([makeCommentContentOfCorrectForm("build98"), makeCommentContentOfCorrectForm("build99"), makeCommentContentOfCorrectForm("build100")], true);
+                    callback = jest.spyOn(mockApi, "updateComment");
+                    return [4 /*yield*/, pullRequest.editMatchingCommentInThread(mockApi, threadToEdit, makeCommentContentRow("release897"), "build98")];
+                case 1:
+                    _a.sent();
+                    expect(callback).toHaveBeenCalledTimes(1);
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+    test("Does not edit thread if no comment matches", function () {
+        var threadToEdit = makeThread([makeCommentContentOfCorrectForm("build98"), makeCommentContentOfCorrectForm("build99"), makeCommentContentOfCorrectForm("build100")], true);
+        var callback = jest.spyOn(mockApi, "updateComment");
+        pullRequest.editMatchingCommentInThread(mockApi, threadToEdit, makeCommentContentRow("release897"), "build97");
+        expect(callback).toHaveBeenCalledTimes(0);
     });
 });

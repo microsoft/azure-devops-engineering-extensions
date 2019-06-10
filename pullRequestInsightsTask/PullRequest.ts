@@ -32,10 +32,9 @@ export class PullRequest {
         }
     }
 
-    public editCommentThread(apiCaller: AbstractAzureApi, thread: azureGitInterfaces.GitPullRequestCommentThread, contentToAdd: string): void {
-        tl.debug("editing comment");
-           for (let comment of thread.comments) {
-            if (this.commentIsFromService(comment.content, messages.failureCommentHeading)) {
+    public editMatchingCommentInThread(apiCaller: AbstractAzureApi, thread: azureGitInterfaces.GitPullRequestCommentThread, contentToAdd: string, currentBuildIteration: string): void {
+        for (let comment of thread.comments) {
+            if (this.commentIsFromService(comment.content, messages.failureCommentHeading) && this.getBuildIterationFromServiceComment(comment.content) === currentBuildIteration) {
                 let updatedContent: string = comment.content + contentToAdd;
                 apiCaller.updateComment({content: updatedContent}, this.id, this.repository, this.projectName, thread.id, comment.id);
                 tl.debug("new comment = " + updatedContent);
