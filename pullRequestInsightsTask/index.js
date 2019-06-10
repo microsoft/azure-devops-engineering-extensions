@@ -40,19 +40,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var tl = require("azure-pipelines-task-lib/task");
 var EnvironmentConfigurations_1 = require("./EnvironmentConfigurations");
-var fs = require('fs');
 var user_messages_json_1 = __importDefault(require("./user_messages.json"));
 var Branch_1 = require("./Branch");
 var AzureApiFactory_1 = require("./AzureApiFactory");
 var PullRequest_1 = require("./PullRequest");
+require("./StringExtensions");
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var pastFailureThreshold, numberBuildsToQuery, configurations, azureApiFactory, azureApi, currentProject, currentPipeline, type, pullRequest, targetBranchName, retrievedPipelines, targetBranch, currentIterationCommentThread, currentIterationCommentThreadId, currentPipelineCommentContent, err_1;
+        var pastFailureThreshold, numberBuildsToQuery, configurations, azureApiFactory, azureApi, currentProject, currentPipeline, type, pullRequest, targetBranchName, retrievedPipelines, targetBranch, currentIterationCommentThread, currentPipelineCommentContent, currentIterationCommentThreadId, err_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    _a.trys.push([0, 12, , 13]);
-                    tl.debug("starting!");
+                    _a.trys.push([0, 11, , 12]);
                     pastFailureThreshold = 2;
                     numberBuildsToQuery = 10;
                     configurations = new EnvironmentConfigurations_1.EnvironmentConfigurations();
@@ -68,11 +67,11 @@ function run() {
                     tl.debug("pull request id: " + configurations.getPullRequestId());
                     if (!!configurations.getPullRequestId()) return [3 /*break*/, 3];
                     tl.debug(this.format(user_messages_json_1.default.notInPullRequestMessage, type));
-                    return [3 /*break*/, 11];
+                    return [3 /*break*/, 10];
                 case 3:
                     if (!!currentPipeline.isFailure()) return [3 /*break*/, 4];
                     tl.debug(this.format(user_messages_json_1.default.noFailureMessage, type));
-                    return [3 /*break*/, 11];
+                    return [3 /*break*/, 10];
                 case 4:
                     pullRequest = new PullRequest_1.PullRequest(configurations.getPullRequestId(), configurations.getRepository(), configurations.getProjectName());
                     tl.debug("past checks to see if task should run");
@@ -86,41 +85,33 @@ function run() {
                     tl.debug("past retrieving pipelines and got: " + retrievedPipelines.length + " pipelines");
                     targetBranch = new Branch_1.Branch(targetBranchName, retrievedPipelines);
                     tl.debug("past making target branch");
-                    if (!targetBranch.tooManyPipelinesFailed(pastFailureThreshold)) return [3 /*break*/, 11];
+                    if (!targetBranch.tooManyPipelinesFailed(pastFailureThreshold)) return [3 /*break*/, 10];
                     tl.debug("too many failures = true");
                     return [4 /*yield*/, pullRequest.getCurrentIterationCommentThread(azureApi, configurations.getBuildIteration())];
                 case 7:
                     currentIterationCommentThread = _a.sent();
-                    currentIterationCommentThreadId = void 0;
-                    currentPipelineCommentContent = format(user_messages_json_1.default.failureCommentRow, currentPipeline.getName(), currentPipeline.getLink(), String(targetBranch.getPipelineFailStreak()), targetBranch.getTruncatedName(), type, targetBranch.getTruncatedName(), targetBranch.getMostRecentFailedPipeline().getName(), targetBranch.getMostRecentFailedPipeline().getLink());
+                    currentPipelineCommentContent = user_messages_json_1.default.failureCommentRow.format(currentPipeline.getName(), currentPipeline.getLink(), String(targetBranch.getPipelineFailStreak()), targetBranch.getTruncatedName(), type, targetBranch.getTruncatedName(), targetBranch.getMostRecentFailedPipeline().getName(), targetBranch.getMostRecentFailedPipeline().getLink());
                     if (!currentIterationCommentThread) return [3 /*break*/, 8];
-                    currentIterationCommentThreadId = currentIterationCommentThread.id;
                     pullRequest.editCommentThread(azureApi, currentIterationCommentThread, currentPipelineCommentContent);
                     return [3 /*break*/, 10];
-                case 8: return [4 /*yield*/, pullRequest.addNewComment(azureApi, format(user_messages_json_1.default.failureCommentHeading, configurations.getBuildIteration()) + currentPipelineCommentContent)];
+                case 8: return [4 /*yield*/, pullRequest.addNewComment(azureApi, user_messages_json_1.default.failureCommentHeading.format(configurations.getBuildIteration()) + currentPipelineCommentContent)];
                 case 9:
                     currentIterationCommentThreadId = (_a.sent()).id;
-                    _a.label = 10;
-                case 10:
                     pullRequest.deactivateOldComments(azureApi, currentIterationCommentThreadId);
-                    _a.label = 11;
-                case 11: return [3 /*break*/, 13];
-                case 12:
+                    _a.label = 10;
+                case 10: return [3 /*break*/, 12];
+                case 11:
                     err_1 = _a.sent();
                     console.log("error!", err_1);
-                    return [3 /*break*/, 13];
-                case 13: return [2 /*return*/];
+                    return [3 /*break*/, 12];
+                case 12: return [2 /*return*/];
             }
         });
     });
 }
-function format(text) {
-    var args = [];
-    for (var _i = 1; _i < arguments.length; _i++) {
-        args[_i - 1] = arguments[_i];
-    }
-    return text.replace(/{(\d+)}/g, function (match, num) {
-        return typeof args[num] !== 'undefined' ? args[num] : match;
-    });
-}
+// function  format(text: string, ...args: string[]): string {
+//     return text.replace(/{(\d+)}/g, (match, num) => {
+//       return typeof args[num] !== 'undefined' ? args[num] : match;
+//     });
+//   }
 run();

@@ -88,18 +88,15 @@ var PullRequest = /** @class */ (function () {
     };
     PullRequest.prototype.editCommentThread = function (apiCaller, thread, contentToAdd) {
         tl.debug("editing comment");
-        // for (let numberComment = 0; numberComment < thread.comments.length; numberComment++){
         for (var _i = 0, _a = thread.comments; _i < _a.length; _i++) {
             var comment = _a[_i];
-            //  if (this.commentIsFromService(thread.comments[numberComment].content, messages.failureCommentHeading)){
             if (this.commentIsFromService(comment.content, user_messages_json_1.default.failureCommentHeading)) {
-                //thread.comments[numberComment] = {content: thread.comments[numberComment].content + contentToAdd};//thread.comments[numberComment].content + this.format(messages.failureCommentRow, "t", "t", "t", "t")};
                 var updatedContent = comment.content + contentToAdd;
                 apiCaller.updateComment({ content: updatedContent }, this.id, this.repository, this.projectName, thread.id, comment.id);
                 tl.debug("new comment = " + updatedContent);
+                break;
             }
         }
-        //   apiCaller.updateCommentThread({comments: thread.comments}, this.id, this.repository, this.projectName, thread.id);
     };
     PullRequest.prototype.getCurrentIterationCommentThread = function (apiCaller, currentBuildIteration) {
         return __awaiter(this, void 0, void 0, function () {
@@ -162,7 +159,7 @@ var PullRequest = /** @class */ (function () {
         regex = regex.replace(/{(\d+)}/g, ".*").replace(/\|/g, '\\|');
         return new RegExp(regex);
     };
-    PullRequest.COMMENT = user_messages_json_1.default.failureComment;
+    PullRequest.COMMENT = user_messages_json_1.default.failureCommentHeading + user_messages_json_1.default.failureCommentRow;
     return PullRequest;
 }());
 exports.PullRequest = PullRequest;

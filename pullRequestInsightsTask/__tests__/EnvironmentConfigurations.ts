@@ -1,7 +1,7 @@
 import { EnvironmentConfigurations } from "../EnvironmentConfigurations";
 import * as tl from 'azure-pipelines-task-lib/task';
 import sinon from "sinon";
-import mockito, { mock, when, anyString } from "ts-mockito";
+import mockito, { mock } from "ts-mockito";
 import { AbstractAzureApi } from "../AbstractAzureApi";
 import { BuildAzureApi } from "../BuildAzureApi";
 import * as azureGitInterfaces from "azure-devops-node-api/interfaces/GitInterfaces";
@@ -14,8 +14,7 @@ describe("EnvirnmentConfigurations Tests", () => {
     
     function setUpGetVariableCall(parametersToOutputs: Map<string, string>): void {
         parametersToOutputs.forEach((value: string, key: string) => {
-         //   console.log(key + " : " + value)
-            getVariableFake.withArgs(key).returns(value);
+        getVariableFake.withArgs(key).returns(value);
         });
         sinon.stub(tl, "getVariable").callsFake(getVariableFake);
     }

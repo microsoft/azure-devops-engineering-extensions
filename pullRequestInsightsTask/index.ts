@@ -1,18 +1,16 @@
 import tl = require('azure-pipelines-task-lib/task');
 import * as azureGitInterfaces from "azure-devops-node-api/interfaces/GitInterfaces";
 import { EnvironmentConfigurations } from './EnvironmentConfigurations';
-let fs = require('fs');
 import messages from './user_messages.json';
 import { Branch } from './Branch';
 import { IPipeline } from './IPipeline';
 import { AzureApiFactory } from './AzureApiFactory';
-import { AbstractAzureApi } from './AbstractAzureApi';
 import { PullRequest } from './PullRequest';
+import './StringExtensions';
 
 
 async function run() {
     try {
-        tl.debug("starting!")
         const pastFailureThreshold: number = 2; 
         const numberBuildsToQuery: number = 10;
         
@@ -42,16 +40,14 @@ async function run() {
             if (targetBranch.tooManyPipelinesFailed(pastFailureThreshold)){
                 tl.debug("too many failures = true");
                 let currentIterationCommentThread: azureGitInterfaces.GitPullRequestCommentThread = await pullRequest.getCurrentIterationCommentThread(azureApi, configurations.getBuildIteration());
-                let currentIterationCommentThreadId: number;
-                let currentPipelineCommentContent: string = format(messages.failureCommentRow, currentPipeline.getName(), currentPipeline.getLink(), String(targetBranch.getPipelineFailStreak()), targetBranch.getTruncatedName(), type, targetBranch.getTruncatedName(), targetBranch.getMostRecentFailedPipeline().getName(), targetBranch.getMostRecentFailedPipeline().getLink());
+                let currentPipelineCommentContent: string = messages.failureCommentRow.format(currentPipeline.getName(), currentPipeline.getLink(), String(targetBranch.getPipelineFailStreak()), targetBranch.getTruncatedName(), type, targetBranch.getTruncatedName(), targetBranch.getMostRecentFailedPipeline().getName(), targetBranch.getMostRecentFailedPipeline().getLink());
                 if (currentIterationCommentThread) {
-                    currentIterationCommentThreadId = currentIterationCommentThread.id;
                     pullRequest.editCommentThread(azureApi, currentIterationCommentThread, currentPipelineCommentContent);
                 }
                 else {
-                    currentIterationCommentThreadId = (await pullRequest.addNewComment(azureApi, format(messages.failureCommentHeading, configurations.getBuildIteration()) + currentPipelineCommentContent)).id;
+                    let currentIterationCommentThreadId: number = (await pullRequest.addNewComment(azureApi, messages.failureCommentHeading.format(configurations.getBuildIteration()) + currentPipelineCommentContent)).id;
+                    pullRequest.deactivateOldComments(azureApi, currentIterationCommentThreadId);
                 }
-                pullRequest.deactivateOldComments(azureApi, currentIterationCommentThreadId);
             }
         }   
     }
@@ -59,12 +55,5 @@ async function run() {
         console.log("error!", err); 
     }
 }
-
-function  format(text: string, ...args: string[]): string {
-    return text.replace(/{(\d+)}/g, (match, num) => {
-      return typeof args[num] !== 'undefined' ? args[num] : match;
-    });
-  }
-
 
 run();
