@@ -18,13 +18,11 @@ export class ReleaseAzureApi extends AbstractAzureApi{
      }
  
      public async getMostRecentPipelinesOfCurrentType(project: string, currentPipeline: IPipeline, maxNumber: number, branchName: string): Promise<IPipeline[]> {
-         tl.debug("project: " + project + ", definition id: " + currentPipeline.getDefinitionId() + ", environment definition id: " + (currentPipeline as Release).getEnvironmentDefinitionId() + ", desired status: " + ReleaseAzureApi.DESIRED_RELEASE_ENVIRONMENT_STATUS + ", number: " + maxNumber + ", branchName: " + branchName)
         return this.getReleases(project, currentPipeline.getDefinitionId(), (currentPipeline as Release).getEnvironmentDefinitionId(), ReleaseAzureApi.DESIRED_RELEASE_ENVIRONMENT_STATUS, maxNumber, branchName);
      }
 
      
     public async getRelease(project: string, releaseId: number): Promise<IPipeline> {
-        tl.debug("sending for release with project name: " + project + " and release id: " + releaseId);
         return new Release(await this.getReleaseData(project, releaseId)); 
     }
 

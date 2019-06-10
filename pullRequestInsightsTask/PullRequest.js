@@ -77,7 +77,7 @@ var PullRequest = /** @class */ (function () {
                         for (_i = 0, serviceComments_1 = serviceComments; _i < serviceComments_1.length; _i++) {
                             commentThread = serviceComments_1[_i];
                             if (commentThread.id != currentIterationCommentId && (commentThread.status === azureGitInterfaces.CommentThreadStatus.Active || commentThread.status === undefined)) {
-                                tl.debug("comment to be deactivated: " + commentThread.id);
+                                tl.debug("comment thread id to be deactivated: " + commentThread.id);
                                 apiCaller.updateCommentThread({ status: azureGitInterfaces.CommentThreadStatus.Closed }, this.id, this.repository, this.projectName, commentThread.id);
                             }
                         }
@@ -91,8 +91,8 @@ var PullRequest = /** @class */ (function () {
             var comment = _a[_i];
             if (this.commentIsFromService(comment.content, user_messages_json_1.default.failureCommentHeading) && this.getBuildIterationFromServiceComment(comment.content) === currentBuildIteration) {
                 var updatedContent = comment.content + contentToAdd;
+                tl.debug("comment to be updated: thread id = " + thread.id + ", comment id = " + comment.id);
                 apiCaller.updateComment({ content: updatedContent }, this.id, this.repository, this.projectName, thread.id, comment.id);
-                tl.debug("new comment = " + updatedContent);
                 break;
             }
         }
@@ -115,7 +115,7 @@ var PullRequest = /** @class */ (function () {
                         for (_c = 0, _d = commentThread.comments; _c < _d.length; _c++) {
                             comment = _d[_c];
                             if (this.getBuildIterationFromServiceComment(comment.content) === currentBuildIteration) {
-                                tl.debug("current iteration comment content: " + comment.content);
+                                tl.debug("comment thread id of thread of current build iteration " + currentBuildIteration + ": thread id = " + commentThread.id + ", comment id = " + comment.id);
                                 return [2 /*return*/, commentThread];
                             }
                         }
@@ -123,7 +123,9 @@ var PullRequest = /** @class */ (function () {
                     case 3:
                         _i++;
                         return [3 /*break*/, 2];
-                    case 4: return [2 /*return*/, null];
+                    case 4:
+                        tl.debug("no comment was found for build iteration " + currentBuildIteration);
+                        return [2 /*return*/, null];
                 }
             });
         });
@@ -134,6 +136,7 @@ var PullRequest = /** @class */ (function () {
         if (splitContent.length > 0) {
             return (splitContent[0].split(" ").slice(2)).join(" ");
         }
+        tl.debug("no build iteration was found in comment content: " + serviceCommentContent);
         return null;
     };
     PullRequest.prototype.getCurrentServiceComments = function (commentThreads) {
@@ -143,8 +146,11 @@ var PullRequest = /** @class */ (function () {
             for (var _a = 0, _b = commentThread.comments; _a < _b.length; _a++) {
                 var comment = _b[_a];
                 if (this.commentIsFromService(comment.content, PullRequest.COMMENT)) {
-                    tl.debug("the comment " + comment.content + " is from service");
+                    tl.debug("the comment: thread id = " + commentThread.id + ", comment id = " + comment.id + "is from service");
                     currentServiceThreads.push(commentThread);
+                }
+                else {
+                    tl.debug("the comment: thread id = " + commentThread.id + ", comment id = " + comment.id + "is not from service");
                 }
             }
         }

@@ -26,7 +26,7 @@ export class PullRequest {
         let serviceComments: azureGitInterfaces.GitPullRequestCommentThread[] = this.getCurrentServiceComments(await apiCaller.getCommentThreads(this.id, this.repository, this.projectName));
         for (let commentThread of serviceComments) {
             if (commentThread.id != currentIterationCommentId && (commentThread.status === azureGitInterfaces.CommentThreadStatus.Active || commentThread.status === undefined)) {
-                tl.debug("comment to be deactivated: " + commentThread.id);
+                tl.debug("comment thread id to be deactivated: " + commentThread.id);
                 apiCaller.updateCommentThread({status: azureGitInterfaces.CommentThreadStatus.Closed}, this.id, this.repository, this.projectName, commentThread.id);
             }
         }
@@ -36,8 +36,8 @@ export class PullRequest {
         for (let comment of thread.comments) {
             if (this.commentIsFromService(comment.content, messages.failureCommentHeading) && this.getBuildIterationFromServiceComment(comment.content) === currentBuildIteration) {
                 let updatedContent: string = comment.content + contentToAdd;
+                tl.debug("comment to be updated: thread id = " + thread.id + ", comment id = " + comment.id);
                 apiCaller.updateComment({content: updatedContent}, this.id, this.repository, this.projectName, thread.id, comment.id);
-                tl.debug("new comment = " + updatedContent);
                 break;
             }
         }
@@ -47,11 +47,12 @@ export class PullRequest {
         for (let commentThread of this.getCurrentServiceComments(await apiCaller.getCommentThreads(this.id, this.repository, this.projectName))){
             for (let comment of commentThread.comments){
                 if (this.getBuildIterationFromServiceComment(comment.content) === currentBuildIteration){
-                    tl.debug("current iteration comment content: " + comment.content)
+                    tl.debug("comment thread id of thread of current build iteration " + currentBuildIteration + ": thread id = " + commentThread.id + ", comment id = " + comment.id);
                     return commentThread;
                 }
             }
         }
+        tl.debug("no comment was found for build iteration " + currentBuildIteration);
         return null;
     }
 
@@ -61,6 +62,7 @@ export class PullRequest {
         if (splitContent.length > 0){
             return (splitContent[0].split(" ").slice(2)).join(" ");  
         }
+        tl.debug("no build iteration was found in comment content: " + serviceCommentContent);
         return null;
     }
 
@@ -69,8 +71,11 @@ export class PullRequest {
         for (let commentThread of commentThreads) {
             for (let comment of commentThread.comments) {
                 if (this.commentIsFromService(comment.content, PullRequest.COMMENT)) {
-                    tl.debug("the comment " + comment.content + " is from service");
+                    tl.debug("the comment: thread id = " + commentThread.id + ", comment id = " + comment.id + "is from service");
                     currentServiceThreads.push(commentThread);
+                }
+                else {
+                    tl.debug("the comment: thread id = " + commentThread.id + ", comment id = " + comment.id + "is not from service");
                 }
             }
         }

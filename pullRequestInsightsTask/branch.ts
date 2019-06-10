@@ -28,7 +28,6 @@ export class Branch{
 
     public getMostRecentFailedPipeline(): IPipeline | null{
         for (let pipeline of this.pipelines){
-            tl.debug(pipeline.getId() + " : " + String(pipeline.isFailure()));
            if (pipeline.isFailure()){
                 return pipeline; 
             }

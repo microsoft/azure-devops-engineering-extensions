@@ -69,9 +69,7 @@ var AbstractAzureApi = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.getConnection().getGitApi()];
-                    case 1:
-                        (_a.sent()).updateThread(thread, repositoryId, pullRequestId, threadId, projectName);
-                        return [2 /*return*/];
+                    case 1: return [2 /*return*/, (_a.sent()).updateThread(thread, repositoryId, pullRequestId, threadId, projectName)];
                 }
             });
         });
@@ -81,9 +79,7 @@ var AbstractAzureApi = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.getConnection().getGitApi()];
-                    case 1:
-                        (_a.sent()).updateComment(comment, repositoryId, pullRequestId, threadId, commentId, projectName);
-                        return [2 /*return*/];
+                    case 1: return [2 /*return*/, (_a.sent()).updateComment(comment, repositoryId, pullRequestId, threadId, commentId, projectName)];
                 }
             });
         });

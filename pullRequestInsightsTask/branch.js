@@ -22,7 +22,6 @@ var Branch = /** @class */ (function () {
     Branch.prototype.getMostRecentFailedPipeline = function () {
         for (var _i = 0, _a = this.pipelines; _i < _a.length; _i++) {
             var pipeline = _a[_i];
-            tl.debug(pipeline.getId() + " : " + String(pipeline.isFailure()));
             if (pipeline.isFailure()) {
                 return pipeline;
             }
