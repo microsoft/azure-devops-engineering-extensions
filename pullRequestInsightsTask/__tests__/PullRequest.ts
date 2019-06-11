@@ -1,11 +1,12 @@
 import * as azureGitInterfaces from "azure-devops-node-api/interfaces/GitInterfaces";
 import { PullRequest } from "../PullRequest";
 import { AbstractAzureApi } from "../AbstractAzureApi";
-import { mock } from "ts-mockito";
+import mockito, { mock } from "ts-mockito";
 import { ReleaseAzureApi } from "../ReleaseAzureApi";
-import sinon from "sinon";
+import sinon, { assert } from "sinon";
 import messages from '../user_messages.json';
 import '../StringExtensions';
+import { async } from "q";
 
 describe("PullRequest Tests", () => {
 
@@ -38,7 +39,7 @@ describe("PullRequest Tests", () => {
         if (!pipelineName){
             pipelineName = "fake";
         }
-        return messages.failureCommentHeading.format(buildIteration) + messages.failureCommentRow.format(pipelineName, "fake", "fake", "fake", "fake", "fake", "fake", "fake");
+        return messages.newIterationCommentHeading.format(buildIteration) + messages.failureCommentRow.format(pipelineName, "fake", "fake", "fake", "fake", "fake", "fake", "fake");
     }
 
     function makeCommentContentRow(pipelineName: string){
@@ -83,9 +84,9 @@ describe("PullRequest Tests", () => {
         console.log("number threads: " + (await mockApi.getCommentThreads(2, "repo", "project")).length);
         await pullRequest.deactivateOldComments(mockApi, 5); 
         for (let thread of threadsToDeactivate) {
-            expect(callback).toBeCalledWith({status: azureGitInterfaces.CommentThreadStatus.Closed}, 2, "repo", "project", thread.id);
+           expect(callback).toBeCalledWith({status: azureGitInterfaces.CommentThreadStatus.Closed}, 2, "repo", "project", thread.id);
         }
-        expect(callback).not.toBeCalledWith({status: azureGitInterfaces.CommentThreadStatus.Closed}, 2, "repo", "project", threadNotToDeactivate[0].id);
+       expect(callback).not.toBeCalledWith({status: azureGitInterfaces.CommentThreadStatus.Closed}, 2, "repo", "project", threadNotToDeactivate[0].id);
     });
 
     test("Only calls to deactivate comments that are active or undefined", async () =>{
@@ -95,10 +96,10 @@ describe("PullRequest Tests", () => {
         setThreads(threadsNotToDeactivate.concat(threadsToDeactivate));
         await pullRequest.deactivateOldComments(mockApi, 5); 
         for (let thread of threadsToDeactivate) {
-            expect(callback).toBeCalledWith({status: azureGitInterfaces.CommentThreadStatus.Closed}, 2, "repo", "project", thread.id);
+           expect(callback).toBeCalledWith({status: azureGitInterfaces.CommentThreadStatus.Closed}, 2, "repo", "project", thread.id);
         }
         for (let thread of threadsNotToDeactivate) {
-            expect(callback).not.toBeCalledWith({status: azureGitInterfaces.CommentThreadStatus.Closed}, 2, "repo", "project", thread.id);
+           expect(callback).not.toBeCalledWith({status: azureGitInterfaces.CommentThreadStatus.Closed}, 2, "repo", "project", thread.id);
         }
     });
 
@@ -126,5 +127,5 @@ describe("PullRequest Tests", () => {
         pullRequest.editMatchingCommentInThread(mockApi, threadToEdit, makeCommentContentRow("release897"), "build97");
         expect(callback).toHaveBeenCalledTimes(0);
     });
-
+    
 });

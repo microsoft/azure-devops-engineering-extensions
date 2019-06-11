@@ -26,11 +26,11 @@ export class Branch{
         return count;
     }
 
-    public getMostRecentFailedPipeline(): IPipeline | null{
-        for (let pipeline of this.pipelines){
-           if (pipeline.isFailure()){
-                return pipeline; 
-            }
+    public getMostRecentCompletePipeline(): IPipeline | null{
+       for (let pipeline of this.pipelines){
+           if (pipeline.isComplete()){
+               return pipeline;
+           }
         }
         return null;
     }

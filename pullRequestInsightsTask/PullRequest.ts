@@ -1,5 +1,5 @@
 import * as azureGitInterfaces from "azure-devops-node-api/interfaces/GitInterfaces";
-import messages from './user_messages.json';
+import messages from "./user_messages.json"
 import { AbstractAzureApi } from "./AbstractAzureApi.js";
 import tl = require('azure-pipelines-task-lib/task');
 
@@ -8,12 +8,12 @@ export class PullRequest {
     private id: number;
     private repository: string;
     private projectName: string;
-    private static readonly COMMENT = messages.failureCommentHeading + messages.failureCommentRow;
+    private static readonly COMMENT =  messages.newIterationCommentHeading + messages.failureCommentRow;
 
     constructor(id: number, repository: string, projectName: string) {
         this.id = id;
         this.repository = repository;
-        this.projectName = projectName;
+        this.projectName = projectName;    
     }
 
     public async addNewComment(apiCaller: AbstractAzureApi, commentContent: string): Promise<azureGitInterfaces.GitPullRequestCommentThread>{
@@ -34,7 +34,7 @@ export class PullRequest {
 
     public editMatchingCommentInThread(apiCaller: AbstractAzureApi, thread: azureGitInterfaces.GitPullRequestCommentThread, contentToAdd: string, currentBuildIteration: string): void {
         for (let comment of thread.comments) {
-            if (this.commentIsFromService(comment.content, messages.failureCommentHeading) && this.getBuildIterationFromServiceComment(comment.content) === currentBuildIteration) {
+            if (this.commentIsFromService(comment.content, messages.failureCommentRow) && this.getBuildIterationFromServiceComment(comment.content) === currentBuildIteration) {
                 let updatedContent: string = comment.content + contentToAdd;
                 tl.debug("comment to be updated: thread id = " + thread.id + ", comment id = " + comment.id);
                 apiCaller.updateComment({content: updatedContent}, this.id, this.repository, this.projectName, thread.id, comment.id);

@@ -42,10 +42,6 @@ var HostTypeError_1 = require("./HostTypeError");
 var AzureApiFactory = /** @class */ (function () {
     function AzureApiFactory() {
     }
-    // private static readonly apiSourceByHostType: { [id: string]: any}  = [
-    //     { "build": (configurations: EnvironmentConfigurations) => new BuildAzureApi(configurations.getTeamURI(), configurations.getAccessKey()) },
-    //     { "release": (configurations: EnvironmentConfigurations) => new ReleaseAzureApi(configurations.getTeamURI(), configurations.getAccessKey()) }
-    // ];
     AzureApiFactory.prototype.create = function (configurations) {
         return __awaiter(this, void 0, void 0, function () {
             var type;

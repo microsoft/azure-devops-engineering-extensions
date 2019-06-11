@@ -80,7 +80,7 @@ describe("PullRequest Tests", function () {
         if (!pipelineName) {
             pipelineName = "fake";
         }
-        return user_messages_json_1.default.failureCommentHeading.format(buildIteration) + user_messages_json_1.default.failureCommentRow.format(pipelineName, "fake", "fake", "fake", "fake", "fake", "fake", "fake");
+        return user_messages_json_1.default.newIterationCommentHeading.format(buildIteration) + user_messages_json_1.default.failureCommentRow.format(pipelineName, "fake", "fake", "fake", "fake", "fake", "fake", "fake");
     }
     function makeCommentContentRow(pipelineName) {
         return user_messages_json_1.default.failureCommentRow.format(pipelineName, "fake", "fake", "fake", "fake", "fake", "fake", "fake");

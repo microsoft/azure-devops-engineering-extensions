@@ -9,6 +9,7 @@ describe('Branch Tests', () => {
     let successfulBuildTwo: IPipeline;
     let failedBuildThree: IPipeline;
     let successfulBuildFour: IPipeline;
+    let incompleteBuild: IPipeline;
     let branch: Branch;
 
     beforeEach(() =>{
@@ -16,8 +17,9 @@ describe('Branch Tests', () => {
         successfulBuildTwo = new Build(null, null);
         failedBuildThree = new Build(null, null);
         successfulBuildFour = new Build(null, null);
+        incompleteBuild = new Build(null, null);
 
-        let builds: IPipeline[] = [failedBuildOne, successfulBuildTwo, failedBuildThree, successfulBuildFour]
+        let builds: IPipeline[] = [failedBuildOne, successfulBuildTwo, failedBuildThree, successfulBuildFour];
         for (let buildNumber = 0; buildNumber < builds.length; buildNumber++){
             sinon.stub(builds[buildNumber], "getId").returns(buildNumber);
             sinon.stub(builds[buildNumber], "isComplete").returns(true);
@@ -26,6 +28,7 @@ describe('Branch Tests', () => {
         sinon.stub(failedBuildThree, "isFailure").returns(true);
         sinon.stub(successfulBuildTwo, "isFailure").returns(false);
         sinon.stub(successfulBuildFour, "isFailure").returns(false);
+        sinon.stub(incompleteBuild, "isComplete").returns(false);
     })
 
     test("Counts pipeline failure streak of multiple fails", ()=>{
@@ -43,20 +46,20 @@ describe('Branch Tests', () => {
         expect(branch.getPipelineFailStreak()).toEqual(0); 
     });
 
-    test("Gets most recently failed pipeline", ()=> {
+    test("Gets most recently completed pipeline", ()=> {
         branch = new Branch("", [failedBuildOne, failedBuildThree, successfulBuildTwo]);
-        expect(branch.getMostRecentFailedPipeline()).toEqual(failedBuildOne);
-        expect(branch.getMostRecentFailedPipeline()).not.toEqual(failedBuildThree);
+        expect(branch.getMostRecentCompletePipeline()).toEqual(failedBuildOne);
+        expect(branch.getMostRecentCompletePipeline()).not.toEqual(failedBuildThree);
     });
 
-    test("Gets most recently failed pipeline when first few succeed", ()=> {
-        branch = new Branch("", [successfulBuildTwo, successfulBuildFour, failedBuildOne]);
-        expect(branch.getMostRecentFailedPipeline()).toEqual(failedBuildOne);
+    test("Gets most recently completed pipeline when first is not finished", ()=> {
+        branch = new Branch("", [incompleteBuild, failedBuildOne]);
+        expect(branch.getMostRecentCompletePipeline()).toEqual(failedBuildOne);
     });
 
-    test("Gets no pipeline when no pipelines fail", ()=> {
-        branch = new Branch("", [successfulBuildFour, successfulBuildTwo]);
-        expect(branch.getMostRecentFailedPipeline()).toBeNull();
+    test("Gets no pipeline when no pipelines are complete", ()=> {
+        branch = new Branch("", [incompleteBuild]);
+        expect(branch.getMostRecentCompletePipeline()).toBeNull();
     });
 
     test("Too many pipelines failed when when failure streak of pipelines is larger than threshold", () => {

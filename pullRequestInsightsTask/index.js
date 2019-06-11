@@ -45,14 +45,15 @@ var Branch_1 = require("./Branch");
 var AzureApiFactory_1 = require("./AzureApiFactory");
 var PullRequest_1 = require("./PullRequest");
 require("./StringExtensions");
+var CommentFactory_1 = require("./CommentFactory");
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var pastFailureThreshold, numberBuildsToQuery, configurations, azureApiFactory, azureApi, currentProject, currentPipeline, type, pullRequest, targetBranchName, retrievedPipelines, targetBranch, currentIterationCommentThread, currentPipelineCommentContent, currentIterationCommentThreadId, err_1;
+        var pastFailureThreshold, numberBuildsToQuery, configurations, azureApiFactory, azureApi, currentProject, currentPipeline, type, commentFactory, pullRequest, targetBranchName, retrievedPipelines, targetBranch, currentIterationCommentThread, currentPipelineCommentContent, currentIterationCommentThreadId, err_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     _a.trys.push([0, 11, , 12]);
-                    pastFailureThreshold = 2;
+                    pastFailureThreshold = 0;
                     numberBuildsToQuery = 10;
                     configurations = new EnvironmentConfigurations_1.EnvironmentConfigurations();
                     azureApiFactory = new AzureApiFactory_1.AzureApiFactory();
@@ -64,6 +65,7 @@ function run() {
                 case 2:
                     currentPipeline = _a.sent();
                     type = configurations.getHostType();
+                    commentFactory = new CommentFactory_1.CommentFactory();
                     tl.debug("pull request id: " + configurations.getPullRequestId());
                     if (!!configurations.getPullRequestId()) return [3 /*break*/, 3];
                     tl.debug(this.format(user_messages_json_1.default.notInPullRequestMessage, type));
@@ -77,23 +79,20 @@ function run() {
                     return [4 /*yield*/, configurations.getTargetBranch(azureApi)];
                 case 5:
                     targetBranchName = _a.sent();
-                    tl.debug("target branch: " + targetBranchName);
+                    tl.debug("target branch of pull request: " + targetBranchName);
                     return [4 /*yield*/, azureApi.getMostRecentPipelinesOfCurrentType(currentProject, currentPipeline, numberBuildsToQuery, targetBranchName)];
                 case 6:
                     retrievedPipelines = _a.sent();
-                    tl.debug("past retrieving pipelines and got: " + retrievedPipelines.length + " pipelines");
                     targetBranch = new Branch_1.Branch(targetBranchName, retrievedPipelines);
-                    tl.debug("past making target branch");
                     if (!targetBranch.tooManyPipelinesFailed(pastFailureThreshold)) return [3 /*break*/, 10];
-                    tl.debug("too many failures = true");
                     return [4 /*yield*/, pullRequest.getCurrentIterationCommentThread(azureApi, configurations.getBuildIteration())];
                 case 7:
                     currentIterationCommentThread = _a.sent();
-                    currentPipelineCommentContent = user_messages_json_1.default.failureCommentRow.format(currentPipeline.getDisplayName(), currentPipeline.getLink(), String(targetBranch.getPipelineFailStreak()), targetBranch.getTruncatedName(), type, targetBranch.getTruncatedName(), targetBranch.getMostRecentFailedPipeline().getDisplayName(), targetBranch.getMostRecentFailedPipeline().getLink());
+                    currentPipelineCommentContent = commentFactory.createRow(targetBranch.getMostRecentCompletePipeline().isFailure(), currentPipeline.getDisplayName(), currentPipeline.getLink(), String(targetBranch.getPipelineFailStreak()), targetBranch.getTruncatedName(), type, targetBranch.getMostRecentCompletePipeline().getDisplayName(), targetBranch.getMostRecentCompletePipeline().getLink());
                     if (!currentIterationCommentThread) return [3 /*break*/, 8];
                     pullRequest.editMatchingCommentInThread(azureApi, currentIterationCommentThread, currentPipelineCommentContent, configurations.getBuildIteration());
                     return [3 /*break*/, 10];
-                case 8: return [4 /*yield*/, pullRequest.addNewComment(azureApi, user_messages_json_1.default.failureCommentHeading.format(configurations.getBuildIteration()) + currentPipelineCommentContent)];
+                case 8: return [4 /*yield*/, pullRequest.addNewComment(azureApi, user_messages_json_1.default.newIterationCommentHeading.format(configurations.getBuildIteration()) + currentPipelineCommentContent)];
                 case 9:
                     currentIterationCommentThreadId = (_a.sent()).id;
                     pullRequest.deactivateOldComments(azureApi, currentIterationCommentThreadId);

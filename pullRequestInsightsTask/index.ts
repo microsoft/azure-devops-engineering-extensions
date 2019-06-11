@@ -7,11 +7,12 @@ import { IPipeline } from './IPipeline';
 import { AzureApiFactory } from './AzureApiFactory';
 import { PullRequest } from './PullRequest';
 import './StringExtensions';
+import { CommentFactory } from './CommentFactory';
 
 
 async function run() {
     try {
-        const pastFailureThreshold: number = 2; 
+        const pastFailureThreshold: number = 0; 
         const numberBuildsToQuery: number = 10;
         
         let configurations: EnvironmentConfigurations = new EnvironmentConfigurations();
@@ -20,6 +21,7 @@ async function run() {
         let currentProject: string = configurations.getProjectName();
         let currentPipeline: IPipeline = await azureApi.getCurrentPipeline(configurations);
         let type: string = configurations.getHostType();
+        let commentFactory: CommentFactory = new CommentFactory();
 
         tl.debug("pull request id: " + configurations.getPullRequestId());
         if (!configurations.getPullRequestId()){
@@ -31,20 +33,17 @@ async function run() {
         else {
             let pullRequest: PullRequest = new PullRequest(configurations.getPullRequestId(), configurations.getRepository(), configurations.getProjectName());
             let targetBranchName: string = await configurations.getTargetBranch(azureApi);
-            tl.debug("target branch: " + targetBranchName);
+            tl.debug("target branch of pull request: " + targetBranchName);
             let retrievedPipelines: IPipeline[] = await azureApi.getMostRecentPipelinesOfCurrentType(currentProject, currentPipeline, numberBuildsToQuery, targetBranchName);
-            tl.debug("past retrieving pipelines and got: " + retrievedPipelines.length + " pipelines");
             let targetBranch: Branch = new Branch(targetBranchName, retrievedPipelines); 
-            tl.debug("past making target branch")
             if (targetBranch.tooManyPipelinesFailed(pastFailureThreshold)){
-                tl.debug("too many failures = true");
                 let currentIterationCommentThread: azureGitInterfaces.GitPullRequestCommentThread = await pullRequest.getCurrentIterationCommentThread(azureApi, configurations.getBuildIteration());
-                let currentPipelineCommentContent: string = messages.failureCommentRow.format(currentPipeline.getDisplayName(), currentPipeline.getLink(), String(targetBranch.getPipelineFailStreak()), targetBranch.getTruncatedName(), type, targetBranch.getTruncatedName(), targetBranch.getMostRecentFailedPipeline().getDisplayName(), targetBranch.getMostRecentFailedPipeline().getLink());
+                let currentPipelineCommentContent: string = commentFactory.createRow(targetBranch.getMostRecentCompletePipeline().isFailure(), currentPipeline.getDisplayName(), currentPipeline.getLink(), String(targetBranch.getPipelineFailStreak()), targetBranch.getTruncatedName(), type, targetBranch.getMostRecentCompletePipeline().getDisplayName(), targetBranch.getMostRecentCompletePipeline().getLink());
                 if (currentIterationCommentThread) {
                     pullRequest.editMatchingCommentInThread(azureApi, currentIterationCommentThread, currentPipelineCommentContent, configurations.getBuildIteration());
                 }
                 else {
-                    let currentIterationCommentThreadId: number = (await pullRequest.addNewComment(azureApi, messages.failureCommentHeading.format(configurations.getBuildIteration()) + currentPipelineCommentContent)).id;
+                    let currentIterationCommentThreadId: number = (await pullRequest.addNewComment(azureApi, messages.newIterationCommentHeading.format(configurations.getBuildIteration()) + currentPipelineCommentContent)).id;
                     pullRequest.deactivateOldComments(azureApi, currentIterationCommentThreadId);
                 }
             }

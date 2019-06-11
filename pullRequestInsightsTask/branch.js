@@ -19,10 +19,10 @@ var Branch = /** @class */ (function () {
         tl.debug("number pipelines failing on " + this.name + " is " + count);
         return count;
     };
-    Branch.prototype.getMostRecentFailedPipeline = function () {
+    Branch.prototype.getMostRecentCompletePipeline = function () {
         for (var _i = 0, _a = this.pipelines; _i < _a.length; _i++) {
             var pipeline = _a[_i];
-            if (pipeline.isFailure()) {
+            if (pipeline.isComplete()) {
                 return pipeline;
             }
         }

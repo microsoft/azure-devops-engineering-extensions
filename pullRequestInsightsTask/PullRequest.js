@@ -89,7 +89,7 @@ var PullRequest = /** @class */ (function () {
     PullRequest.prototype.editMatchingCommentInThread = function (apiCaller, thread, contentToAdd, currentBuildIteration) {
         for (var _i = 0, _a = thread.comments; _i < _a.length; _i++) {
             var comment = _a[_i];
-            if (this.commentIsFromService(comment.content, user_messages_json_1.default.failureCommentHeading) && this.getBuildIterationFromServiceComment(comment.content) === currentBuildIteration) {
+            if (this.commentIsFromService(comment.content, user_messages_json_1.default.failureCommentRow) && this.getBuildIterationFromServiceComment(comment.content) === currentBuildIteration) {
                 var updatedContent = comment.content + contentToAdd;
                 tl.debug("comment to be updated: thread id = " + thread.id + ", comment id = " + comment.id);
                 apiCaller.updateComment({ content: updatedContent }, this.id, this.repository, this.projectName, thread.id, comment.id);
@@ -164,7 +164,7 @@ var PullRequest = /** @class */ (function () {
         regex = regex.replace(/{(\d+)}/g, ".*").replace(/\|/g, '\\|');
         return new RegExp(regex);
     };
-    PullRequest.COMMENT = user_messages_json_1.default.failureCommentHeading + user_messages_json_1.default.failureCommentRow;
+    PullRequest.COMMENT = user_messages_json_1.default.newIterationCommentHeading + user_messages_json_1.default.failureCommentRow;
     return PullRequest;
 }());
 exports.PullRequest = PullRequest;
