@@ -14,6 +14,9 @@ stages:
       workingDirectory: .\pullRequestInsightsTask\
       displayName: 'npm install'
     - powershell: 
+        Rename-Item -Path "C:\azure-pipelines-prinsights\pullRequestInsightsTask\task.preProd" -NewName "task.json"
+      displayName: 'specify task.json'
+    - powershell: 
         tsc
       displayName: 'compile'
     - powershell:
@@ -22,3 +25,20 @@ stages:
       displayName: 'test'  
     - task: PRInsights@0
       displayName: Pull Request Insights
+    - task: PackageAzureDevOpsExtension@2
+      inputs:
+        rootFolder: "./"
+        patternManifest: "vss-extension-pp.json"
+        outputPath: "./epsteam.PullRequestInsightsExtension.vsix"
+      displayName: Package Task
+    - task: PublishAzureDevOpsExtension@2
+      inputs:
+        connectTo: "VsTeam"
+        connectedServiceName: "Visual Studio Marketplace"
+        fileType: "VSIX file"
+        vsixFile: "./epsteam.PullRequestInsightsExtension.vsix"
+        rootFolder: "./"
+        patternManifest: "vss-extension-pp.json"
+      displayName: Publish Task
+      
+          
