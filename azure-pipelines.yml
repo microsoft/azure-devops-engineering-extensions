@@ -17,7 +17,6 @@ stages:
       displayName: 'compile'
     - script:
         cd .\pullRequestInsightsTask\
-    - script:
         npm test
       displayName: 'test'  
     - task: PRInsights@0
