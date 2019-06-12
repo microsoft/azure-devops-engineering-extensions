@@ -31,7 +31,7 @@ stages:
         patternManifest: "vss-extension-pp.json"
         outputPath: "./epsteam.PullRequestInsightsExtension.vsix"
       displayName: Package Task
-    - task: PublishExtension@
+    - task: PublishExtension@1
       inputs:
         connectTo: "VsTeam"
         connectedServiceName: "Visual Studio Marketplace"
