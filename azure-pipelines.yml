@@ -35,7 +35,7 @@ stages:
       inputs:
         connectTo: "VsTeam"
         connectedServiceName: "Visual Studio Marketplace"
-        fileType: "VSIX file"
+        fileType: "vsix"
         vsixFile: "./epsteam.PullRequestInsightsExtension.vsix"
         rootFolder: "./"
         patternManifest: "vss-extension-pp.json"
