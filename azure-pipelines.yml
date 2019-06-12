@@ -25,13 +25,13 @@ stages:
       displayName: 'test'  
     - task: PRInsights@0
       displayName: Pull Request Insights
-    - task: PackageAzureDevOpsExtension@2
+    - task: PackageVSTSExtension@1
       inputs:
         rootFolder: "./"
         patternManifest: "vss-extension-pp.json"
         outputPath: "./epsteam.PullRequestInsightsExtension.vsix"
       displayName: Package Task
-    - task: PublishAzureDevOpsExtension@2
+    - task: PublishExtension@
       inputs:
         connectTo: "VsTeam"
         connectedServiceName: "Visual Studio Marketplace"
