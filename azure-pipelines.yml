@@ -15,7 +15,7 @@ stages:
     - powershell: 
         tsc
       displayName: 'compile'
-    - powershell: 
+    - powershell: |
         cd .\pullRequestInsightsTask\
         npm test
       displayName: 'test'  
