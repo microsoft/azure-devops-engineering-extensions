@@ -9,13 +9,13 @@ stages:
       demands:
       - msbuild
     steps:
-    - script: 
+    - powershell: 
         npm install
       displayName: 'npm install'
-    - script:
+    - powershell: 
         tsc
       displayName: 'compile'
-    - script:
+    - powershell: 
         cd .\pullRequestInsightsTask\
         npm test
       displayName: 'test'  
