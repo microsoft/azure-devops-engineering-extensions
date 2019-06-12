@@ -9,9 +9,8 @@ stages:
       demands:
       - msbuild
     steps:
-    - powershell: |
+    - powershell:
         npm install
-        npm install -g jest
       displayName: 'npm install'
     - powershell: 
         tsc
