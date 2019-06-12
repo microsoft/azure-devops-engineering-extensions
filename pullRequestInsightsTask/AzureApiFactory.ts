@@ -9,13 +9,7 @@ export class AzureApiFactory{
     private static readonly BUILD = "build";
     private static readonly RELEASE = "release";
 
-    // private static readonly apiSourceByHostType: { [id: string]: any}  = [
-    //     { "build": (configurations: EnvironmentConfigurations) => new BuildAzureApi(configurations.getTeamURI(), configurations.getAccessKey()) },
-    //     { "release": (configurations: EnvironmentConfigurations) => new ReleaseAzureApi(configurations.getTeamURI(), configurations.getAccessKey()) }
-    // ];
-
     public async create(configurations: EnvironmentConfigurations): Promise<AbstractAzureApi>{
-      //  AzureApiFactory.apiSourceByHostType[configurations.getHostType()](configurations)
      let type: string = configurations.getHostType();
      tl.debug("host type: " + type);
         if (type.toLowerCase() === AzureApiFactory.BUILD){

@@ -57,7 +57,6 @@ describe("EnvirnmentConfigurations Tests", function () {
     var mockApi;
     function setUpGetVariableCall(parametersToOutputs) {
         parametersToOutputs.forEach(function (value, key) {
-            //   console.log(key + " : " + value)
             getVariableFake.withArgs(key).returns(value);
         });
         sinon_1.default.stub(tl, "getVariable").callsFake(getVariableFake);

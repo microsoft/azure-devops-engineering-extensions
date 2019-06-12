@@ -40,19 +40,20 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var tl = require("azure-pipelines-task-lib/task");
 var EnvironmentConfigurations_1 = require("./EnvironmentConfigurations");
-var fs = require('fs');
 var user_messages_json_1 = __importDefault(require("./user_messages.json"));
 var Branch_1 = require("./Branch");
 var AzureApiFactory_1 = require("./AzureApiFactory");
+var PullRequest_1 = require("./PullRequest");
+require("./StringExtensions");
+var CommentFactory_1 = require("./CommentFactory");
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var pastFailureThreshold, numberBuildsToQuery, configurations, azureApiFactory, azureApi, currentProject, currentPipeline, targetBranchName, retrievedPipelines, targetBranch, err_1;
+        var pastFailureThreshold, numberBuildsToQuery, configurations, azureApiFactory, azureApi, currentProject, currentPipeline, type, commentFactory, pullRequest, targetBranchName, retrievedPipelines, targetBranch, currentIterationCommentThread, currentPipelineCommentContent, currentIterationCommentThreadId, err_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    _a.trys.push([0, 8, , 9]);
-                    tl.debug("starting!");
-                    pastFailureThreshold = 2;
+                    _a.trys.push([0, 11, , 12]);
+                    pastFailureThreshold = 0;
                     numberBuildsToQuery = 10;
                     configurations = new EnvironmentConfigurations_1.EnvironmentConfigurations();
                     azureApiFactory = new AzureApiFactory_1.AzureApiFactory();
@@ -63,56 +64,47 @@ function run() {
                     return [4 /*yield*/, azureApi.getCurrentPipeline(configurations)];
                 case 2:
                     currentPipeline = _a.sent();
+                    type = configurations.getHostType();
+                    commentFactory = new CommentFactory_1.CommentFactory();
                     tl.debug("pull request id: " + configurations.getPullRequestId());
                     if (!!configurations.getPullRequestId()) return [3 /*break*/, 3];
-                    tl.debug(this.format(user_messages_json_1.default.notInPullRequestMessage, configurations.getHostType()));
-                    return [3 /*break*/, 7];
+                    tl.debug(this.format(user_messages_json_1.default.notInPullRequestMessage, type));
+                    return [3 /*break*/, 10];
                 case 3:
                     if (!!currentPipeline.isFailure()) return [3 /*break*/, 4];
-                    tl.debug(this.format(user_messages_json_1.default.noFailureMessage, configurations.getHostType()));
-                    return [3 /*break*/, 7];
+                    tl.debug(this.format(user_messages_json_1.default.noFailureMessage, type));
+                    return [3 /*break*/, 10];
                 case 4:
-                    tl.debug("past checks to see if task should run");
+                    pullRequest = new PullRequest_1.PullRequest(configurations.getPullRequestId(), configurations.getRepository(), configurations.getProjectName());
                     return [4 /*yield*/, configurations.getTargetBranch(azureApi)];
                 case 5:
                     targetBranchName = _a.sent();
-                    tl.debug("target branch: " + targetBranchName);
+                    tl.debug("target branch of pull request: " + targetBranchName);
                     return [4 /*yield*/, azureApi.getMostRecentPipelinesOfCurrentType(currentProject, currentPipeline, numberBuildsToQuery, targetBranchName)];
                 case 6:
                     retrievedPipelines = _a.sent();
-                    tl.debug("past retrieving pipelines and got: " + retrievedPipelines.length + " pipelines");
                     targetBranch = new Branch_1.Branch(targetBranchName, retrievedPipelines);
-                    tl.debug("past making target branch");
-                    if (targetBranch.tooManyPipelinesFailed(pastFailureThreshold)) {
-                        tl.debug("too many failures = true");
-                        postFailuresComment(azureApi, currentPipeline, targetBranch, configurations.getPullRequestId(), configurations.getRepository(), configurations.getProjectName(), configurations.getHostType());
-                    }
-                    _a.label = 7;
-                case 7: return [3 /*break*/, 9];
-                case 8:
+                    if (!targetBranch.tooManyPipelinesFailed(pastFailureThreshold)) return [3 /*break*/, 10];
+                    return [4 /*yield*/, pullRequest.getCurrentIterationCommentThread(azureApi, configurations.getBuildIteration())];
+                case 7:
+                    currentIterationCommentThread = _a.sent();
+                    currentPipelineCommentContent = commentFactory.createRow(targetBranch.getMostRecentCompletePipeline().isFailure(), currentPipeline.getDisplayName(), currentPipeline.getLink(), String(targetBranch.getPipelineFailStreak()), targetBranch.getTruncatedName(), type, targetBranch.getMostRecentCompletePipeline().getDisplayName(), targetBranch.getMostRecentCompletePipeline().getLink());
+                    if (!currentIterationCommentThread) return [3 /*break*/, 8];
+                    pullRequest.editMatchingCommentInThread(azureApi, currentIterationCommentThread, currentPipelineCommentContent, configurations.getBuildIteration());
+                    return [3 /*break*/, 10];
+                case 8: return [4 /*yield*/, pullRequest.addNewComment(azureApi, user_messages_json_1.default.newIterationCommentHeading.format(configurations.getBuildIteration()) + currentPipelineCommentContent)];
+                case 9:
+                    currentIterationCommentThreadId = (_a.sent()).id;
+                    pullRequest.deactivateOldComments(azureApi, currentIterationCommentThreadId);
+                    _a.label = 10;
+                case 10: return [3 /*break*/, 12];
+                case 11:
                     err_1 = _a.sent();
                     console.log("error!", err_1);
-                    return [3 /*break*/, 9];
-                case 9: return [2 /*return*/];
+                    return [3 /*break*/, 12];
+                case 12: return [2 /*return*/];
             }
         });
-    });
-}
-function postFailuresComment(azureApi, currentPipeline, targetBranch, pullRequestId, repository, project, type) {
-    var mostRecentTargetFailedPipeline = targetBranch.getMostRecentFailedPipeline();
-    if (mostRecentTargetFailedPipeline !== null) {
-        var thread = { comments: new Array({ content: format(user_messages_json_1.default.failureComment, currentPipeline.getName(), currentPipeline.getLink(), String(targetBranch.getPipelineFailStreak()), targetBranch.getTruncatedName(), type, targetBranch.getTruncatedName(), mostRecentTargetFailedPipeline.getName(), mostRecentTargetFailedPipeline.getLink()) }) };
-        azureApi.postNewCommentThread(thread, pullRequestId, repository, project);
-        tl.debug(user_messages_json_1.default.commentCompletedMessage);
-    }
-}
-function format(text) {
-    var args = [];
-    for (var _i = 1; _i < arguments.length; _i++) {
-        args[_i - 1] = arguments[_i];
-    }
-    return text.replace(/{(\d+)}/g, function (match, num) {
-        return typeof args[num] !== 'undefined' ? args[num] : match;
     });
 }
 run();

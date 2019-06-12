@@ -9,13 +9,13 @@ export class EnvironmentConfigurations{
     private static readonly PULL_REQUEST_ID_KEYS = ["SYSTEM_PULLREQUEST_PULLREQUESTID", "BUILD_PULLREQUEST_ID"];
     private static readonly PROJECT_KEY = "SYSTEM_TEAMPROJECT";
     private static readonly BUILD_ID_KEY = "BUILD_BUILDID";
+    private static readonly BUILD_NUMBER_KEY = "BUILD_BUILDNUMBER";
     private static readonly RELEASE_ID_KEY = "RELEASE_RELEASEID";
     private static readonly HOST_KEY = "SYSTEM_HOSTTYPE";
     private static readonly TARGET_BRANCH_KEYS = ["SYSTEM_PULLREQUEST_TARGETBRANCH", "BUILD_TARGETBRANCH"];
     private static readonly BUILD_SOURCE_BRANCH_KEY = "BUILD_SOURCEBRANCH"; 
     private static readonly PULL_KEY = "pull";
     private static readonly SEPERATOR = "/";
-
 
     public getTeamURI(): string {
         return this.loadFromEnvironment(EnvironmentConfigurations.TEAM_FOUNDATION_KEY);
@@ -32,10 +32,10 @@ export class EnvironmentConfigurations{
     public getPullRequestId(): number {
         let pullRequestId: number = Number(this.tryKeys(EnvironmentConfigurations.PULL_REQUEST_ID_KEYS));
         let sourceBranch: string[] = this.getBuildSourceBranch().split(EnvironmentConfigurations.SEPERATOR);
-        if (!pullRequestId && sourceBranch[1] === EnvironmentConfigurations.PULL_KEY){
+        if (!pullRequestId && sourceBranch[1] === EnvironmentConfigurations.PULL_KEY) {
             pullRequestId = Number(sourceBranch[2]);
         }
-        if (pullRequestId === undefined || isNaN(pullRequestId)){
+        if (pullRequestId === undefined || isNaN(pullRequestId)) {
             return null;
         }
       return pullRequestId;
@@ -56,7 +56,7 @@ export class EnvironmentConfigurations{
         return targetBranch;
     }
 
-    public getHostType(): string{
+    public getHostType(): string {
         return this.loadFromEnvironment(EnvironmentConfigurations.HOST_KEY);
     }
 
@@ -72,11 +72,14 @@ export class EnvironmentConfigurations{
         return this.loadFromEnvironment(EnvironmentConfigurations.BUILD_SOURCE_BRANCH_KEY);
     }
 
-    private tryKeys(keys: string[]){
+    public getBuildIteration(): string {
+        return this.loadFromEnvironment(EnvironmentConfigurations.BUILD_NUMBER_KEY);
+    }
+
+    private tryKeys(keys: string[]) {
         let result: string;
-        for (let key of keys){
+        for (let key of keys) {
            result = this.loadFromEnvironment(key);
-         //  console.log("result " + result)
            if (result){
                break;
            }
@@ -84,7 +87,7 @@ export class EnvironmentConfigurations{
         return result;
     }
 
-    private loadFromEnvironment(key: string): string{
+    private loadFromEnvironment(key: string): string {
         return tl.getVariable(key);
     }
 }

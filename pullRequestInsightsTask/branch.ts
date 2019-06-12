@@ -18,7 +18,7 @@ export class Branch{
             if (this.pipelines[numberPipeline].isFailure()){
                 count++;
             }
-            else {
+            else if (this.pipelines[numberPipeline].isComplete()){
                 break;
             }
         }
@@ -26,12 +26,11 @@ export class Branch{
         return count;
     }
 
-    public getMostRecentFailedPipeline(): IPipeline | null{
-        for (let pipeline of this.pipelines){
-            tl.debug(pipeline.getId() + " : " + String(pipeline.isFailure()));
-           if (pipeline.isFailure()){
-                return pipeline; 
-            }
+    public getMostRecentCompletePipeline(): IPipeline | null{
+       for (let pipeline of this.pipelines){
+           if (pipeline.isComplete()){
+               return pipeline;
+           }
         }
         return null;
     }

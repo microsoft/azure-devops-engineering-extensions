@@ -3,14 +3,10 @@ import * as azureBuildInterfaces from "azure-devops-node-api/interfaces/BuildInt
 
 export class Build implements IPipeline{
 
-    // private project: string;
-    // private id: number;
     private buildData: azureBuildInterfaces.Build; 
     private timelineData: azureBuildInterfaces.Timeline;
 
-    constructor(buildData: azureBuildInterfaces.Build, timelineData: azureBuildInterfaces.Timeline){
-        // this.apiCaller = apiCaller;
-        // this.project = project;
+    constructor(buildData: azureBuildInterfaces.Build, timelineData: azureBuildInterfaces.Timeline) {
         this.buildData = buildData;
         this.timelineData = timelineData;
     }
@@ -33,23 +29,23 @@ export class Build implements IPipeline{
         return this.buildData.status === azureBuildInterfaces.BuildStatus.Completed;
     }
 
-    public getDefinitionId(): number{
+    public getDefinitionId(): number {
         return Number(this.buildData.definition.id);
     }
 
-    public getLink(): string{
+    public getLink(): string {
         return String(this.buildData._links.web.href);
     }
 
-    public getId(): number{
+    public getId(): number {
         return Number(this.buildData.id); 
     }
 
-    public getDisplayName(): string{
+    public getDisplayName(): string {
         return this.buildData.buildNumber;
     }
 
-    private taskFailed(task: azureBuildInterfaces.TimelineRecord): boolean{
+    private taskFailed(task: azureBuildInterfaces.TimelineRecord): boolean {
         return task.state === azureBuildInterfaces.TimelineRecordState.Completed && task.result === azureBuildInterfaces.TaskResult.Failed; 
     }
 } 

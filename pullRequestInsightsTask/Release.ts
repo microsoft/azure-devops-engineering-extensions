@@ -5,12 +5,12 @@ export class Release implements IPipeline{
 
     private releaseData: azureReleaseInterfaces.Release;
     private environmentData: azureReleaseInterfaces.ReleaseEnvironment;
+    private static readonly COMPLETE_STATUSES = [azureReleaseInterfaces.DeploymentStatus.PartiallySucceeded, azureReleaseInterfaces.DeploymentStatus.Succeeded, azureReleaseInterfaces.DeploymentStatus.Failed];
 
     constructor(releaseData: azureReleaseInterfaces.Release){
         this.releaseData = releaseData;
         this.environmentData = releaseData.environments[0];
     }
-
 
     private getSelectedDeployment(deploymentAttempts: azureReleaseInterfaces.DeploymentAttempt[]): azureReleaseInterfaces.DeploymentAttempt {
         if (deploymentAttempts.length > 0){
@@ -44,23 +44,27 @@ export class Release implements IPipeline{
         return false;
     }
     
-    public isComplete(): boolean{
-        return this.getSelectedDeployment(this.environmentData.deploySteps).status !== azureReleaseInterfaces.DeploymentStatus.InProgress;
+    public isComplete(): boolean {
+        return Release.COMPLETE_STATUSES.includes(this.getSelectedDeployment(this.environmentData.deploySteps).status);
     }
 
-    public getLink(): string{
+    public getLink(): string {
         return String(this.releaseData._links.web.href);
     }
 
-    public getId(): number{
+    public getId(): number {
         return Number(this.releaseData.id);
     }
 
-    public getDisplayName(): string{
-        return this.releaseData.name;
+    public getDisplayName(): string {
+        return this.releaseData.name + "/" + this.getEnvironmentName();
     }
 
-    private taskFailed(task: azureReleaseInterfaces.ReleaseTask): boolean{
+    public getEnvironmentName(): string {
+        return this.environmentData.name;
+    }
+
+    private taskFailed(task: azureReleaseInterfaces.ReleaseTask): boolean {
         return task.status === azureReleaseInterfaces.TaskStatus.Failed || task.status === azureReleaseInterfaces.TaskStatus.Failure;
     }
 }

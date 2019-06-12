@@ -95,12 +95,14 @@ var EnvironmentConfigurations = /** @class */ (function () {
     EnvironmentConfigurations.prototype.getBuildSourceBranch = function () {
         return this.loadFromEnvironment(EnvironmentConfigurations.BUILD_SOURCE_BRANCH_KEY);
     };
+    EnvironmentConfigurations.prototype.getBuildIteration = function () {
+        return this.loadFromEnvironment(EnvironmentConfigurations.BUILD_NUMBER_KEY);
+    };
     EnvironmentConfigurations.prototype.tryKeys = function (keys) {
         var result;
         for (var _i = 0, keys_1 = keys; _i < keys_1.length; _i++) {
             var key = keys_1[_i];
             result = this.loadFromEnvironment(key);
-            //  console.log("result " + result)
             if (result) {
                 break;
             }
@@ -117,6 +119,7 @@ var EnvironmentConfigurations = /** @class */ (function () {
     EnvironmentConfigurations.PULL_REQUEST_ID_KEYS = ["SYSTEM_PULLREQUEST_PULLREQUESTID", "BUILD_PULLREQUEST_ID"];
     EnvironmentConfigurations.PROJECT_KEY = "SYSTEM_TEAMPROJECT";
     EnvironmentConfigurations.BUILD_ID_KEY = "BUILD_BUILDID";
+    EnvironmentConfigurations.BUILD_NUMBER_KEY = "BUILD_BUILDNUMBER";
     EnvironmentConfigurations.RELEASE_ID_KEY = "RELEASE_RELEASEID";
     EnvironmentConfigurations.HOST_KEY = "SYSTEM_HOSTTYPE";
     EnvironmentConfigurations.TARGET_BRANCH_KEYS = ["SYSTEM_PULLREQUEST_TARGETBRANCH", "BUILD_TARGETBRANCH"];

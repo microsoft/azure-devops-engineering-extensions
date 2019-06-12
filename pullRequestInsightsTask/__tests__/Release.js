@@ -58,7 +58,7 @@ describe('Release Tests', function () {
     test('Correct deployment attempt is selected for failure assessment', function () {
         fillMockReleaseData([getMockDeployStep(azureReleaseInterfaces.DeploymentStatus.Failed, azureReleaseInterfaces.DeploymentReason.Manual), getMockDeployStep(azureReleaseInterfaces.DeploymentStatus.Succeeded, azureReleaseInterfaces.DeploymentReason.Automated)]);
         release = new Release_1.Release(mockReleaseData);
-        expect(release.isFailure()).toBe(false);
+        expect(release.isFailure()).toBe(true);
     });
     test('Incomplete release without current failures is not failure', function () {
         var deployPhases = [getMockDeployPhase([getMockReleaseTask(azureReleaseInterfaces.TaskStatus.Succeeded)]), getMockDeployPhase([getMockReleaseTask(azureReleaseInterfaces.TaskStatus.Succeeded)])];
