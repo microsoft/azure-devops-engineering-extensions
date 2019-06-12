@@ -11,6 +11,7 @@ stages:
     steps:
     - powershell:
         npm install
+      workingDirectory: .\pullRequestInsightsTask\
       displayName: 'npm install'
     - powershell: 
         tsc
