@@ -38,7 +38,7 @@ stages:
     - task: PublishExtension@1
       inputs:
         connectTo: "VsTeam"
-        connectedServiceName: "Visual Studio Marketplace"
+        connectedServiceName: "service connection"
         fileType: "vsix"
         vsixFile: "./epsteam.PullRequestInsightsExtension.vsix"
         rootFolder: "./"
