@@ -14,7 +14,7 @@ stages:
       workingDirectory: .\pullRequestInsightsTask\
       displayName: 'npm install'
     - powershell: 
-        Rename-Item -Path "c:\azure-pipelines-prinsights\pullRequestInsightsTask\task.preProd" -NewName "task.json"
+        Rename-Item -Path ".\pullRequestInsightsTask\task.preProd" -NewName "task.json"
       displayName: 'specify task.json'
     - powershell: 
         tsc
