@@ -5,5 +5,6 @@ export interface IPipeline{
     getLink: ()=> string;
     getId: ()=> number;
     getDisplayName: ()=> string;
+    getTaskLength(taskId: string): number | null;
 }
 

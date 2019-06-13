@@ -48,4 +48,8 @@ export class Branch{
         return seperatedName.slice(2).join("");
     }
 
+    public getPercentileTimeForPipelineTask(percentile: number, taskId: string): number | null{
+        return null // TODO
+    }
+
 }

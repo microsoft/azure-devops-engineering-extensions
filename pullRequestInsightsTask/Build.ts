@@ -45,6 +45,10 @@ export class Build implements IPipeline{
         return this.buildData.buildNumber;
     }
 
+    public getTaskLength(taskId: string): number | null{
+        return 7; // TODO
+    }
+
     private taskFailed(task: azureBuildInterfaces.TimelineRecord): boolean {
         return task.state === azureBuildInterfaces.TimelineRecordState.Completed && task.result === azureBuildInterfaces.TaskResult.Failed; 
     }
