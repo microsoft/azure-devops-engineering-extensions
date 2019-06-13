@@ -1,0 +1,20 @@
+{
+    "id": "c4ffd380-3a3b-4fa6-b02a-00ee18afe1f4",
+    "name": "PRInsights",
+    "friendlyName": "PR Insights",
+    "description": "Gets insight into pull requests",
+    "helpMarkDown": "",
+    "category": "Utility",
+    "author": "Leah Schwartz",
+    "version": {
+        "Major": 0,
+        "Minor": 0,
+        "Patch": 17
+    },
+    "instanceNameFormat": "PR Insights",
+    "execution": {
+        "Node": {
+            "target": "Index.js"
+        }
+    }
+}
