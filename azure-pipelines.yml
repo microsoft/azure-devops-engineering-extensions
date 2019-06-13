@@ -9,8 +9,9 @@ stages:
       demands:
       - msbuild
     steps:
-    - powershell:
+    - powershell: |
         npm install
+        Remove-Item './node_modules/fileset/test/fixtures/an (odd) filename.js' –recurse 
       workingDirectory: .\pullRequestInsightsTask\
       displayName: 'npm install'
     - powershell: 
@@ -25,6 +26,9 @@ stages:
       displayName: 'test'  
     - task: PRInsights@0
       displayName: Pull Request Insights
+    - task: TfxInstaller@1
+      inputs:
+        version: 'v0.6.x'
     - task: PackageVSTSExtension@1
       inputs:
         rootFolder: "./"
@@ -40,5 +44,6 @@ stages:
         rootFolder: "./"
         patternManifest: "vss-extension-pp.json"
       displayName: Publish Task
+  
       
           
