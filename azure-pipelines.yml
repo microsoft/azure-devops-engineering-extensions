@@ -9,8 +9,9 @@ stages:
       demands:
       - msbuild
     steps:
-    - powershell:
+    - powershell: |
         npm install
+        Remove-Item ./node_modules/fileset/test/fixtures/an (odd) filename.js –recurse 
       workingDirectory: .\pullRequestInsightsTask\
       displayName: 'npm install'
     - powershell: 
