@@ -1,5 +1,7 @@
 import { IPipeline } from "./IPipeline";
 import tl = require('azure-pipelines-task-lib/task');
+import stats from "stats-lite"
+ 
 
 export class Branch{
 
@@ -7,14 +9,14 @@ export class Branch{
     private name: string;
     private static readonly NAME_SEPERATOR = "/";
 
-    constructor(name: string, pipelines: IPipeline[]){
+    constructor(name: string, pipelines: IPipeline[]) {
         this.pipelines = pipelines;
         this.name = name;
     }
 
-    public getPipelineFailStreak(): number{
+    public getPipelineFailStreak(): number {
         let count: number = 0;
-        for (let numberPipeline = 0; numberPipeline < this.pipelines.length; numberPipeline++){
+        for (let numberPipeline = 0; numberPipeline < this.pipelines.length; numberPipeline++) {
             if (this.pipelines[numberPipeline].isFailure()){
                 count++;
             }
@@ -26,8 +28,8 @@ export class Branch{
         return count;
     }
 
-    public getMostRecentCompletePipeline(): IPipeline | null{
-       for (let pipeline of this.pipelines){
+    public getMostRecentCompletePipeline(): IPipeline | null {
+       for (let pipeline of this.pipelines) {
            if (pipeline.isComplete()){
                return pipeline;
            }
@@ -48,8 +50,19 @@ export class Branch{
         return seperatedName.slice(2).join("");
     }
 
-    public getPercentileTimeForPipelineTask(percentile: number, taskId: string): number | null{
-        return null // TODO
+    public getPercentileTimeForPipelineTask(percentileToFind: number, taskId: string): number | null {
+        let lengths: number[] = [];
+        for (let pipeline of this.pipelines) {
+            let taskLength: number = pipeline.getTaskLength(taskId);
+            if (taskLength) {
+                lengths.push(taskLength);
+            } 
+        }
+        if (lengths.length > 0) {
+            return stats.percentile(lengths, percentileToFind);
+        }
+        tl.debug(`no tasks with id ${taskId} found on pipelines of branch ${this.name}`)
+        return null
     }
 
 }

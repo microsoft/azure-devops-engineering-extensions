@@ -75,7 +75,7 @@ export class PullRequest {
                     currentServiceThreads.push(commentThread);
                 }
                 else {
-                    tl.debug("the comment: thread id = " + commentThread.id + ", comment id = " + comment.id + "is not from service");
+                    tl.debug("the comment: thread id = " + commentThread.id + ", comment id = " + comment.id + " is not from service");
                 }
             }
         }
