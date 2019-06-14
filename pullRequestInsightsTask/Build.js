@@ -17,12 +17,10 @@ var Build = /** @class */ (function () {
         if (this.isComplete()) {
             return this.buildData.result === azureBuildInterfaces.BuildResult.Failed;
         }
-        if (this.timelineData.records) {
-            for (var _i = 0, _a = this.timelineData.records; _i < _a.length; _i++) {
-                var taskRecord = _a[_i];
-                if (this.taskFailed(taskRecord)) {
-                    return true;
-                }
+        for (var _i = 0, _a = this.timelineData.records; _i < _a.length; _i++) {
+            var taskRecord = _a[_i];
+            if (this.taskFailed(taskRecord)) {
+                return true;
             }
         }
         return false;
@@ -41,6 +39,15 @@ var Build = /** @class */ (function () {
     };
     Build.prototype.getDisplayName = function () {
         return this.buildData.buildNumber;
+    };
+    Build.prototype.getTaskLength = function (taskId) {
+        for (var _i = 0, _a = this.timelineData.records; _i < _a.length; _i++) {
+            var taskRecord = _a[_i];
+            if (taskRecord.id === taskId && taskRecord.state === azureBuildInterfaces.TimelineRecordState.Completed) {
+                return taskRecord.finishTime.valueOf() - taskRecord.startTime.valueOf();
+            }
+        }
+        return null;
     };
     Build.prototype.taskFailed = function (task) {
         return task.state === azureBuildInterfaces.TimelineRecordState.Completed && task.result === azureBuildInterfaces.TaskResult.Failed;

@@ -54,10 +54,10 @@ var Release = /** @class */ (function () {
         return Number(this.releaseData.id);
     };
     Release.prototype.getDisplayName = function () {
-        return this.releaseData.name + "/" + this.getEnvironmentName();
+        return this.releaseData.name + "/" + this.environmentData.name;
     };
-    Release.prototype.getEnvironmentName = function () {
-        return this.environmentData.name;
+    Release.prototype.getTaskLength = function (taskId) {
+        return 5; // TODO
     };
     Release.prototype.taskFailed = function (task) {
         return task.status === azureReleaseInterfaces.TaskStatus.Failed || task.status === azureReleaseInterfaces.TaskStatus.Failure;

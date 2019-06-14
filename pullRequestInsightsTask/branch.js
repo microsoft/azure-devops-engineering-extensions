@@ -38,6 +38,9 @@ var Branch = /** @class */ (function () {
         var seperatedName = this.name.split(Branch.NAME_SEPERATOR);
         return seperatedName.slice(2).join("");
     };
+    Branch.prototype.getPercentileTimeForPipelineTask = function (percentile, taskId) {
+        return null; // TODO
+    };
     Branch.NAME_SEPERATOR = "/";
     return Branch;
 }());
