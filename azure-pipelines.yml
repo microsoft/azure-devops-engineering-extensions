@@ -9,7 +9,7 @@ stages:
       demands:
       - msbuild
     steps:
-    - powershell: |
+    - powershell: 
         npm install
        # Remove-Item './node_modules/fileset/test/fixtures/an (odd) filename.js' –recurse 
       workingDirectory: .\pullRequestInsightsTask\
@@ -29,6 +29,10 @@ stages:
     - task: TfxInstaller@1
       inputs:
         version: 'v0.6.x'
+    - powershell:
+        Remove-Item './node_modules/fileset/test/fixtures/an (odd) filename.js' –recurse 
+      workingDirectory: .\pullRequestInsightsTask\
+      displayName: 'Remove Bad Node File'
     - task: PackageVSTSExtension@1
       inputs:
         rootFolder: "./"
