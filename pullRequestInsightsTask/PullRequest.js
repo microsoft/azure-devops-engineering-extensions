@@ -64,25 +64,19 @@ var PullRequest = /** @class */ (function () {
             });
         });
     };
-    PullRequest.prototype.deactivateOldComments = function (apiCaller, currentIterationCommentId) {
+    PullRequest.prototype.deactivateOldComments = function (apiCaller, serviceComments, currentIterationCommentId) {
         return __awaiter(this, void 0, void 0, function () {
-            var serviceComments, _a, _i, serviceComments_1, commentThread;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
-                    case 0:
-                        _a = this.getCurrentServiceComments;
-                        return [4 /*yield*/, apiCaller.getCommentThreads(this.id, this.repository, this.projectName)];
-                    case 1:
-                        serviceComments = _a.apply(this, [_b.sent()]);
-                        for (_i = 0, serviceComments_1 = serviceComments; _i < serviceComments_1.length; _i++) {
-                            commentThread = serviceComments_1[_i];
-                            if (commentThread.id != currentIterationCommentId && (commentThread.status === azureGitInterfaces.CommentThreadStatus.Active || commentThread.status === undefined)) {
-                                tl.debug("comment thread id to be deactivated: " + commentThread.id);
-                                apiCaller.updateCommentThread({ status: azureGitInterfaces.CommentThreadStatus.Closed }, this.id, this.repository, this.projectName, commentThread.id);
-                            }
-                        }
-                        return [2 /*return*/];
+            var _i, serviceComments_1, commentThread;
+            return __generator(this, function (_a) {
+                // let serviceComments: azureGitInterfaces.GitPullRequestCommentThread[] = this.getCurrentServiceComments(await apiCaller.getCommentThreads(this.id, this.repository, this.projectName));
+                for (_i = 0, serviceComments_1 = serviceComments; _i < serviceComments_1.length; _i++) {
+                    commentThread = serviceComments_1[_i];
+                    if (commentThread.id != currentIterationCommentId && (commentThread.status === azureGitInterfaces.CommentThreadStatus.Active || commentThread.status === undefined)) {
+                        tl.debug("comment thread id to be deactivated: " + commentThread.id);
+                        apiCaller.updateCommentThread({ status: azureGitInterfaces.CommentThreadStatus.Closed }, this.id, this.repository, this.projectName, commentThread.id);
+                    }
                 }
+                return [2 /*return*/];
             });
         });
     };
@@ -97,64 +91,62 @@ var PullRequest = /** @class */ (function () {
             }
         }
     };
-    PullRequest.prototype.getCurrentIterationCommentThread = function (apiCaller, currentBuildIteration) {
+    PullRequest.prototype.getCurrentIterationCommentThread = function (apiCaller, serviceComments, currentBuildIteration) {
         return __awaiter(this, void 0, void 0, function () {
-            var _i, _a, _b, commentThread, _c, _d, comment;
-            return __generator(this, function (_e) {
-                switch (_e.label) {
-                    case 0:
-                        _i = 0;
-                        _b = this.getCurrentServiceComments;
-                        return [4 /*yield*/, apiCaller.getCommentThreads(this.id, this.repository, this.projectName)];
-                    case 1:
-                        _a = _b.apply(this, [_e.sent()]);
-                        _e.label = 2;
-                    case 2:
-                        if (!(_i < _a.length)) return [3 /*break*/, 4];
-                        commentThread = _a[_i];
-                        for (_c = 0, _d = commentThread.comments; _c < _d.length; _c++) {
-                            comment = _d[_c];
-                            if (this.getBuildIterationFromServiceComment(comment.content) === currentBuildIteration) {
-                                tl.debug("comment thread id of thread of current build iteration " + currentBuildIteration + ": thread id = " + commentThread.id + ", comment id = " + comment.id);
-                                return [2 /*return*/, commentThread];
-                            }
+            var _i, serviceComments_2, commentThread, _a, _b, comment;
+            return __generator(this, function (_c) {
+                //for (let commentThread of this.getCurrentServiceComments(await apiCaller.getCommentThreads(this.id, this.repository, this.projectName))){
+                for (_i = 0, serviceComments_2 = serviceComments; _i < serviceComments_2.length; _i++) {
+                    commentThread = serviceComments_2[_i];
+                    for (_a = 0, _b = commentThread.comments; _a < _b.length; _a++) {
+                        comment = _b[_a];
+                        if (this.getBuildIterationFromServiceComment(comment.content) === currentBuildIteration) {
+                            tl.debug("comment thread id of thread of current build iteration " + currentBuildIteration + ": thread id = " + commentThread.id + ", comment id = " + comment.id);
+                            return [2 /*return*/, commentThread];
                         }
-                        _e.label = 3;
-                    case 3:
-                        _i++;
-                        return [3 /*break*/, 2];
-                    case 4:
-                        tl.debug("no comment was found for build iteration " + currentBuildIteration);
-                        return [2 /*return*/, null];
+                    }
                 }
+                tl.debug("no comment was found for build iteration " + currentBuildIteration);
+                return [2 /*return*/, null];
             });
         });
     };
     PullRequest.prototype.getBuildIterationFromServiceComment = function (serviceCommentContent) {
-        var splitContent = serviceCommentContent.split("\|");
+        var splitContent = serviceCommentContent.split("\_\_");
         splitContent.shift();
+        tl.debug("content of comment: " + splitContent[0]);
         if (splitContent.length > 0) {
             return (splitContent[0].split(" ").slice(2)).join(" ");
         }
         tl.debug("no build iteration was found in comment content: " + serviceCommentContent);
         return null;
     };
-    PullRequest.prototype.getCurrentServiceComments = function (commentThreads) {
-        var currentServiceThreads = [];
-        for (var _i = 0, commentThreads_1 = commentThreads; _i < commentThreads_1.length; _i++) {
-            var commentThread = commentThreads_1[_i];
-            for (var _a = 0, _b = commentThread.comments; _a < _b.length; _a++) {
-                var comment = _b[_a];
-                if (this.commentIsFromService(comment.content, PullRequest.COMMENT)) {
-                    tl.debug("the comment: thread id = " + commentThread.id + ", comment id = " + comment.id + "is from service");
-                    currentServiceThreads.push(commentThread);
+    PullRequest.prototype.getCurrentServiceComments = function (apiCaller) {
+        return __awaiter(this, void 0, void 0, function () {
+            var commentThreads, serviceThreads, _i, commentThreads_1, commentThread, _a, _b, comment;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
+                    case 0: return [4 /*yield*/, apiCaller.getCommentThreads(this.id, this.repository, this.projectName)];
+                    case 1:
+                        commentThreads = _c.sent();
+                        serviceThreads = [];
+                        for (_i = 0, commentThreads_1 = commentThreads; _i < commentThreads_1.length; _i++) {
+                            commentThread = commentThreads_1[_i];
+                            for (_a = 0, _b = commentThread.comments; _a < _b.length; _a++) {
+                                comment = _b[_a];
+                                if (this.commentIsFromService(comment.content, PullRequest.COMMENT)) {
+                                    tl.debug("the comment: thread id = " + commentThread.id + ", comment id = " + comment.id + " is from service");
+                                    serviceThreads.push(commentThread);
+                                }
+                                else {
+                                    tl.debug("the comment: thread id = " + commentThread.id + ", comment id = " + comment.id + " is not from service");
+                                }
+                            }
+                        }
+                        return [2 /*return*/, serviceThreads];
                 }
-                else {
-                    tl.debug("the comment: thread id = " + commentThread.id + ", comment id = " + comment.id + "is not from service");
-                }
-            }
-        }
-        return currentServiceThreads;
+            });
+        });
     };
     PullRequest.prototype.commentIsFromService = function (commentContent, commentFormatString) {
         return this.convertCommentFormatToRegex(commentFormatString).test(commentContent);
@@ -162,9 +154,10 @@ var PullRequest = /** @class */ (function () {
     PullRequest.prototype.convertCommentFormatToRegex = function (commentFormatString) {
         var regex = commentFormatString.split("\n")[0];
         regex = regex.replace(/{(\d+)}/g, ".*").replace(/\|/g, '\\|');
+        tl.debug("regex = " + new RegExp(regex));
         return new RegExp(regex);
     };
-    PullRequest.COMMENT = user_messages_json_1.default.newIterationCommentHeading + user_messages_json_1.default.failureCommentRow;
+    PullRequest.COMMENT = user_messages_json_1.default.newIterationCommentHeading;
     return PullRequest;
 }());
 exports.PullRequest = PullRequest;

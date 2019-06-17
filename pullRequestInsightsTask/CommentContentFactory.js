@@ -9,7 +9,7 @@ var CommentContentFactory = /** @class */ (function () {
     function CommentContentFactory() {
     }
     CommentContentFactory.prototype.createIterationHeader = function (buildIteration) {
-        return user_messages_json_1.default.failureCommentHeading.format(buildIteration);
+        return user_messages_json_1.default.newIterationCommentHeading.format(buildIteration) + "\n" + user_messages_json_1.default.failureCommentTableHeading;
     };
     CommentContentFactory.prototype.createCurrentPipelineFailureRow = function (isFailure, pipelineDisplayName, pipelineLink, pipelineFailStreak, targetName, type, recentFailedPipelineName, recentFailedPipelineLink) {
         if (isFailure) {

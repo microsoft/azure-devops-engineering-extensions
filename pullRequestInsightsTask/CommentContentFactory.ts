@@ -5,7 +5,7 @@ import './StringExtensions';
 export class CommentContentFactory {
    
     public createIterationHeader(buildIteration: string): string{
-        return messages.failureCommentHeading.format(buildIteration);
+        return messages.newIterationCommentHeading.format(buildIteration) + "\n" + messages.failureCommentTableHeading;
     }
 
     public createCurrentPipelineFailureRow(isFailure: boolean, pipelineDisplayName: string, pipelineLink: string, pipelineFailStreak: string, targetName: string, type: string, recentFailedPipelineName: string, recentFailedPipelineLink: string): string {

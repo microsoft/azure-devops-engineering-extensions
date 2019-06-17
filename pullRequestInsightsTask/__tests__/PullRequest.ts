@@ -6,7 +6,7 @@ import { ReleaseAzureApi } from "../ReleaseAzureApi";
 import sinon, { assert } from "sinon";
 import messages from '../user_messages.json';
 import '../StringExtensions';
-import { async } from "q";
+
 
 describe("PullRequest Tests", () => {
 
@@ -51,21 +51,22 @@ describe("PullRequest Tests", () => {
         mockApi = mock(ReleaseAzureApi);
     })
 
-    test("Does not find a comment thread when comments are of wrong format", () => {
+    test("Does not find a comment thread when comments are of wrong format", async () => {
         setThreads([makeThread(["|jk jk hj| failure |", "fake comment"], false), makeThread(["|jk jk hj| failure |", "fake comment"], false)]);
-        expect(pullRequest.getCurrentIterationCommentThread(mockApi, "thisBuild")).toBeNull; 
+        expect(pullRequest.getCurrentIterationCommentThread(mockApi, await pullRequest.getCurrentServiceComments(mockApi), "thisBuild")).toBeNull; 
     });
 
     test("Finds comment thread when comment of same build iteration in correct format exists", async () => {
-        let expectedThread: azureGitInterfaces.GitPullRequestCommentThread = makeThread([makeCommentContentOfCorrectForm("345")], false , 5);
-        setThreads([makeThread(["|jk jk hj| failure |", "fake comment"], false), expectedThread]);
-        expect((await pullRequest.getCurrentIterationCommentThread(mockApi, "345"))).toBe(expectedThread); 
+        let expectedThread: azureGitInterfaces.GitPullRequestCommentThread = makeThread([makeCommentContentOfCorrectForm("345")], true , 5);
+        console.log("comment: " + expectedThread.comments[0].content)
+        setThreads([makeThread(["|jk jk hj| failure |", "fake comment"], true), expectedThread]);
+        expect((await pullRequest.getCurrentIterationCommentThread(mockApi,  await pullRequest.getCurrentServiceComments(mockApi), "345"))).toBe(expectedThread); 
     });
 
     test("Finds correct comment thread when many comment threads of correct format exist", async () => {
         let expectedThread: azureGitInterfaces.GitPullRequestCommentThread = makeThread([makeCommentContentOfCorrectForm("400")], false, 7);
         setThreads([makeThread(["fake comment"], false), makeThread([makeCommentContentOfCorrectForm("345")], false, 5), expectedThread]);
-        expect((await pullRequest.getCurrentIterationCommentThread(mockApi, "400"))).toBe(expectedThread); 
+        expect((await pullRequest.getCurrentIterationCommentThread(mockApi,  await pullRequest.getCurrentServiceComments(mockApi), "400"))).toBe(expectedThread); 
     });
 
     test("Calls to create new thread when adding comment", () => {
@@ -82,7 +83,7 @@ describe("PullRequest Tests", () => {
         let callback: jest.SpyInstance = jest.spyOn(mockApi, "updateCommentThread");
         setThreads(threadNotToDeactivate.concat(threadsToDeactivate));
         console.log("number threads: " + (await mockApi.getCommentThreads(2, "repo", "project")).length);
-        await pullRequest.deactivateOldComments(mockApi, 5); 
+        await pullRequest.deactivateOldComments(mockApi,  await pullRequest.getCurrentServiceComments(mockApi), 5); 
         for (let thread of threadsToDeactivate) {
            expect(callback).toBeCalledWith({status: azureGitInterfaces.CommentThreadStatus.Closed}, 2, "repo", "project", thread.id);
         }
@@ -94,7 +95,7 @@ describe("PullRequest Tests", () => {
         let threadsNotToDeactivate: azureGitInterfaces.GitPullRequestCommentThread[] =  [makeThread([makeCommentContentOfCorrectForm("750")], false, azureGitInterfaces.CommentThreadStatus.Closed, 1000), makeThread([makeCommentContentOfCorrectForm("750")], false, azureGitInterfaces.CommentThreadStatus.WontFix, 900)];
         let callback: jest.SpyInstance = jest.spyOn(mockApi, "updateCommentThread");
         setThreads(threadsNotToDeactivate.concat(threadsToDeactivate));
-        await pullRequest.deactivateOldComments(mockApi, 5); 
+        await pullRequest.deactivateOldComments(mockApi,  await pullRequest.getCurrentServiceComments(mockApi), 5); 
         for (let thread of threadsToDeactivate) {
            expect(callback).toBeCalledWith({status: azureGitInterfaces.CommentThreadStatus.Closed}, 2, "repo", "project", thread.id);
         }

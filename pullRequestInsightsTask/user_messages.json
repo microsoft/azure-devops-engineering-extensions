@@ -2,8 +2,8 @@
     "notInPullRequestMessage": "Nothing occured because this {0} is not being run from a pull request",
     "noFailureMessage": "Nothing occured because the {0} has not failed any tasks",
     "commentCompletedMessage": "Comment was successfully posted",
-    "failureCommentHeading": "|Build Iteration: {0}| | |\n|---|---|---|",
-    "newIterationCommentHeading": "|Build Iteration: {0}| | |\n|---|---|---|",
+    "failureCommentTableHeading": "|Name|Target History|Latest Target Run|\n|---|---|---|",
+    "newIterationCommentHeading": "__Build Iteration: {0}__",
     "failureCommentRow": "\n|[{0}]({1})|Failing last {2} {3} {4}s|Latest run from {5}: [{6}]({7})|",
     "successCommentRow": "\n|[{0}]({1})|Last {2} {3} successful||"
 }

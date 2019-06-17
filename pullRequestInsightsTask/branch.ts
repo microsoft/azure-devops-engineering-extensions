@@ -1,6 +1,6 @@
 import { IPipeline } from "./IPipeline";
 import tl = require('azure-pipelines-task-lib/task');
-import stats from "stats-lite"
+import stats from "stats-lite";
  
 
 export class Branch{
