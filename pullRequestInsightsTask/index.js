@@ -92,7 +92,7 @@ function run() {
                     return [4 /*yield*/, pullRequest.getCurrentIterationCommentThread(azureApi, serviceThreads, configurations.getBuildIteration())];
                 case 6:
                     currentIterationCommentThread = _a.sent();
-                    currentPipelineCommentContent = commentFactory.createTableSection(targetBranch.getMostRecentCompletePipeline().isFailure(), currentPipeline.getDisplayName(), currentPipeline.getLink(), String(targetBranch.getPipelineFailStreak()), targetBranch.getTruncatedName(), type, targetBranch.getMostRecentCompletePipeline().getDisplayName(), targetBranch.getMostRecentCompletePipeline().getLink());
+                    currentPipelineCommentContent = commentFactory.createTableSection(currentPipeline, targetBranch.getMostRecentCompletePipeline(), targetBranch, type, longRunningValidations, thresholdTimes);
                     if (!currentIterationCommentThread) return [3 /*break*/, 7];
                     pullRequest.editMatchingCommentInThread(azureApi, currentIterationCommentThread, currentPipelineCommentContent, configurations.getBuildIteration());
                     return [3 /*break*/, 9];

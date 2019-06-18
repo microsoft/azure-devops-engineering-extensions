@@ -24,7 +24,7 @@ var CommentContentFactory = /** @class */ (function () {
             }
             return user_messages_json_1.default.successCommentRow.format(current.getDisplayName(), current.getLink(), target.getTruncatedName(), type);
         }
-        //  TODO
+        return ""; // TODO
     };
     return CommentContentFactory;
 }());
