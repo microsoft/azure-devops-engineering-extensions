@@ -26,9 +26,9 @@ export class CommentContentFactory {
         }
         let section: string;
         for (let index = 0; index < longRunningValidations.size; index++) {
-            let taskId: string = Object.keys(longRunningValidations)[index];
+            let taskId: string = Array.from(longRunningValidations.keys())[index];
             if (index == 0) {
-                section = messages.longRunningValidationCommentFirstSectionRow.format(current.getDisplayName(), taskId, String(longRunningValidations.get(taskId)), String(thresholdTimes.get(taskId)), mostRecent.getDisplayName(), mostRecent.getLink());
+                section = messages.longRunningValidationCommentFirstSectionRow.format(current.getDisplayName(), current.getLink(), taskId, String(longRunningValidations.get(taskId)), String(thresholdTimes.get(taskId)), mostRecent.getDisplayName(), mostRecent.getLink());
             }
             else {
                 section += "\n" + messages.longRunningValidationCommentLowerSectionRow.format(taskId, String(longRunningValidations.get(taskId)), String(thresholdTimes.get(taskId)));

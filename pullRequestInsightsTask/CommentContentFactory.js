@@ -26,9 +26,9 @@ var CommentContentFactory = /** @class */ (function () {
         }
         var section;
         for (var index = 0; index < longRunningValidations.size; index++) {
-            var taskId = Object.keys(longRunningValidations)[index];
+            var taskId = Array.from(longRunningValidations.keys())[index];
             if (index == 0) {
-                section = user_messages_json_1.default.longRunningValidationCommentFirstSectionRow.format(current.getDisplayName(), taskId, String(longRunningValidations.get(taskId)), String(thresholdTimes.get(taskId)), mostRecent.getDisplayName(), mostRecent.getLink());
+                section = user_messages_json_1.default.longRunningValidationCommentFirstSectionRow.format(current.getDisplayName(), current.getLink(), taskId, String(longRunningValidations.get(taskId)), String(thresholdTimes.get(taskId)), mostRecent.getDisplayName(), mostRecent.getLink());
             }
             else {
                 section += "\n" + user_messages_json_1.default.longRunningValidationCommentLowerSectionRow.format(taskId, String(longRunningValidations.get(taskId)), String(thresholdTimes.get(taskId)));
