@@ -3,6 +3,7 @@ import { EnvironmentConfigurations } from "./EnvironmentConfigurations";
 import * as azureBuildInterfaces from "azure-devops-node-api/interfaces/BuildInterfaces";
 import { IPipeline } from "./IPipeline";
 import { Build } from "./Build";
+import tl = require('azure-pipelines-task-lib/task');
 
 export class BuildAzureApi extends AbstractAzureApi{ 
 
@@ -14,11 +15,11 @@ export class BuildAzureApi extends AbstractAzureApi{
     }
 
     public async getCurrentPipeline(configurations: EnvironmentConfigurations): Promise<IPipeline>{
-        return this.getBuild(configurations.getProjectName(), configurations.getBuildId()); 
+        return await this.getBuild(configurations.getProjectName(), configurations.getBuildId()); 
     }
 
     public async getMostRecentPipelinesOfCurrentType(project: string, currentPipeline: IPipeline, maxNumber: number, branchName: string): Promise<IPipeline[]>{
-        return this.getBuilds(project, currentPipeline.getDefinitionId(), BuildAzureApi.DESIRED_BUILD_REASON, BuildAzureApi.DESIRED_BUILD_STATUS, maxNumber, branchName);
+        return await this.getBuilds(project, currentPipeline.getDefinitionId(), BuildAzureApi.DESIRED_BUILD_REASON, BuildAzureApi.DESIRED_BUILD_STATUS, maxNumber, branchName);
     }
 
     public async getBuild(project: string, buildId: number): Promise<IPipeline>{
@@ -28,9 +29,11 @@ export class BuildAzureApi extends AbstractAzureApi{
     public async getBuilds(project: string, definition?: number, reason?: number, status?: number, maxNumber?: number, branchName?: string): Promise<IPipeline[]>{
         let builds: Array<IPipeline> = []; 
         let rawBuildsData: azureBuildInterfaces.Build[] = await (await this.getConnection().getBuildApi()).getBuilds(project, Array(definition), undefined, undefined, undefined, undefined, undefined, reason, status, undefined, undefined, undefined, maxNumber, undefined, undefined, undefined, undefined, branchName);  
-        for (let numberBuild = 0; numberBuild < rawBuildsData.length; numberBuild++){
-            let id: number = Number(rawBuildsData[numberBuild].id);
-            builds[numberBuild] = new Build(rawBuildsData[numberBuild], await this.getBuildTimeline(project, id));
+        for (let buildData of rawBuildsData) {
+            let timeline: azureBuildInterfaces.Timeline = await this.getBuildTimeline(project, buildData.id);
+            if (timeline !== null){
+               builds.push(new Build(buildData, timeline));
+            }
         }
         return builds;
     }

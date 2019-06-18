@@ -31,8 +31,9 @@ export class CommentContentFactory {
                 section = messages.longRunningValidationCommentFirstSectionRow.format(current.getDisplayName(), taskId, String(longRunningValidations.get(taskId)), String(thresholdTimes.get(taskId)), mostRecent.getDisplayName(), mostRecent.getLink());
             }
             else {
-                section += messages.longRunningValidationCommentLowerSectionRow.format(taskId, String(longRunningValidations.get(taskId)), String(thresholdTimes.get(taskId)));
+                section += "\n" + messages.longRunningValidationCommentLowerSectionRow.format(taskId, String(longRunningValidations.get(taskId)), String(thresholdTimes.get(taskId)));
             }
         }
+        return section;
     }
 }

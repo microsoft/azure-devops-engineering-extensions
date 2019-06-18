@@ -57,7 +57,9 @@ var Branch = /** @class */ (function () {
             if (times.length > 0) {
                 percentileTimesForTasks.set(taskId, stats_lite_1.default.percentile(times, percentileToFind));
             }
-            tl.debug("no tasks with id " + taskId + " found on pipelines of branch " + this.name);
+            else {
+                tl.debug("no tasks with id " + taskId + " found on pipelines of branch " + this.name);
+            }
         }
         return percentileTimesForTasks;
     };

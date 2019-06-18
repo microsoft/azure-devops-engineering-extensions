@@ -66,14 +66,20 @@ var BuildAzureApi = /** @class */ (function (_super) {
     BuildAzureApi.prototype.getCurrentPipeline = function (configurations) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                return [2 /*return*/, this.getBuild(configurations.getProjectName(), configurations.getBuildId())];
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.getBuild(configurations.getProjectName(), configurations.getBuildId())];
+                    case 1: return [2 /*return*/, _a.sent()];
+                }
             });
         });
     };
     BuildAzureApi.prototype.getMostRecentPipelinesOfCurrentType = function (project, currentPipeline, maxNumber, branchName) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                return [2 /*return*/, this.getBuilds(project, currentPipeline.getDefinitionId(), BuildAzureApi.DESIRED_BUILD_REASON, BuildAzureApi.DESIRED_BUILD_STATUS, maxNumber, branchName)];
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.getBuilds(project, currentPipeline.getDefinitionId(), BuildAzureApi.DESIRED_BUILD_REASON, BuildAzureApi.DESIRED_BUILD_STATUS, maxNumber, branchName)];
+                    case 1: return [2 /*return*/, _a.sent()];
+                }
             });
         });
     };
@@ -95,30 +101,29 @@ var BuildAzureApi = /** @class */ (function (_super) {
     };
     BuildAzureApi.prototype.getBuilds = function (project, definition, reason, status, maxNumber, branchName) {
         return __awaiter(this, void 0, void 0, function () {
-            var builds, rawBuildsData, numberBuild, id, _a, _b, _c, _d;
-            return __generator(this, function (_e) {
-                switch (_e.label) {
+            var builds, rawBuildsData, _i, rawBuildsData_1, buildData, timeline;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
                     case 0:
                         builds = [];
                         return [4 /*yield*/, this.getConnection().getBuildApi()];
-                    case 1: return [4 /*yield*/, (_e.sent()).getBuilds(project, Array(definition), undefined, undefined, undefined, undefined, undefined, reason, status, undefined, undefined, undefined, maxNumber, undefined, undefined, undefined, undefined, branchName)];
+                    case 1: return [4 /*yield*/, (_a.sent()).getBuilds(project, Array(definition), undefined, undefined, undefined, undefined, undefined, reason, status, undefined, undefined, undefined, maxNumber, undefined, undefined, undefined, undefined, branchName)];
                     case 2:
-                        rawBuildsData = _e.sent();
-                        numberBuild = 0;
-                        _e.label = 3;
+                        rawBuildsData = _a.sent();
+                        _i = 0, rawBuildsData_1 = rawBuildsData;
+                        _a.label = 3;
                     case 3:
-                        if (!(numberBuild < rawBuildsData.length)) return [3 /*break*/, 6];
-                        id = Number(rawBuildsData[numberBuild].id);
-                        _a = builds;
-                        _b = numberBuild;
-                        _c = Build_1.Build.bind;
-                        _d = [void 0, rawBuildsData[numberBuild]];
-                        return [4 /*yield*/, this.getBuildTimeline(project, id)];
+                        if (!(_i < rawBuildsData_1.length)) return [3 /*break*/, 6];
+                        buildData = rawBuildsData_1[_i];
+                        return [4 /*yield*/, this.getBuildTimeline(project, buildData.id)];
                     case 4:
-                        _a[_b] = new (_c.apply(Build_1.Build, _d.concat([_e.sent()])))();
-                        _e.label = 5;
+                        timeline = _a.sent();
+                        if (timeline !== null) {
+                            builds.push(new Build_1.Build(buildData, timeline));
+                        }
+                        _a.label = 5;
                     case 5:
-                        numberBuild++;
+                        _i++;
                         return [3 /*break*/, 3];
                     case 6: return [2 /*return*/, builds];
                 }

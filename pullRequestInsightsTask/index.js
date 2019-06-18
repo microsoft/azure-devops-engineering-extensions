@@ -78,6 +78,7 @@ function run() {
                     return [4 /*yield*/, azureApi.getMostRecentPipelinesOfCurrentType(currentProject, currentPipeline, numberBuildsToQuery, targetBranchName)];
                 case 4:
                     retrievedPipelines = _a.sent();
+                    tl.debug("Number of retrieved pipelines for " + targetBranchName + " = " + retrievedPipelines.length);
                     targetBranch = new Branch_1.Branch(targetBranchName, retrievedPipelines);
                     thresholdTimes = new Map();
                     longRunningValidations = new Map();
@@ -96,7 +97,7 @@ function run() {
                     if (!currentIterationCommentThread) return [3 /*break*/, 7];
                     pullRequest.editMatchingCommentInThread(azureApi, currentIterationCommentThread, currentPipelineCommentContent, configurations.getBuildIteration());
                     return [3 /*break*/, 9];
-                case 7: return [4 /*yield*/, pullRequest.addNewComment(azureApi, commentFactory.createIterationHeader(configurations.getBuildIteration()) + currentPipelineCommentContent)];
+                case 7: return [4 /*yield*/, pullRequest.addNewComment(azureApi, commentFactory.createIterationHeader(configurations.getBuildIteration()) + "\n" + commentFactory.createTableHeader(currentPipeline.isFailure(), targetBranch.getTruncatedName(), String(percentile)) + "\n" + currentPipelineCommentContent)];
                 case 8:
                     currentIterationCommentThreadId = (_a.sent()).id;
                     pullRequest.deactivateOldComments(azureApi, serviceThreads, currentIterationCommentThreadId);

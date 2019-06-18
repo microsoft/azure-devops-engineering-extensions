@@ -50,10 +50,22 @@ var Build = /** @class */ (function () {
         return null;
     };
     Build.prototype.getTaskIds = function () {
-        return []; // TODO
+        var taskIds = [];
+        for (var _i = 0, _a = this.timelineData.records; _i < _a.length; _i++) {
+            var taskRecord = _a[_i];
+            taskIds.push(taskRecord.id);
+        }
+        return taskIds;
     };
-    Build.prototype.getLongRunningValidations = function () {
-        return new Map(); // TODO
+    Build.prototype.getLongRunningValidations = function (taskThresholdTimes) {
+        var longRunningValidations = new Map();
+        for (var _i = 0, _a = this.getTaskIds(); _i < _a.length; _i++) {
+            var taskId = _a[_i];
+            if (taskThresholdTimes.has(taskId) && this.getTaskLength(taskId) > taskThresholdTimes.get(taskId)) {
+                longRunningValidations.set(taskId, this.getTaskLength(taskId));
+            }
+        }
+        return longRunningValidations;
     };
     Build.prototype.taskFailed = function (task) {
         return task.state === azureBuildInterfaces.TimelineRecordState.Completed && task.result === azureBuildInterfaces.TaskResult.Failed;

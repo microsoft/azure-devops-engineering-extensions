@@ -32,6 +32,7 @@ async function run() {
         let targetBranchName: string = await configurations.getTargetBranch(azureApi);
         tl.debug("target branch of pull request: " + targetBranchName);
         let retrievedPipelines: IPipeline[] = await azureApi.getMostRecentPipelinesOfCurrentType(currentProject, currentPipeline, numberBuildsToQuery, targetBranchName);
+        tl.debug(`Number of retrieved pipelines for ${targetBranchName} = ` + retrievedPipelines.length);
         let targetBranch: Branch = new Branch(targetBranchName, retrievedPipelines); 
         let thresholdTimes: Map<string, number> = new Map();
         let longRunningValidations: Map<string, number> = new Map();
@@ -47,7 +48,7 @@ async function run() {
                 pullRequest.editMatchingCommentInThread(azureApi, currentIterationCommentThread, currentPipelineCommentContent, configurations.getBuildIteration());
             }
             else {
-                let currentIterationCommentThreadId: number = (await pullRequest.addNewComment(azureApi, commentFactory.createIterationHeader(configurations.getBuildIteration()) + currentPipelineCommentContent)).id;
+                let currentIterationCommentThreadId: number = (await pullRequest.addNewComment(azureApi, commentFactory.createIterationHeader(configurations.getBuildIteration()) + "\n" + commentFactory.createTableHeader(currentPipeline.isFailure(), targetBranch.getTruncatedName(), String(percentile)) + "\n" + currentPipelineCommentContent)).id;
                 pullRequest.deactivateOldComments(azureApi, serviceThreads, currentIterationCommentThreadId);
             }
         }   
