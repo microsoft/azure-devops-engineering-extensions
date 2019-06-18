@@ -3,4 +3,3 @@ node_modules/
 *.js
 *.taskkey
 package-lock.json
-pullRequestInsightsTask/package-lock.json
