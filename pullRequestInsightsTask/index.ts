@@ -25,7 +25,7 @@ async function run() {
 
         tl.debug("pull request id: " + configurations.getPullRequestId());
         if (!configurations.getPullRequestId()){
-            tl.debug(this.format(messages.notInPullRequestMessage, type));
+            tl.debug(messages.notInPullRequestMessage.format(type));
         }
     
         let pullRequest: PullRequest = new PullRequest(configurations.getPullRequestId(), configurations.getRepository(), configurations.getProjectName());
