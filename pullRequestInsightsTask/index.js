@@ -48,22 +48,22 @@ require("./StringExtensions");
 var CommentContentFactory_1 = require("./CommentContentFactory");
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var percentile, numberBuildsToQuery, configurations, azureApiFactory, azureApi, currentProject, currentPipeline, type, commentFactory, pullRequest, targetBranchName, retrievedPipelines, targetBranch, thresholdTimes, longRunningValidations, serviceThreads, currentIterationCommentThread, currentPipelineCommentContent, currentIterationCommentThreadId, err_1;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
+        var percentile, numberBuildsToQuery, configurations, azureApiFactory, azureApi, currentProject, currentPipeline, type, commentFactory, pullRequest, targetBranchName, retrievedPipelines, targetBranch, thresholdTimes, longRunningValidations, _i, _a, taskId, serviceThreads, currentIterationCommentThread, currentPipelineCommentContent, currentIterationCommentThreadId, err_1;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
                 case 0:
-                    _a.trys.push([0, 10, , 11]);
+                    _b.trys.push([0, 10, , 11]);
                     percentile = 0;
                     numberBuildsToQuery = 10;
                     configurations = new EnvironmentConfigurations_1.EnvironmentConfigurations();
                     azureApiFactory = new AzureApiFactory_1.AzureApiFactory();
                     return [4 /*yield*/, azureApiFactory.create(configurations)];
                 case 1:
-                    azureApi = _a.sent();
+                    azureApi = _b.sent();
                     currentProject = configurations.getProjectName();
                     return [4 /*yield*/, azureApi.getCurrentPipeline(configurations)];
                 case 2:
-                    currentPipeline = _a.sent();
+                    currentPipeline = _b.sent();
                     type = configurations.getHostType();
                     commentFactory = new CommentContentFactory_1.CommentContentFactory();
                     tl.debug("pull request id: " + configurations.getPullRequestId());
@@ -73,11 +73,11 @@ function run() {
                     pullRequest = new PullRequest_1.PullRequest(configurations.getPullRequestId(), configurations.getRepository(), configurations.getProjectName());
                     return [4 /*yield*/, configurations.getTargetBranch(azureApi)];
                 case 3:
-                    targetBranchName = _a.sent();
+                    targetBranchName = _b.sent();
                     tl.debug("target branch of pull request: " + targetBranchName);
                     return [4 /*yield*/, azureApi.getMostRecentPipelinesOfCurrentType(currentProject, currentPipeline, numberBuildsToQuery, targetBranchName)];
                 case 4:
-                    retrievedPipelines = _a.sent();
+                    retrievedPipelines = _b.sent();
                     tl.debug("Number of retrieved pipelines for " + targetBranchName + " = " + retrievedPipelines.length);
                     targetBranch = new Branch_1.Branch(targetBranchName, retrievedPipelines);
                     thresholdTimes = new Map();
@@ -85,26 +85,31 @@ function run() {
                     if (!currentPipeline.isFailure()) {
                         thresholdTimes = targetBranch.getPercentileTimesForPipelineTasks(percentile, currentPipeline.getTaskIds());
                         longRunningValidations = currentPipeline.getLongRunningValidations(thresholdTimes);
+                        tl.debug("Number of longRunningValidations = " + longRunningValidations.size);
+                        for (_i = 0, _a = Array.from(longRunningValidations.keys()); _i < _a.length; _i++) {
+                            taskId = _a[_i];
+                            tl.debug("long running validation: " + taskId);
+                        }
                     }
-                    if (!(currentPipeline.isFailure() || longRunningValidations.keys.length > 0)) return [3 /*break*/, 9];
+                    if (!(currentPipeline.isFailure() || longRunningValidations.size > 0)) return [3 /*break*/, 9];
                     return [4 /*yield*/, pullRequest.getCurrentServiceComments(azureApi)];
                 case 5:
-                    serviceThreads = _a.sent();
+                    serviceThreads = _b.sent();
                     return [4 /*yield*/, pullRequest.getCurrentIterationCommentThread(azureApi, serviceThreads, configurations.getBuildIteration())];
                 case 6:
-                    currentIterationCommentThread = _a.sent();
+                    currentIterationCommentThread = _b.sent();
                     currentPipelineCommentContent = commentFactory.createTableSection(currentPipeline, targetBranch.getMostRecentCompletePipeline(), targetBranch, type, longRunningValidations, thresholdTimes);
                     if (!currentIterationCommentThread) return [3 /*break*/, 7];
                     pullRequest.editMatchingCommentInThread(azureApi, currentIterationCommentThread, currentPipelineCommentContent, configurations.getBuildIteration());
                     return [3 /*break*/, 9];
                 case 7: return [4 /*yield*/, pullRequest.addNewComment(azureApi, commentFactory.createIterationHeader(configurations.getBuildIteration()) + "\n" + commentFactory.createTableHeader(currentPipeline.isFailure(), targetBranch.getTruncatedName(), String(percentile)) + "\n" + currentPipelineCommentContent)];
                 case 8:
-                    currentIterationCommentThreadId = (_a.sent()).id;
+                    currentIterationCommentThreadId = (_b.sent()).id;
                     pullRequest.deactivateOldComments(azureApi, serviceThreads, currentIterationCommentThreadId);
-                    _a.label = 9;
+                    _b.label = 9;
                 case 9: return [3 /*break*/, 11];
                 case 10:
-                    err_1 = _a.sent();
+                    err_1 = _b.sent();
                     console.log("error!", err_1);
                     return [3 /*break*/, 11];
                 case 11: return [2 /*return*/];
