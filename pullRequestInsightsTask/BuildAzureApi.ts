@@ -6,7 +6,6 @@ import { Build } from "./Build";
 
 export class BuildAzureApi extends AbstractAzureApi{ 
 
-    static readonly DESIRED_BUILD_REASON: number = azureBuildInterfaces.BuildReason.BatchedCI + azureBuildInterfaces.BuildReason.IndividualCI;
     static readonly DESIRED_BUILD_STATUS: number = azureBuildInterfaces.BuildStatus.Completed;
 
     constructor (uri: string, accessKey: string) {
@@ -18,16 +17,16 @@ export class BuildAzureApi extends AbstractAzureApi{
     }
 
     public async getMostRecentPipelinesOfCurrentType(project: string, currentPipeline: IPipeline, maxNumber: number, branchName: string): Promise<IPipeline[]>{
-        return this.getBuilds(project, currentPipeline.getDefinitionId(), BuildAzureApi.DESIRED_BUILD_REASON, BuildAzureApi.DESIRED_BUILD_STATUS, maxNumber, branchName);
+        return this.getBuilds(project, currentPipeline.getDefinitionId(), BuildAzureApi.DESIRED_BUILD_STATUS, maxNumber, branchName);
     }
 
     public async getBuild(project: string, buildId: number): Promise<IPipeline>{
         return new Build(await this.getBuildData(project, buildId), await this.getBuildTimeline(project, buildId));
     }
 
-    public async getBuilds(project: string, definition?: number, reason?: number, status?: number, maxNumber?: number, branchName?: string): Promise<IPipeline[]>{
+    public async getBuilds(project: string, definition?: number, status?: number, maxNumber?: number, branchName?: string): Promise<IPipeline[]>{
         let builds: Array<IPipeline> = []; 
-        let rawBuildsData: azureBuildInterfaces.Build[] = await (await this.getConnection().getBuildApi()).getBuilds(project, Array(definition), undefined, undefined, undefined, undefined, undefined, reason, status, undefined, undefined, undefined, maxNumber, undefined, undefined, undefined, undefined, branchName);  
+        let rawBuildsData: azureBuildInterfaces.Build[] = await (await this.getConnection().getBuildApi()).getBuilds(project, Array(definition), undefined, undefined, undefined, undefined, undefined, undefined, status, undefined, undefined, undefined, maxNumber, undefined, undefined, undefined, undefined, branchName);  
         for (let numberBuild = 0; numberBuild < rawBuildsData.length; numberBuild++){
             let id: number = Number(rawBuildsData[numberBuild].id);
             builds[numberBuild] = new Build(rawBuildsData[numberBuild], await this.getBuildTimeline(project, id));
