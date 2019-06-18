@@ -76,10 +76,7 @@ var BuildAzureApi = /** @class */ (function (_super) {
     BuildAzureApi.prototype.getMostRecentPipelinesOfCurrentType = function (project, currentPipeline, maxNumber, branchName) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.getBuilds(project, currentPipeline.getDefinitionId(), BuildAzureApi.DESIRED_BUILD_REASON, BuildAzureApi.DESIRED_BUILD_STATUS, maxNumber, branchName)];
-                    case 1: return [2 /*return*/, _a.sent()];
-                }
+                return [2 /*return*/, this.getBuilds(project, currentPipeline.getDefinitionId(), BuildAzureApi.DESIRED_BUILD_STATUS, maxNumber, branchName)];
             });
         });
     };
@@ -99,7 +96,7 @@ var BuildAzureApi = /** @class */ (function (_super) {
             });
         });
     };
-    BuildAzureApi.prototype.getBuilds = function (project, definition, reason, status, maxNumber, branchName) {
+    BuildAzureApi.prototype.getBuilds = function (project, definition, status, maxNumber, branchName) {
         return __awaiter(this, void 0, void 0, function () {
             var builds, rawBuildsData, _i, rawBuildsData_1, buildData, timeline;
             return __generator(this, function (_a) {
@@ -107,7 +104,7 @@ var BuildAzureApi = /** @class */ (function (_super) {
                     case 0:
                         builds = [];
                         return [4 /*yield*/, this.getConnection().getBuildApi()];
-                    case 1: return [4 /*yield*/, (_a.sent()).getBuilds(project, Array(definition), undefined, undefined, undefined, undefined, undefined, reason, status, undefined, undefined, undefined, maxNumber, undefined, undefined, undefined, undefined, branchName)];
+                    case 1: return [4 /*yield*/, (_a.sent()).getBuilds(project, Array(definition), undefined, undefined, undefined, undefined, undefined, undefined, status, undefined, undefined, undefined, maxNumber, undefined, undefined, undefined, undefined, branchName)];
                     case 2:
                         rawBuildsData = _a.sent();
                         _i = 0, rawBuildsData_1 = rawBuildsData;
@@ -150,7 +147,6 @@ var BuildAzureApi = /** @class */ (function (_super) {
             });
         });
     };
-    BuildAzureApi.DESIRED_BUILD_REASON = azureBuildInterfaces.BuildReason.BatchedCI + azureBuildInterfaces.BuildReason.IndividualCI;
     BuildAzureApi.DESIRED_BUILD_STATUS = azureBuildInterfaces.BuildStatus.Completed;
     return BuildAzureApi;
 }(AbstractAzureApi_1.AbstractAzureApi));
