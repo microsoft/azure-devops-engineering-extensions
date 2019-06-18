@@ -1,5 +1,6 @@
 import { IPipeline } from "./IPipeline";
 import * as azureBuildInterfaces from "azure-devops-node-api/interfaces/BuildInterfaces";
+import tl = require('azure-pipelines-task-lib/task');
 
 export class Build implements IPipeline{
 
@@ -16,7 +17,7 @@ export class Build implements IPipeline{
             return this.buildData.result === azureBuildInterfaces.BuildResult.Failed;
         }
         for (let taskRecord of this.timelineData.records){
-            if (this.taskFailed(taskRecord)){
+            if (this.taskRan(taskRecord) && this.taskFailed(taskRecord)){
                 return true;
             }
         }
@@ -45,7 +46,10 @@ export class Build implements IPipeline{
 
     public getTaskLength(taskId: string): number | null{
         for (let taskRecord of this.timelineData.records) {
-            if (taskRecord.id === taskId && taskRecord.state === azureBuildInterfaces.TimelineRecordState.Completed){
+            if (taskRecord.id === taskId && this.taskRan(taskRecord)){
+                tl.debug(this.getDisplayName() + " : task = " + taskId);
+                tl.debug(" start = " + taskRecord.startTime.valueOf());
+                tl.debug(" end = " + taskRecord.finishTime.valueOf());
                 return taskRecord.finishTime.valueOf() - taskRecord.startTime.valueOf();
             }
         }
@@ -70,7 +74,11 @@ export class Build implements IPipeline{
         return longRunningValidations;
     }
 
+    private taskRan(task: azureBuildInterfaces.TimelineRecord): boolean {
+        return task.state === azureBuildInterfaces.TimelineRecordState.Completed && task.startTime !== null && task.finishTime !== null;
+    }
+
     private taskFailed(task: azureBuildInterfaces.TimelineRecord): boolean {
-        return task.state === azureBuildInterfaces.TimelineRecordState.Completed && task.result === azureBuildInterfaces.TaskResult.Failed; 
+        return task.result === azureBuildInterfaces.TaskResult.Failed; 
     }
 } 

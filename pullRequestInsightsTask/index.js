@@ -68,7 +68,7 @@ function run() {
                     commentFactory = new CommentContentFactory_1.CommentContentFactory();
                     tl.debug("pull request id: " + configurations.getPullRequestId());
                     if (!configurations.getPullRequestId()) {
-                        tl.debug((user_messages_json_1.default.notInPullRequestMessage.format(type)));
+                        tl.debug(user_messages_json_1.default.notInPullRequestMessage.format(type));
                     }
                     pullRequest = new PullRequest_1.PullRequest(configurations.getPullRequestId(), configurations.getRepository(), configurations.getProjectName());
                     return [4 /*yield*/, configurations.getTargetBranch(azureApi)];

@@ -8,6 +8,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var azureBuildInterfaces = __importStar(require("azure-devops-node-api/interfaces/BuildInterfaces"));
+var tl = require("azure-pipelines-task-lib/task");
 var Build = /** @class */ (function () {
     function Build(buildData, timelineData) {
         this.buildData = buildData;
@@ -19,7 +20,7 @@ var Build = /** @class */ (function () {
         }
         for (var _i = 0, _a = this.timelineData.records; _i < _a.length; _i++) {
             var taskRecord = _a[_i];
-            if (this.taskFailed(taskRecord)) {
+            if (this.taskRan(taskRecord) && this.taskFailed(taskRecord)) {
                 return true;
             }
         }
@@ -43,7 +44,10 @@ var Build = /** @class */ (function () {
     Build.prototype.getTaskLength = function (taskId) {
         for (var _i = 0, _a = this.timelineData.records; _i < _a.length; _i++) {
             var taskRecord = _a[_i];
-            if (taskRecord.id === taskId && taskRecord.state === azureBuildInterfaces.TimelineRecordState.Completed) {
+            if (taskRecord.id === taskId && this.taskRan(taskRecord)) {
+                tl.debug(this.getDisplayName() + " : task = " + taskId);
+                tl.debug(" start = " + taskRecord.startTime.valueOf());
+                tl.debug(" end = " + taskRecord.finishTime.valueOf());
                 return taskRecord.finishTime.valueOf() - taskRecord.startTime.valueOf();
             }
         }
@@ -67,8 +71,11 @@ var Build = /** @class */ (function () {
         }
         return longRunningValidations;
     };
+    Build.prototype.taskRan = function (task) {
+        return task.state === azureBuildInterfaces.TimelineRecordState.Completed && task.startTime !== null && task.finishTime !== null;
+    };
     Build.prototype.taskFailed = function (task) {
-        return task.state === azureBuildInterfaces.TimelineRecordState.Completed && task.result === azureBuildInterfaces.TaskResult.Failed;
+        return task.result === azureBuildInterfaces.TaskResult.Failed;
     };
     return Build;
 }());
