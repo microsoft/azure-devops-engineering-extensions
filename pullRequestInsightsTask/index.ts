@@ -27,15 +27,22 @@ async function run() {
         if (!configurations.getPullRequestId()){
             tl.debug(this.format(messages.notInPullRequestMessage, type));
         }
-        else if (currentPipeline.isFailure()) {
-            let pullRequest: PullRequest = new PullRequest(configurations.getPullRequestId(), configurations.getRepository(), configurations.getProjectName());
-            let targetBranchName: string = await configurations.getTargetBranch(azureApi);
-            tl.debug("target branch of pull request: " + targetBranchName);
-            let retrievedPipelines: IPipeline[] = await azureApi.getMostRecentPipelinesOfCurrentType(currentProject, currentPipeline, numberBuildsToQuery, targetBranchName);
-            let targetBranch: Branch = new Branch(targetBranchName, retrievedPipelines); 
+    
+        let pullRequest: PullRequest = new PullRequest(configurations.getPullRequestId(), configurations.getRepository(), configurations.getProjectName());
+        let targetBranchName: string = await configurations.getTargetBranch(azureApi);
+        tl.debug("target branch of pull request: " + targetBranchName);
+        let retrievedPipelines: IPipeline[] = await azureApi.getMostRecentPipelinesOfCurrentType(currentProject, currentPipeline, numberBuildsToQuery, targetBranchName);
+        let targetBranch: Branch = new Branch(targetBranchName, retrievedPipelines); 
+        let thresholdTimes: Map<string, number> = new Map();
+        let longRunningValidations: Map<string, number> = new Map();
+        if (!currentPipeline.isFailure()){
+            thresholdTimes = targetBranch.getPercentileTimesForPipelineTasks(percentile, currentPipeline.getTaskIds());
+            longRunningValidations = currentPipeline.getLongRunningValidations(thresholdTimes);
+        }
+        if (currentPipeline.isFailure() || longRunningValidations.keys.length > 0) {
             let serviceThreads: azureGitInterfaces.GitPullRequestCommentThread[] = await pullRequest.getCurrentServiceComments(azureApi);
             let currentIterationCommentThread: azureGitInterfaces.GitPullRequestCommentThread = await pullRequest.getCurrentIterationCommentThread(azureApi, serviceThreads, configurations.getBuildIteration());
-            let currentPipelineCommentContent: string = commentFactory.createTableSection(targetBranch.getMostRecentCompletePipeline().isFailure(), currentPipeline.getDisplayName(), currentPipeline.getLink(), String(targetBranch.getPipelineFailStreak()), targetBranch.getTruncatedName(), type, targetBranch.getMostRecentCompletePipeline().getDisplayName(), targetBranch.getMostRecentCompletePipeline().getLink());
+            let currentPipelineCommentContent: string = commentFactory.createTableSection(currentPipeline, targetBranch.getMostRecentCompletePipeline(), targetBranch, type, longRunningValidations, thresholdTimes);
             if (currentIterationCommentThread) {
                 pullRequest.editMatchingCommentInThread(azureApi, currentIterationCommentThread, currentPipelineCommentContent, configurations.getBuildIteration());
             }
@@ -44,11 +51,6 @@ async function run() {
                 pullRequest.deactivateOldComments(azureApi, serviceThreads, currentIterationCommentThreadId);
             }
         }   
-        else {
-            tl.debug(this.format(messages.noFailureMessage, type));
-            // code for checking if has long running validations
-            // post longrunning comment if so
-        }
     }
     catch (err) {
         console.log("error!", err); 

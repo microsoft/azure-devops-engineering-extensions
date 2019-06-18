@@ -24,6 +24,6 @@ export class CommentContentFactory {
         }
         return messages.successCommentRow.format(current.getDisplayName(), current.getLink(), target.getTruncatedName(), type);
     }
-    //  TODO
+    return ""; // TODO
     }
 }

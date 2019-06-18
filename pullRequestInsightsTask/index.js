@@ -48,12 +48,12 @@ require("./StringExtensions");
 var CommentContentFactory_1 = require("./CommentContentFactory");
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var pastFailureThreshold, numberBuildsToQuery, configurations, azureApiFactory, azureApi, currentProject, currentPipeline, type, commentFactory, pullRequest, targetBranchName, retrievedPipelines, targetBranch, serviceThreads, currentIterationCommentThread, currentPipelineCommentContent, currentIterationCommentThreadId, err_1;
+        var percentile, numberBuildsToQuery, configurations, azureApiFactory, azureApi, currentProject, currentPipeline, type, commentFactory, pullRequest, targetBranchName, retrievedPipelines, targetBranch, thresholdTimes, longRunningValidations, serviceThreads, currentIterationCommentThread, currentPipelineCommentContent, currentIterationCommentThreadId, err_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    _a.trys.push([0, 13, , 14]);
-                    pastFailureThreshold = 0;
+                    _a.trys.push([0, 10, , 11]);
+                    percentile = 0;
                     numberBuildsToQuery = 10;
                     configurations = new EnvironmentConfigurations_1.EnvironmentConfigurations();
                     azureApiFactory = new AzureApiFactory_1.AzureApiFactory();
@@ -67,45 +67,46 @@ function run() {
                     type = configurations.getHostType();
                     commentFactory = new CommentContentFactory_1.CommentContentFactory();
                     tl.debug("pull request id: " + configurations.getPullRequestId());
-                    if (!!configurations.getPullRequestId()) return [3 /*break*/, 3];
-                    tl.debug(this.format(user_messages_json_1.default.notInPullRequestMessage, type));
-                    return [3 /*break*/, 12];
-                case 3:
-                    if (!currentPipeline.isFailure()) return [3 /*break*/, 11];
+                    if (!configurations.getPullRequestId()) {
+                        tl.debug(this.format(user_messages_json_1.default.notInPullRequestMessage, type));
+                    }
                     pullRequest = new PullRequest_1.PullRequest(configurations.getPullRequestId(), configurations.getRepository(), configurations.getProjectName());
                     return [4 /*yield*/, configurations.getTargetBranch(azureApi)];
-                case 4:
+                case 3:
                     targetBranchName = _a.sent();
                     tl.debug("target branch of pull request: " + targetBranchName);
                     return [4 /*yield*/, azureApi.getMostRecentPipelinesOfCurrentType(currentProject, currentPipeline, numberBuildsToQuery, targetBranchName)];
-                case 5:
+                case 4:
                     retrievedPipelines = _a.sent();
                     targetBranch = new Branch_1.Branch(targetBranchName, retrievedPipelines);
+                    thresholdTimes = new Map();
+                    longRunningValidations = new Map();
+                    if (!currentPipeline.isFailure()) {
+                        thresholdTimes = targetBranch.getPercentileTimesForPipelineTasks(percentile, currentPipeline.getTaskIds());
+                        longRunningValidations = currentPipeline.getLongRunningValidations(thresholdTimes);
+                    }
+                    if (!(currentPipeline.isFailure() || longRunningValidations.keys.length > 0)) return [3 /*break*/, 9];
                     return [4 /*yield*/, pullRequest.getCurrentServiceComments(azureApi)];
-                case 6:
+                case 5:
                     serviceThreads = _a.sent();
                     return [4 /*yield*/, pullRequest.getCurrentIterationCommentThread(azureApi, serviceThreads, configurations.getBuildIteration())];
-                case 7:
+                case 6:
                     currentIterationCommentThread = _a.sent();
-                    currentPipelineCommentContent = commentFactory.createCurrentPipelineFailureRow(targetBranch.getMostRecentCompletePipeline().isFailure(), currentPipeline.getDisplayName(), currentPipeline.getLink(), String(targetBranch.getPipelineFailStreak()), targetBranch.getTruncatedName(), type, targetBranch.getMostRecentCompletePipeline().getDisplayName(), targetBranch.getMostRecentCompletePipeline().getLink());
-                    if (!currentIterationCommentThread) return [3 /*break*/, 8];
+                    currentPipelineCommentContent = commentFactory.createTableSection(targetBranch.getMostRecentCompletePipeline().isFailure(), currentPipeline.getDisplayName(), currentPipeline.getLink(), String(targetBranch.getPipelineFailStreak()), targetBranch.getTruncatedName(), type, targetBranch.getMostRecentCompletePipeline().getDisplayName(), targetBranch.getMostRecentCompletePipeline().getLink());
+                    if (!currentIterationCommentThread) return [3 /*break*/, 7];
                     pullRequest.editMatchingCommentInThread(azureApi, currentIterationCommentThread, currentPipelineCommentContent, configurations.getBuildIteration());
-                    return [3 /*break*/, 10];
-                case 8: return [4 /*yield*/, pullRequest.addNewComment(azureApi, commentFactory.createIterationHeader(configurations.getBuildIteration()) + currentPipelineCommentContent)];
-                case 9:
+                    return [3 /*break*/, 9];
+                case 7: return [4 /*yield*/, pullRequest.addNewComment(azureApi, commentFactory.createIterationHeader(configurations.getBuildIteration()) + currentPipelineCommentContent)];
+                case 8:
                     currentIterationCommentThreadId = (_a.sent()).id;
                     pullRequest.deactivateOldComments(azureApi, serviceThreads, currentIterationCommentThreadId);
-                    _a.label = 10;
-                case 10: return [3 /*break*/, 12];
-                case 11:
-                    tl.debug(this.format(user_messages_json_1.default.noFailureMessage, type));
-                    _a.label = 12;
-                case 12: return [3 /*break*/, 14];
-                case 13:
+                    _a.label = 9;
+                case 9: return [3 /*break*/, 11];
+                case 10:
                     err_1 = _a.sent();
                     console.log("error!", err_1);
-                    return [3 /*break*/, 14];
-                case 14: return [2 /*return*/];
+                    return [3 /*break*/, 11];
+                case 11: return [2 /*return*/];
             }
         });
     });

@@ -50,19 +50,21 @@ export class Branch{
         return seperatedName.slice(2).join("");
     }
 
-    public getPercentileTimeForPipelineTask(percentileToFind: number, taskId: string): number | null {
-        let lengths: number[] = [];
-        for (let pipeline of this.pipelines) {
-            let taskLength: number = pipeline.getTaskLength(taskId);
-            if (taskLength) {
-                lengths.push(taskLength);
-            } 
-        }
-        if (lengths.length > 0) {
-            return stats.percentile(lengths, percentileToFind);
+    public getPercentileTimesForPipelineTasks(percentileToFind: number, taskIds: string[]): Map<string, number> {
+        let percentileTimesForTasks: Map<string, number> = new Map();
+        for (let taskId of taskIds) {
+            let times: number[] = [];
+            for (let pipeline of this.pipelines) {
+                let taskLength: number = pipeline.getTaskLength(taskId);
+                if (taskLength) {
+                    times.push(taskLength);
+                } 
+            }
+        if (times.length > 0) {
+            percentileTimesForTasks.set(taskId, stats.percentile(times, percentileToFind));
         }
         tl.debug(`no tasks with id ${taskId} found on pipelines of branch ${this.name}`)
-        return null
     }
-
+    return percentileTimesForTasks;
+    }
 }

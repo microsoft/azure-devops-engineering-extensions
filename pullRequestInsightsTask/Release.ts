@@ -64,6 +64,14 @@ export class Release implements IPipeline{
         return 5; // TODO
     }
 
+    public getTaskIds(): string[] {
+        return []; // TODO
+    }
+
+    public getLongRunningValidations(): Map<string, number> {
+        return new Map(); // TODO
+    }
+
     private taskFailed(task: azureReleaseInterfaces.ReleaseTask): boolean {
         return task.status === azureReleaseInterfaces.TaskStatus.Failed || task.status === azureReleaseInterfaces.TaskStatus.Failure;
     }

@@ -49,6 +49,12 @@ var Build = /** @class */ (function () {
         }
         return null;
     };
+    Build.prototype.getTaskIds = function () {
+        return []; // TODO
+    };
+    Build.prototype.getLongRunningValidations = function () {
+        return new Map(); // TODO
+    };
     Build.prototype.taskFailed = function (task) {
         return task.state === azureBuildInterfaces.TimelineRecordState.Completed && task.result === azureBuildInterfaces.TaskResult.Failed;
     };

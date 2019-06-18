@@ -52,6 +52,14 @@ export class Build implements IPipeline{
         return null;
     }
 
+    public getTaskIds(): string[] {
+        return []; // TODO
+    }
+
+    public getLongRunningValidations(): Map<string, number> {
+        return new Map(); // TODO
+    }
+
     private taskFailed(task: azureBuildInterfaces.TimelineRecord): boolean {
         return task.state === azureBuildInterfaces.TimelineRecordState.Completed && task.result === azureBuildInterfaces.TaskResult.Failed; 
     }

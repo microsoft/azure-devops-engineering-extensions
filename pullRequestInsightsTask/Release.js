@@ -59,6 +59,12 @@ var Release = /** @class */ (function () {
     Release.prototype.getTaskLength = function (taskId) {
         return 5; // TODO
     };
+    Release.prototype.getTaskIds = function () {
+        return []; // TODO
+    };
+    Release.prototype.getLongRunningValidations = function () {
+        return new Map(); // TODO
+    };
     Release.prototype.taskFailed = function (task) {
         return task.status === azureReleaseInterfaces.TaskStatus.Failed || task.status === azureReleaseInterfaces.TaskStatus.Failure;
     };

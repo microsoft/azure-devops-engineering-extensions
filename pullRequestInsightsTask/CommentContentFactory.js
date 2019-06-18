@@ -9,13 +9,22 @@ var CommentContentFactory = /** @class */ (function () {
     function CommentContentFactory() {
     }
     CommentContentFactory.prototype.createIterationHeader = function (buildIteration) {
-        return user_messages_json_1.default.newIterationCommentHeading.format(buildIteration) + "\n" + user_messages_json_1.default.failureCommentTableHeading;
+        return user_messages_json_1.default.newIterationCommentHeading.format(buildIteration);
     };
-    CommentContentFactory.prototype.createCurrentPipelineFailureRow = function (isFailure, pipelineDisplayName, pipelineLink, pipelineFailStreak, targetName, type, recentFailedPipelineName, recentFailedPipelineLink) {
+    CommentContentFactory.prototype.createTableHeader = function (isFailure, targetBranchName, percentile) {
         if (isFailure) {
-            return user_messages_json_1.default.failureCommentRow.format(pipelineDisplayName, pipelineLink, pipelineFailStreak, targetName, type, targetName, recentFailedPipelineName, recentFailedPipelineLink);
+            return user_messages_json_1.default.failureCommentTableHeading.format(targetBranchName, targetBranchName);
         }
-        return user_messages_json_1.default.successCommentRow.format(pipelineDisplayName, pipelineLink, targetName, type);
+        return user_messages_json_1.default.longRunningValidationCommentTableHeading.format(percentile, targetBranchName, targetBranchName);
+    };
+    CommentContentFactory.prototype.createTableSection = function (current, mostRecent, target, type, longRunningValidations, thresholdTimes) {
+        if (current.isFailure()) {
+            if (mostRecent.isFailure()) {
+                return user_messages_json_1.default.failureCommentRow.format(current.getDisplayName(), current.getLink(), String(target.getPipelineFailStreak()), target.getTruncatedName(), type, target.getTruncatedName(), mostRecent.getDisplayName(), mostRecent.getLink());
+            }
+            return user_messages_json_1.default.successCommentRow.format(current.getDisplayName(), current.getLink(), target.getTruncatedName(), type);
+        }
+        //  TODO
     };
     return CommentContentFactory;
 }());

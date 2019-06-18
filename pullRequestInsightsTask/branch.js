@@ -42,20 +42,24 @@ var Branch = /** @class */ (function () {
         var seperatedName = this.name.split(Branch.NAME_SEPERATOR);
         return seperatedName.slice(2).join("");
     };
-    Branch.prototype.getPercentileTimeForPipelineTask = function (percentileToFind, taskId) {
-        var lengths = [];
-        for (var _i = 0, _a = this.pipelines; _i < _a.length; _i++) {
-            var pipeline = _a[_i];
-            var taskLength = pipeline.getTaskLength(taskId);
-            if (taskLength) {
-                lengths.push(taskLength);
+    Branch.prototype.getPercentileTimesForPipelineTasks = function (percentileToFind, taskIds) {
+        var percentileTimesForTasks = new Map();
+        for (var _i = 0, taskIds_1 = taskIds; _i < taskIds_1.length; _i++) {
+            var taskId = taskIds_1[_i];
+            var times = [];
+            for (var _a = 0, _b = this.pipelines; _a < _b.length; _a++) {
+                var pipeline = _b[_a];
+                var taskLength = pipeline.getTaskLength(taskId);
+                if (taskLength) {
+                    times.push(taskLength);
+                }
             }
+            if (times.length > 0) {
+                percentileTimesForTasks.set(taskId, stats_lite_1.default.percentile(times, percentileToFind));
+            }
+            tl.debug("no tasks with id " + taskId + " found on pipelines of branch " + this.name);
         }
-        if (lengths.length > 0) {
-            return stats_lite_1.default.percentile(lengths, percentileToFind);
-        }
-        tl.debug("no tasks with id " + taskId + " found on pipelines of branch " + this.name);
-        return null;
+        return percentileTimesForTasks;
     };
     Branch.NAME_SEPERATOR = "/";
     return Branch;

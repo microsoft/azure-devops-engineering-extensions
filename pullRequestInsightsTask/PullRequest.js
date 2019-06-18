@@ -114,7 +114,6 @@ var PullRequest = /** @class */ (function () {
     PullRequest.prototype.getBuildIterationFromServiceComment = function (serviceCommentContent) {
         var splitContent = serviceCommentContent.split("\_\_");
         splitContent.shift();
-        tl.debug("content of comment: " + splitContent[0]);
         if (splitContent.length > 0) {
             return (splitContent[0].split(" ").slice(2)).join(" ");
         }
