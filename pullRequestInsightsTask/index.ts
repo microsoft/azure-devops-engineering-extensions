@@ -12,7 +12,7 @@ import { CommentContentFactory } from './CommentContentFactory';
 
 async function run() {
     try {
-        const pastFailureThreshold: number = 0; 
+        const percentile: number = 0; 
         const numberBuildsToQuery: number = 10;
         
         let configurations: EnvironmentConfigurations = new EnvironmentConfigurations();
@@ -35,7 +35,7 @@ async function run() {
             let targetBranch: Branch = new Branch(targetBranchName, retrievedPipelines); 
             let serviceThreads: azureGitInterfaces.GitPullRequestCommentThread[] = await pullRequest.getCurrentServiceComments(azureApi);
             let currentIterationCommentThread: azureGitInterfaces.GitPullRequestCommentThread = await pullRequest.getCurrentIterationCommentThread(azureApi, serviceThreads, configurations.getBuildIteration());
-            let currentPipelineCommentContent: string = commentFactory.createCurrentPipelineFailureRow(targetBranch.getMostRecentCompletePipeline().isFailure(), currentPipeline.getDisplayName(), currentPipeline.getLink(), String(targetBranch.getPipelineFailStreak()), targetBranch.getTruncatedName(), type, targetBranch.getMostRecentCompletePipeline().getDisplayName(), targetBranch.getMostRecentCompletePipeline().getLink());
+            let currentPipelineCommentContent: string = commentFactory.createTableSection(targetBranch.getMostRecentCompletePipeline().isFailure(), currentPipeline.getDisplayName(), currentPipeline.getLink(), String(targetBranch.getPipelineFailStreak()), targetBranch.getTruncatedName(), type, targetBranch.getMostRecentCompletePipeline().getDisplayName(), targetBranch.getMostRecentCompletePipeline().getLink());
             if (currentIterationCommentThread) {
                 pullRequest.editMatchingCommentInThread(azureApi, currentIterationCommentThread, currentPipelineCommentContent, configurations.getBuildIteration());
             }
