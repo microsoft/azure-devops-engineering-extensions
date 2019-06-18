@@ -79,4 +79,5 @@ describe('Build Tests', () => {
         build = new Build(null, mockBuildTimeline);
         expect(build.getTaskLength("xyz")).toBe(90075000);
     });
+    
 });

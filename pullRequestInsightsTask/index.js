@@ -53,7 +53,7 @@ function run() {
             switch (_b.label) {
                 case 0:
                     _b.trys.push([0, 10, , 11]);
-                    percentile = 0;
+                    percentile = 95;
                     numberBuildsToQuery = 10;
                     configurations = new EnvironmentConfigurations_1.EnvironmentConfigurations();
                     azureApiFactory = new AzureApiFactory_1.AzureApiFactory();

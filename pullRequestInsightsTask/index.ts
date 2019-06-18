@@ -12,7 +12,7 @@ import { CommentContentFactory } from './CommentContentFactory';
 
 async function run() {
     try {
-        const percentile: number = 0; 
+        const percentile: number = 95; 
         const numberBuildsToQuery: number = 10;
         
         let configurations: EnvironmentConfigurations = new EnvironmentConfigurations();

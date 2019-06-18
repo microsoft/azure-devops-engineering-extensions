@@ -11,6 +11,7 @@ describe('Branch Tests', () => {
     let successfulBuildFour: IPipeline;
     let incompleteBuild: IPipeline;
     let branch: Branch;
+    let taskLengthFake: sinon.SinonStub;
 
     beforeEach(() => {
         failedBuildOne = new Build(null, null);
@@ -31,11 +32,14 @@ describe('Branch Tests', () => {
         sinon.stub(incompleteBuild, "isComplete").returns(false);
     });
 
-    function makePipeline(isFailure?: boolean, isComplete?: boolean, taskLength?: number): IPipeline {
+    function makePipeline(isFailure?: boolean, isComplete?: boolean, taskLengths?: Map<String, number>): IPipeline {
         let pipeline: IPipeline = new Build(null, null);
         sinon.stub(pipeline, "isFailure").returns(isFailure);
         sinon.stub(pipeline, "isComplete").returns(isComplete);
-        sinon.stub(pipeline, "getTaskLength").returns(taskLength);
+        taskLengths.forEach((value: number, key: string) => {
+            taskLengthFake.withArgs(key).returns(value);
+        });
+        sinon.stub(pipeline, "getTaskLength").callsFake(taskLengthFake);
         return pipeline;
     }
 
@@ -80,23 +84,33 @@ describe('Branch Tests', () => {
         expect(branch.tooManyPipelinesFailed(2)).toBe(true);
     });
 
-    // test("Null return when invalid task id is given", () => {
-    //     branch = new Branch("", [makePipeline(undefined, undefined, null), makePipeline(undefined, undefined, null), makePipeline(undefined, undefined, null)]);
-    //     expect(branch.getPercentileTimeForPipelineTask(70, "abc")).toBeNull();
-    // });
+    test("Null return when invalid task id is given", () => {
+        branch = new Branch("", [makePipeline(undefined, undefined, null), makePipeline(undefined, undefined, null), makePipeline(undefined, undefined, null)]);
+        expect(branch.getPercentileTimesForPipelineTasks(70, ["abc"])).toBe(new Map());
+    });
 
-    // test("Correct percentile is returned when task only ran on some pipelines", () => {
-    //     branch = new Branch("", [makePipeline(undefined, undefined, 16), makePipeline(undefined, undefined, null), makePipeline(undefined, undefined, 4), makePipeline(undefined, undefined, 20), makePipeline(undefined, undefined, 3)]);
-    //     expect(branch.getPercentileTimeForPipelineTask(.75, "abc")).toBe(18);
-    // });
+    test("Correct percentile is returned when task only ran on some pipelines", () => {
+        branch = new Branch("", [makePipeline(undefined, undefined, new Map([["abc", 16]])), makePipeline(undefined, undefined, new Map([["abc", null]])), makePipeline(undefined, undefined,  new Map([["abc", 4]])), makePipeline(undefined, undefined,  new Map([["abc", 20]])), makePipeline(undefined, undefined,  new Map([["abc", 3]]))]);
+        expect(branch.getPercentileTimesForPipelineTasks(.75, ["abc"])).toBe(new Map([["abc", 18]]));
+    });
 
-    // test("Correct percentile is returned for a valid task when percentile falls on exact length", () => {
-    //     branch = new Branch("", [makePipeline(undefined, undefined, 4), makePipeline(undefined, undefined, 2), makePipeline(undefined, undefined, 3), makePipeline(undefined, undefined, 1)]);
-    //     expect(branch.getPercentileTimeForPipelineTask(.625, "jkl")).toBe(3);
-    // });
+    test("Correct percentile is returned for a valid task when percentile falls on exact length", () => {
+        branch = new Branch("", [makePipeline(undefined, undefined, new Map([["jkl", 4]])), makePipeline(undefined, undefined, new Map([["jkl", 2]])), makePipeline(undefined, undefined, new Map([["jkl", 3]])), makePipeline(undefined, undefined, new Map([["jkl", 1]]))]);
+        expect(branch.getPercentileTimesForPipelineTasks(.625, ["jkl"])).toBe(new Map([["jkl", 3]]));
+    });
 
     // test("Correct percentile is returned for a valid task when percentile does not fall on exact length", () => {
     //     branch = new Branch("", [makePipeline(undefined, undefined, 4), makePipeline(undefined, undefined, 2), makePipeline(undefined, undefined, 3), makePipeline(undefined, undefined, 1)]);
-    //     expect(branch.getPercentileTimeForPipelineTask(.40, "jkl")).toBe(2.1);
+    //     expect(branch.getPercentileTimesForPipelineTasks(.40, ["jkl"])).toBe(new Map([["jkl", 2.1]]));
+    // });
+
+    // test("Correct percentiles returned for multiple valid task when percentile does not fall on exact length", () => {
+    //     branch = new Branch("", [makePipeline(undefined, undefined, 4), makePipeline(undefined, undefined, 2), makePipeline(undefined, undefined, 3), makePipeline(undefined, undefined, 1)]);
+    //     expect(branch.getPercentileTimesForPipelineTasks(.40, ["jkl"])).toBe(new Map([["jkl", 2.1]]));
+    // });
+
+    // test("Correct percentiles returned for multiple valid and invalid tasks ", () => {
+    //     branch = new Branch("", [makePipeline(undefined, undefined, 4), makePipeline(undefined, undefined, 2), makePipeline(undefined, undefined, 3), makePipeline(undefined, undefined, 1)]);
+    //     expect(branch.getPercentileTimesForPipelineTasks(.40, ["jkl", "abc", "hij"])).toBe(new Map([["jkl", 2.1], ["hij", 3]]));
     // });
 })
