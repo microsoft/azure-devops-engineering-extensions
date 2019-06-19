@@ -6,6 +6,7 @@ import { ReleaseAzureApi } from "../ReleaseAzureApi";
 import sinon, { assert } from "sinon";
 import messages from '../user_messages.json';
 import '../StringExtensions';
+import tl = require('azure-pipelines-task-lib/task');
 
 
 describe("PullRequest Tests", () => {
@@ -39,7 +40,7 @@ describe("PullRequest Tests", () => {
         if (!pipelineName){
             pipelineName = "fake";
         }
-        return messages.newIterationCommentHeading.format(buildIteration) + messages.failureCommentRow.format(pipelineName, "fake", "fake", "fake", "fake", "fake", "fake", "fake");
+        return messages.newIterationCommentHeading.format(buildIteration) + "\n" + messages.failureCommentTableHeading + "\n" + messages.failureCommentRow.format(pipelineName, "fake", "fake", "fake", "fake", "fake", "fake", "fake");
     }
 
     function makeCommentContentRow(pipelineName: string){
@@ -106,9 +107,13 @@ describe("PullRequest Tests", () => {
 
     test("Calls to edit only matching comment in matching thread", async () =>{
         let commentContentToAddTo: string = makeCommentContentOfCorrectForm("500");
+        tl.debug(`content to add to: ${commentContentToAddTo}`)
         let commentContentToAdd: string = makeCommentContentRow("release-77");
+        tl.debug(`content to add ${commentContentToAdd}`)
         let commentContentNotToAddTo: string = makeCommentContentOfCorrectForm("800");
+        tl.debug(`content not to add to ${commentContentNotToAddTo}`)
         let threadToEdit: azureGitInterfaces.GitPullRequestCommentThread = makeThread([commentContentNotToAddTo, commentContentToAddTo], true, azureGitInterfaces.CommentThreadStatus.Active, 10);
+        tl.debug("thread to add to id: " + threadToEdit.id)
         let callback: jest.SpyInstance = jest.spyOn(mockApi, "updateComment");
         await pullRequest.editMatchingCommentInThread(mockApi, threadToEdit, commentContentToAdd, "500");
         expect(callback).toBeCalledWith({content: commentContentToAddTo + commentContentToAdd}, 2, "repo", "project", 10, 1);
