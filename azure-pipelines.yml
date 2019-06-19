@@ -1,6 +1,7 @@
-.\pullRequestInsightsTask\: &workingDirectory
 trigger:
 - master
+variables: 
+  taskPath: .\pullRequestInsightsTask
 stages:  
 - stage: Build
   jobs:
@@ -12,18 +13,18 @@ stages:
     steps:
     - powershell: 
         npm install
-      workingDirectory: *workingDirectory
+      workingDirectory: $(taskPath)
       displayName: 'npm install'
     - powershell: 
-        Rename-Item -Path ".\pullRequestInsightsTask\task.preProd" -NewName "task.json"
+        Rename-Item -Path "$(taskPath)\task.$(version)" -NewName "task.json"
       displayName: 'specify task.json'
     - powershell: 
         tsc
-      workingDirectory: .\pullRequestInsightsTask\
+      workingDirectory: $(taskPath)
       displayName: 'compile'
     - powershell:
         npm test
-      workingDirectory: *workingDirectory
+      workingDirectory: $(taskPath)
       displayName: 'test'  
     - task: PRInsights@0
       displayName: Pull Request Insights
@@ -32,12 +33,12 @@ stages:
         version: 'v0.6.x'
     - powershell:
         Remove-Item './node_modules/fileset/test/fixtures/an (odd) filename.js' –recurse 
-      workingDirectory: *workingDirectory
+      workingDirectory: $(taskPath)
       displayName: 'Remove Bad Node File'
     - task: PackageVSTSExtension@1
       inputs:
         rootFolder: "./"
-        patternManifest: "vss-extension-pp.json"
+        patternManifest: "vss-extension-$(version).json"
         outputPath: "./epsteam.PullRequestInsightsExtension.vsix"
       displayName: Package Task
     - task: PublishExtension@1
@@ -47,7 +48,7 @@ stages:
         fileType: "vsix"
         vsixFile: "./epsteam.PullRequestInsightsExtension.vsix"
         rootFolder: "./"
-        patternManifest: "vss-extension-pp.json"
+        patternManifest: "vss-extension-$(version).json"
       displayName: Publish Task
   
       
