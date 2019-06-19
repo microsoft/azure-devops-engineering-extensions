@@ -1,3 +1,4 @@
+.\pullRequestInsightsTask\: &workingDirectory
 trigger:
 - master
 stages:  
@@ -11,8 +12,7 @@ stages:
     steps:
     - powershell: 
         npm install
-       # Remove-Item './node_modules/fileset/test/fixtures/an (odd) filename.js' –recurse 
-      workingDirectory: .\pullRequestInsightsTask\
+      workingDirectory: *workingDirectory
       displayName: 'npm install'
     - powershell: 
         Rename-Item -Path ".\pullRequestInsightsTask\task.preProd" -NewName "task.json"
@@ -22,7 +22,7 @@ stages:
       displayName: 'compile'
     - powershell:
         npm test
-      workingDirectory: .\pullRequestInsightsTask\
+      workingDirectory: *workingDirectory
       displayName: 'test'  
     - task: PRInsights@0
       displayName: Pull Request Insights
@@ -31,7 +31,7 @@ stages:
         version: 'v0.6.x'
     - powershell:
         Remove-Item './node_modules/fileset/test/fixtures/an (odd) filename.js' –recurse 
-      workingDirectory: .\pullRequestInsightsTask\
+      workingDirectory: *workingDirectory
       displayName: 'Remove Bad Node File'
     - task: PackageVSTSExtension@1
       inputs:
