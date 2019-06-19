@@ -47,7 +47,7 @@ async function run() {
                 pullRequest.editMatchingCommentInThread(azureApi, currentIterationCommentThread, currentPipelineCommentContent, configurations.getBuildIteration());
             }
             else {
-                let currentIterationCommentThreadId: number = (await pullRequest.addNewComment(azureApi, commentFactory.createIterationHeader(configurations.getBuildIteration()) + currentPipelineCommentContent)).id;
+                let currentIterationCommentThreadId: number = (await pullRequest.addNewComment(azureApi, commentFactory.createIterationHeader(configurations.getBuildIteration()) + "\n" + commentFactory.createTableHeader(currentPipeline.isFailure(), targetBranch.getTruncatedName(), String(percentile)) + currentPipelineCommentContent)).id;
                 pullRequest.deactivateOldComments(azureApi, serviceThreads, currentIterationCommentThreadId);
             }
         }   
