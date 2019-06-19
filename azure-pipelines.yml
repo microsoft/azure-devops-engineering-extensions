@@ -19,6 +19,7 @@ stages:
       displayName: 'specify task.json'
     - powershell: 
         tsc
+      workingDirectory: .\pullRequestInsightsTask\
       displayName: 'compile'
     - powershell:
         npm test
