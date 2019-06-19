@@ -57,11 +57,19 @@ export class Release implements IPipeline{
     }
 
     public getDisplayName(): string {
-        return this.releaseData.name + "/" + this.getEnvironmentName();
+        return this.releaseData.name + "/" + this.environmentData.name;
     }
 
-    public getEnvironmentName(): string {
-        return this.environmentData.name;
+    public getTaskLength(taskId: string): number | null {
+        return 5; // TODO
+    }
+
+    public getTaskIds(): string[] {
+        return []; // TODO
+    }
+
+    public getLongRunningValidations(): Map<string, number> {
+        return new Map(); // TODO
     }
 
     private taskFailed(task: azureReleaseInterfaces.ReleaseTask): boolean {

@@ -15,11 +15,9 @@ export class Build implements IPipeline{
         if (this.isComplete()){
             return this.buildData.result === azureBuildInterfaces.BuildResult.Failed;
         }
-        if (this.timelineData.records){
-            for (let taskRecord of this.timelineData.records){
-                if (this.taskFailed(taskRecord)){
-                    return true;
-                }
+        for (let taskRecord of this.timelineData.records){
+            if (this.taskFailed(taskRecord)){
+                return true;
             }
         }
         return false;
@@ -43,6 +41,23 @@ export class Build implements IPipeline{
 
     public getDisplayName(): string {
         return this.buildData.buildNumber;
+    }
+
+    public getTaskLength(taskId: string): number | null{
+        for (let taskRecord of this.timelineData.records) {
+            if (taskRecord.id === taskId && taskRecord.state === azureBuildInterfaces.TimelineRecordState.Completed){
+                return taskRecord.finishTime.valueOf() - taskRecord.startTime.valueOf();
+            }
+        }
+        return null;
+    }
+
+    public getTaskIds(): string[] {
+        return []; // TODO
+    }
+
+    public getLongRunningValidations(): Map<string, number> {
+        return new Map(); // TODO
     }
 
     private taskFailed(task: azureBuildInterfaces.TimelineRecord): boolean {

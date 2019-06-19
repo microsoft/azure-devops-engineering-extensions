@@ -11,10 +11,13 @@
   "dependencies": {
     "@types/jest": "^24.0.13",
     "@types/sinon": "^7.0.12",
+    "@types/stats-lite": "^2.2.0",
     "azure-devops-node-api": "^8.0.0",
     "azure-pipelines-task-lib": "^2.8.0",
     "jest": "^20.0.4",
+    "moment": "^2.24.0",
     "sinon": "^7.3.2",
+    "stats-lite": "^2.0.0",
     "ts-mockito": "^2.3.1"
   },
   "devDependencies": {
