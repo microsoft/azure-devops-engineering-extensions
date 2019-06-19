@@ -82,8 +82,6 @@ export class PullRequest {
     }
 
     private commentIsFromService(commentContent: string, commentFormatString: string): boolean {
-        tl.debug("checking " + commentContent + " against " + commentFormatString)
-        tl.debug("comment is from service " +  this.convertCommentFormatToRegex(commentFormatString).test(commentContent));
        return this.convertCommentFormatToRegex(commentFormatString).test(commentContent);
     }
 

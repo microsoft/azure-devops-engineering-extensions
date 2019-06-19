@@ -107,13 +107,9 @@ describe("PullRequest Tests", () => {
 
     test("Calls to edit only matching comment in matching thread", async () =>{
         let commentContentToAddTo: string = makeCommentContentOfCorrectForm("500");
-        tl.debug(`content to add to: ${commentContentToAddTo}`)
         let commentContentToAdd: string = makeCommentContentRow("release-77");
-        tl.debug(`content to add ${commentContentToAdd}`)
         let commentContentNotToAddTo: string = makeCommentContentOfCorrectForm("800");
-        tl.debug(`content not to add to ${commentContentNotToAddTo}`)
         let threadToEdit: azureGitInterfaces.GitPullRequestCommentThread = makeThread([commentContentNotToAddTo, commentContentToAddTo], true, azureGitInterfaces.CommentThreadStatus.Active, 10);
-        tl.debug("thread to add to id: " + threadToEdit.id)
         let callback: jest.SpyInstance = jest.spyOn(mockApi, "updateComment");
         await pullRequest.editMatchingCommentInThread(mockApi, threadToEdit, commentContentToAdd, "500");
         expect(callback).toBeCalledWith({content: commentContentToAddTo + commentContentToAdd}, 2, "repo", "project", 10, 1);

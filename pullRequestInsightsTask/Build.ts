@@ -47,9 +47,6 @@ export class Build implements IPipeline{
     public getTaskLength(taskId: string): number | null{
         for (let taskRecord of this.timelineData.records) {
             if (taskRecord.id === taskId && this.taskRan(taskRecord)){
-                tl.debug(this.getDisplayName() + " : task = " + taskId);
-                tl.debug(" start = " + taskRecord.startTime.valueOf());
-                tl.debug(" end = " + taskRecord.finishTime.valueOf());
                 return taskRecord.finishTime.valueOf() - taskRecord.startTime.valueOf();
             }
         }
