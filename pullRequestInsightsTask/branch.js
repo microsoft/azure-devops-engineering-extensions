@@ -32,9 +32,6 @@ var Branch = /** @class */ (function () {
         }
         return null;
     };
-    Branch.prototype.tooManyPipelinesFailed = function (failureThreshold) {
-        return this.getPipelineFailStreak() >= failureThreshold;
-    };
     Branch.prototype.getFullName = function () {
         return this.name;
     };

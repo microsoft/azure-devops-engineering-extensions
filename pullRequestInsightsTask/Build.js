@@ -8,6 +8,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var azureBuildInterfaces = __importStar(require("azure-devops-node-api/interfaces/BuildInterfaces"));
+var tl = require("azure-pipelines-task-lib/task");
 var Build = /** @class */ (function () {
     function Build(buildData, timelineData) {
         this.buildData = buildData;
@@ -44,12 +45,16 @@ var Build = /** @class */ (function () {
         for (var _i = 0, _a = this.timelineData.records; _i < _a.length; _i++) {
             var taskRecord = _a[_i];
             if (taskRecord.id === taskId && this.taskRan(taskRecord)) {
-                return taskRecord.finishTime.valueOf() - taskRecord.startTime.valueOf();
+                tl.debug("task: " + taskId + " " + taskRecord.startTime.getTime() + " " + taskRecord.finishTime.getTime() + " " + (taskRecord.finishTime.getTime() - taskRecord.startTime.getTime()));
+                return taskRecord.finishTime.getTime() - taskRecord.startTime.getTime();
             }
         }
         return null;
     };
     Build.prototype.getTaskIds = function () {
+        if (!this.timelineData.records) {
+            return null;
+        }
         var taskIds = [];
         for (var _i = 0, _a = this.timelineData.records; _i < _a.length; _i++) {
             var taskRecord = _a[_i];

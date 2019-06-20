@@ -95,7 +95,7 @@ function run() {
                     return [4 /*yield*/, pullRequest.getCurrentServiceComments(azureApi)];
                 case 5:
                     serviceThreads = _b.sent();
-                    return [4 /*yield*/, pullRequest.getCurrentIterationCommentThread(azureApi, serviceThreads, configurations.getBuildIteration())];
+                    return [4 /*yield*/, pullRequest.getCurrentIterationCommentThread(serviceThreads, configurations.getBuildIteration())];
                 case 6:
                     currentIterationCommentThread = _b.sent();
                     currentPipelineCommentContent = commentFactory.createTableSection(currentPipeline, targetBranch.getMostRecentCompletePipeline(), targetBranch, type, longRunningValidations, thresholdTimes);

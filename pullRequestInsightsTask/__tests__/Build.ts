@@ -1,5 +1,6 @@
 import * as azureBuildInterfaces from "azure-devops-node-api/interfaces/BuildInterfaces";
 import { Build } from "../Build";
+import { stringify } from "querystring";
 
 
 describe('Build Tests', () => {
@@ -74,10 +75,52 @@ describe('Build Tests', () => {
         expect(build.getTaskLength("abc")).toBeNull();
     });
 
+    test('Cancelled task id has null time', () => {
+        fillMockBuildTimeline([makeTask(undefined, azureBuildInterfaces.TimelineRecordState.Completed, null, null)]);
+        build = new Build(null, mockBuildTimeline);
+        expect(build.getTaskLength("abc")).toBeNull();
+    });
+
     test('Length of completed task is properly calculated', () => {
         fillMockBuildTimeline([makeTask(undefined, azureBuildInterfaces.TimelineRecordState.Completed, new Date("2019-05-23 01:14:40.00"), new Date("2019-05-24 02:15:55.00"), "xyz")]);
         build = new Build(null, mockBuildTimeline);
         expect(build.getTaskLength("xyz")).toBe(90075000);
     });
+
+    test('Task ids are properly retrieved', () => {
+        fillMockBuildTimeline([makeTask(undefined, undefined, undefined, undefined, "yellow"), makeTask(undefined, undefined, undefined, undefined, "blue"), makeTask(undefined, undefined, undefined, undefined, "red")]);
+        build = new Build(null, mockBuildTimeline);
+        expect(build.getTaskIds()).toEqual(["yellow", "blue", "red"]);
+    });
     
+    test('Null is returned when there are no task ids to be retrieved', () => {
+        fillMockBuildTimeline([]);
+        build = new Build(null, mockBuildTimeline);
+        expect(build.getTaskIds()).toEqual([]);
+    });
+
+    test('No long running tasks retrieved without matching threshold times', () => {
+        fillMockBuildTimeline([makeTask(undefined, azureBuildInterfaces.TimelineRecordState.Completed, new Date("2019-05-23 01:14:40.00"), new Date("2019-05-24 02:15:55.00"), "abc")]);
+        build = new Build(null, mockBuildTimeline);
+        expect(build.getLongRunningValidations(new Map<string, number>([["def", 3]]))).toEqual(new Map<string, number>());
+    });
+
+    test('All tasks returned when all are long running', () => {
+        fillMockBuildTimeline([makeTask(undefined, azureBuildInterfaces.TimelineRecordState.Completed, new Date("2019-05-24 01:15:00.00"), new Date("2019-05-24 01:15:00.05"), "abc"), makeTask(undefined, azureBuildInterfaces.TimelineRecordState.Completed, new Date("2019-05-24 01:15:00.05"), new Date("2019-05-24 01:15:00.15"), "hijk")]);
+        build = new Build(null, mockBuildTimeline);
+        expect(build.getLongRunningValidations(new Map<string, number>([["abc", 48], ["hijk", 70]]))).toEqual(new Map<string, number>([["abc", 50], ["hijk", 100]]));
+    });
+    
+    test('Tasks properly filtered when only some are long running', () => {
+        fillMockBuildTimeline([makeTask(undefined, azureBuildInterfaces.TimelineRecordState.Completed, new Date("2019-05-24 01:15:00.00"), new Date("2019-05-24 01:15:00.05"), "abc"), makeTask(undefined, azureBuildInterfaces.TimelineRecordState.Completed, new Date("2019-05-24 01:15:00.05"), new Date("2019-05-24 01:15:00.15"), "hijk")]);
+        build = new Build(null, mockBuildTimeline);
+        expect(build.getLongRunningValidations(new Map<string, number>([["abc", 2], ["hijk", 500]]))).toEqual(new Map<string, number>([["abc", 50]]));
+    });
+
+    test('Task with same length as threshold is not long running', () => {
+        fillMockBuildTimeline([makeTask(undefined, azureBuildInterfaces.TimelineRecordState.Completed, new Date("2019-05-24 01:15:00.00"), new Date("2019-05-24 01:15:00.05"), "abc"), makeTask(undefined, azureBuildInterfaces.TimelineRecordState.Completed, new Date("2019-05-24 01:15:00.05"), new Date("2019-05-24 01:15:00.15"), "hijk")]);
+        build = new Build(null, mockBuildTimeline);
+        expect(build.getLongRunningValidations(new Map<string, number>([["abc", 50]]))).toEqual(new Map<string, number>());
+    });
+
 });

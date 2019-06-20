@@ -47,13 +47,17 @@ export class Build implements IPipeline{
     public getTaskLength(taskId: string): number | null{
         for (let taskRecord of this.timelineData.records) {
             if (taskRecord.id === taskId && this.taskRan(taskRecord)){
-                return taskRecord.finishTime.valueOf() - taskRecord.startTime.valueOf();
+                tl.debug("task: " + taskId + " " + taskRecord.startTime.getTime() + " " + taskRecord.finishTime.getTime() + " " + (taskRecord.finishTime.getTime() - taskRecord.startTime.getTime()));
+                return taskRecord.finishTime.getTime() - taskRecord.startTime.getTime();
             }
         }
         return null;
     }
 
     public getTaskIds(): string[] {
+        if (!this.timelineData.records) {
+            return null;
+        }
         let taskIds: string[] = [];
         for (let taskRecord of this.timelineData.records) {
             taskIds.push(taskRecord.id);
