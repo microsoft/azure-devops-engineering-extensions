@@ -37,10 +37,6 @@ export class Branch{
         return null;
     }
 
-    public tooManyPipelinesFailed(failureThreshold: number): boolean {
-        return this.getPipelineFailStreak() >= failureThreshold;
-    }
-
     public getFullName(): string{
         return this.name;
     }

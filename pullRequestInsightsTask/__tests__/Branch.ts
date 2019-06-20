@@ -81,16 +81,6 @@ describe('Branch Tests', () => {
         expect(branch.getMostRecentCompletePipeline()).toBeNull();
     });
 
-    test("Too many pipelines failed when when failure streak of pipelines is larger than threshold", () => {
-        branch = new Branch("", [failedBuildOne, failedBuildOne, failedBuildOne, failedBuildOne, successfulBuildTwo, successfulBuildTwo]);
-        expect(branch.tooManyPipelinesFailed(2)).toBe(true);
-    });
-
-    test("Too many pipelines failed is false when failure streak of pipelines is shorter than threshold", () => {
-        branch = new Branch("", [failedBuildOne, failedBuildOne, successfulBuildTwo, successfulBuildTwo]);
-        expect(branch.tooManyPipelinesFailed(2)).toBe(true);
-    });
-
     test("Null return when invalid task id is given", () => {
         branch = new Branch("", [makePipeline(undefined, undefined, null), makePipeline(undefined, undefined, null), makePipeline(undefined, undefined, null)]);
         expect(branch.getPercentileTimesForPipelineTasks(70, ["abc"])).toEqual(new Map<string, number>([["abc", null]]));

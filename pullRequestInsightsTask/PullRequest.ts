@@ -42,7 +42,7 @@ export class PullRequest {
         }
     }
 
-    public async getCurrentIterationCommentThread(apiCaller: AbstractAzureApi, serviceComments: azureGitInterfaces.GitPullRequestCommentThread[], currentBuildIteration: string): Promise<azureGitInterfaces.GitPullRequestCommentThread | null> {
+    public async getCurrentIterationCommentThread(serviceComments: azureGitInterfaces.GitPullRequestCommentThread[], currentBuildIteration: string): Promise<azureGitInterfaces.GitPullRequestCommentThread | null> {
         for (let commentThread of serviceComments) {
             for (let comment of commentThread.comments){
                 if (this.getBuildIterationFromServiceComment(comment.content) === currentBuildIteration){
