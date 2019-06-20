@@ -1,5 +1,5 @@
 {
-    "notInPullRequestMessage": "Nothing occured because this {0} is not being run from a pull request",
+    "notInPullRequestMessage": "Nothing occured because this task is not being run from a pull request",
     "noFailureMessage": "Nothing occured because the {0} has not failed any tasks",
     "commentCompletedMessage": "Comment was successfully posted",
     "failureCommentTableHeading": "|Name|Target History|Latest Target Run|\n|---|---|---|",
