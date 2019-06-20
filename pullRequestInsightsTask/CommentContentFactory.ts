@@ -12,9 +12,9 @@ export class CommentContentFactory {
 
     public createTableHeader(isFailure: boolean, targetBranchName: string, percentile: string): string {
         if (isFailure) {
-            return messages.failureCommentTableHeading.format(targetBranchName, targetBranchName);
+            return messages.failureCommentTableHeading.format(targetBranchName);
         }
-        return messages.longRunningValidationCommentTableHeading.format(percentile, targetBranchName, targetBranchName);
+        return messages.longRunningValidationCommentTableHeading.format(percentile, targetBranchName);
     }
 
     public createTableSection(current: IPipeline, mostRecent: IPipeline, target: Branch, type: string, longRunningValidations: Map<string, number>, thresholdTimes: Map<string, number>): string {

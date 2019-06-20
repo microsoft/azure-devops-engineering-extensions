@@ -8,3 +8,6 @@ String.prototype.format = function() {
       ;
     });
 }
+String.prototype.interpolate = function() {
+  return this.replace('"', '`');
+}
