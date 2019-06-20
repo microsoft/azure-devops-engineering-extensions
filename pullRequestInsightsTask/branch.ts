@@ -64,6 +64,7 @@ export class Branch{
             percentileTimesForTasks.set(taskId, stats.percentile(times, percentileToFind));
         }
         else {
+            percentileTimesForTasks.set(taskId, null);
             tl.debug(`no tasks with id ${taskId} found on pipelines of branch ${this.name}`);
         }
     }

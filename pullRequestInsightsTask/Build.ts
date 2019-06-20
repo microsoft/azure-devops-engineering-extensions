@@ -64,7 +64,7 @@ export class Build implements IPipeline{
     public getLongRunningValidations(taskThresholdTimes: Map<string, number>): Map<string, number> {
         let longRunningValidations: Map<string, number> = new Map(); 
         for (let taskId of this.getTaskIds()) {
-            if (taskThresholdTimes.has(taskId) && this.getTaskLength(taskId) > taskThresholdTimes.get(taskId)) {
+            if (taskThresholdTimes.get(taskId) && this.getTaskLength(taskId) > taskThresholdTimes.get(taskId)) {
                 longRunningValidations.set(taskId, this.getTaskLength(taskId));
             }
         }

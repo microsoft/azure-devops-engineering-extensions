@@ -61,7 +61,7 @@ var Build = /** @class */ (function () {
         var longRunningValidations = new Map();
         for (var _i = 0, _a = this.getTaskIds(); _i < _a.length; _i++) {
             var taskId = _a[_i];
-            if (taskThresholdTimes.has(taskId) && this.getTaskLength(taskId) > taskThresholdTimes.get(taskId)) {
+            if (taskThresholdTimes.get(taskId) && this.getTaskLength(taskId) > taskThresholdTimes.get(taskId)) {
                 longRunningValidations.set(taskId, this.getTaskLength(taskId));
             }
         }
