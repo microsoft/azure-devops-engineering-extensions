@@ -59,19 +59,19 @@ export abstract class Table {
         this.currentData += data;
     }
 
-    protected editHeaderColumnForPipelineType(current: string): string {
-        return this.addExtraInformationToRow(messages.releaseHeaderColumn, 0, current);
+    protected editHeaderColumnForPipelineType(currentMessage: string): string {
+        return this.addExtraInformationToRow(messages.releaseHeaderColumn, 0, currentMessage);
     }
 
-    protected editRowForPipelineType(current: string, pipeline: IPipeline): string {
-        return this.addExtraInformationToRow(messages.releaseRowColumn.format(String(pipeline.getDefinitionId())), 0, current);
+    protected editRowForPipelineType(currentPipeline: IPipeline, currentMessage: string): string {
+        return this.addExtraInformationToRow(messages.releaseRowColumn.format(String(currentPipeline.getDefinitionId())), 0, currentMessage);
     }
 
-    private addExtraInformationToRow(informationToAdd: string, index: number, current: string): string {
+    private addExtraInformationToRow(informationToAdd: string, index: number, currentMessage: string): string {
         if (this.pipelineType === AzureApiFactory.RELEASE) {
-            return current.slice(0, index) + informationToAdd + current.slice(index, current.length);
+            return currentMessage.slice(0, index) + informationToAdd + currentMessage.slice(index, currentMessage.length);
         }
-        return current;
+        return currentMessage;
     }
 
 }
@@ -89,7 +89,8 @@ export class FailureTable extends Table {
             if (mostRecent.isFailure()) {
                 messageString = messages.failureCommentRow;
             }
-            this.addTableData(Table.NEW_LINE + messageString.format(current.getDisplayName(), current.getLink(), String(target.getPipelineFailStreak()), target.getTruncatedName(), type, mostRecent.getDisplayName(), mostRecent.getLink()));
+            messageString = messageString.format(current.getDisplayName(), current.getLink(), String(target.getPipelineFailStreak()), target.getTruncatedName(), type, mostRecent.getDisplayName(), mostRecent.getLink());
+            this.addTableData(Table.NEW_LINE + this.editRowForPipelineType(current, messageString));
         }
     }
 }
@@ -109,7 +110,8 @@ export class LongRunningValidationsTable extends Table {
                 if (index > 0) {
                     messageString = messages.longRunningValidationCommentLowerSectionRow;
                 }
-                this.addTableData(Table.NEW_LINE + messageString.format(taskId, String(longRunningValidations.get(taskId)), String(thresholdTimes.get(taskId))));
+                messageString = messageString.format(taskId, String(longRunningValidations.get(taskId)), String(thresholdTimes.get(taskId)));
+                this.addTableData(Table.NEW_LINE + this.editRowForPipelineType(current, messageString));
             }
         }
     }

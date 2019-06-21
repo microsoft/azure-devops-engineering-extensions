@@ -3,6 +3,8 @@ import { Build } from "../Build";
 import { IPipeline } from "../IPipeline";
 import sinon from "sinon";
 import { Branch } from "../branch";
+import { Release } from "../Release";
+import { mock } from "ts-mockito";
 
 
 describe("FailureTable Tests", () => {
@@ -13,11 +15,12 @@ describe("FailureTable Tests", () => {
        
     });
 
-    function makeFakePipeline(name: string, link: string, isFailure: boolean, longRunningValidations?: Map<string, number>): IPipeline {
-       let pipeline: IPipeline = new Build(null, null);
+    function makeFakePipeline(name: string, link: string, isFailure: boolean, definitionId: number, longRunningValidations?: Map<string, number>): IPipeline {
+       let pipeline: IPipeline = mock(Release);
        sinon.stub(pipeline, "isFailure").returns(isFailure);
        sinon.stub(pipeline, "getDisplayName").returns(name);
        sinon.stub(pipeline, "getLink").returns(link);
+       sinon.stub((pipeline as Release), "getDefinitionId").returns(definitionId);
        //sinon.stub(pipeline, "getLongRunningValidations").returns(longRunningValidations);
        return pipeline;
     }
@@ -45,13 +48,13 @@ describe("FailureTable Tests", () => {
 
     test("Section is added to table with data", () => {
        failureTable = new FailureTable("build", "|Name|fakeTarget History|Latest fakeTarget Run|\n|---|---|---|");
-       failureTable.addSection(makeFakePipeline("thisBuild", "h", true), makeFakePipeline("otherBuild", "j", true), makeFakeBranch("thisBranch", 7), "build", null);
+       failureTable.addSection(makeFakePipeline("thisBuild", "h", true, null), makeFakePipeline("otherBuild", "j", true, null), makeFakeBranch("thisBranch", 7), "build", null);
        expect(failureTable.getTableAsString()).toBe("|Name|fakeTarget History|Latest fakeTarget Run|\n|---|---|---|\n|[thisBuild](h)|Failing last 7 thisBranch builds|Latest run from thisBranch: [otherBuild](j)|");
     });
 
     test("Section is not added to empty table without heading", () => {
         failureTable = new FailureTable("build");
-        failureTable.addSection(makeFakePipeline("thisBuild", "h", true), makeFakePipeline("otherBuild", "j", true), makeFakeBranch("thisBranch", 7), "build", null);
+        failureTable.addSection(makeFakePipeline("thisBuild", "h", true, null), makeFakePipeline("otherBuild", "j", true, null), makeFakeBranch("thisBranch", 7), "build", null);
         expect(failureTable.getTableAsString()).toBe("");
      });
 
@@ -72,14 +75,14 @@ describe("FailureTable Tests", () => {
     });
 
     test("Row properly formatted for release",  () => {
-       
+        failureTable = new FailureTable("release", "|Definition Name|Name|fakeTarget History|Latest fakeTarget Run|\n|---|---|---|---|");
+        failureTable.addSection(makeFakePipeline("someRelease", "link", true, 5), makeFakePipeline("otherRelease", "otherLink", true, null), makeFakeBranch("thisBranch", 7), "release", null);
+        expect(failureTable.getTableAsString()).toBe("|Definition Name|Name|fakeTarget History|Latest fakeTarget Run|\n|---|---|---|---|\n|5|[someRelease](link)|Failing last 7 thisBranch releases|Latest run from thisBranch: [otherRelease](otherLink)|");
     });
 
-    test("Failure row added when most recent failed",  () => {
-       
-    });
-
-    test("Success row added when most recent did not fail",  () => {
-       
+    test("Success row added when most recent failed",  () => {
+        failureTable = new FailureTable("build", "|Name|fakeTarget History|Latest fakeTarget Run|\n|---|---|---|");
+        failureTable.addSection(makeFakePipeline("thisBuild", "h", true, null), makeFakePipeline("otherBuild", "j", false, null), makeFakeBranch("thisBranch", 7), "build", null);
+        expect(failureTable.getTableAsString()).toBe("|Name|fakeTarget History|Latest fakeTarget Run|\n|---|---|---|\n|[thisBuild](h)|Last thisBranch build successful|Latest run from thisBranch: [otherBuild](j)|")
     });
 });
