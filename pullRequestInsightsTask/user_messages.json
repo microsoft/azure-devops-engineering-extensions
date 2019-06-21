@@ -4,9 +4,11 @@
     "commentCompletedMessage": "Comment was successfully posted",
     "failureCommentTableHeading": "|Name|{0} History|Latest {0} Run|\n|---|---|---|",
     "newIterationCommentHeading": "__Build Iteration: {0}__",
-    "failureCommentRow": "|[{0}]({1})|Failing last {2} {3} {4}s|Latest run from {3}: [{5}]({6}) ${hello}|",
-    "successCommentRow": "|[{0}]({1})|Last {2} {3} successful|Latest run from {2}: [{4}]({5}) ${hello}|",
+    "failureCommentRow": "|[{0}]({1})|Failing last {2} {3} {4}s|Latest run from {3}: [{5}]({6})|",
+    "successCommentRow": "|[{0}]({1})|Last {2} {3} successful|Latest run from {2}: [{4}]({5})|",
     "longRunningValidationCommentTableHeading": "|Name|Long Running Pipeline/Task|Pipeline/Task Duration|{0}th Percentile on {1}|Latest {1} Run|\n|---|---|---|---|---|",
     "longRunningValidationCommentFirstSectionRow": "|{0}|{1}|{2} ms|{3} ms|[{4}]({5})|",
-    "longRunningValidationCommentLowerSectionRow": "||{0}|{1} ms|{2} ms||"
+    "longRunningValidationCommentLowerSectionRow": "||{0}|{1} ms|{2} ms||",
+    "releaseHeaderColumn": "|Definition Name|",
+    "releaseRowColumn": "|{0}|"
 }

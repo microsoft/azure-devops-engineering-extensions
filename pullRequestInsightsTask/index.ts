@@ -23,14 +23,12 @@ async function run() {
         else {
             let azureApiFactory: AzureApiFactory = new AzureApiFactory();
             let azureApi = await azureApiFactory.create(configurations); 
-            let currentProject: string = configurations.getProjectName();
             let currentPipeline: IPipeline = await azureApi.getCurrentPipeline(configurations);
-            let type: string = configurations.getHostType();
             let commentFactory: CommentContentFactory = new CommentContentFactory();
             let pullRequest: PullRequest = new PullRequest(configurations.getPullRequestId(), configurations.getRepository(), configurations.getProjectName());
             let targetBranchName: string = await configurations.getTargetBranch(azureApi);
             tl.debug("target branch of pull request: " + targetBranchName);
-            let retrievedPipelines: IPipeline[] = await azureApi.getMostRecentPipelinesOfCurrentType(currentProject, currentPipeline, numberBuildsToQuery, targetBranchName);
+            let retrievedPipelines: IPipeline[] = await azureApi.getMostRecentPipelinesOfCurrentType(configurations.getProjectName(), currentPipeline, numberBuildsToQuery, targetBranchName);
             tl.debug(`Number of retrieved pipelines for ${targetBranchName} = ` + retrievedPipelines.length);
             let targetBranch: Branch = new Branch(targetBranchName, retrievedPipelines); 
             let thresholdTimes: Map<string, number> = new Map();
@@ -40,14 +38,14 @@ async function run() {
                 thresholdTimes = targetBranch.getPercentileTimesForPipelineTasks(percentile, currentPipeline.getTaskIds());
                 longRunningValidations = currentPipeline.getLongRunningValidations(thresholdTimes);
                 tl.debug("Number of longRunningValidations = " + longRunningValidations.size);
-                for (let taskId of Array.from(longRunningValidations.keys())) {
-                    tl.debug("long running validation: " + taskId);
-                }
+                // for (let taskId of Array.from(longRunningValidations.keys())) {
+                //     tl.debug("long running validation: " + taskId);
+                // }
             }
             if (currentPipeline.isFailure() || longRunningValidations.size > 0) {
                 let serviceThreads: azureGitInterfaces.GitPullRequestCommentThread[] = await pullRequest.getCurrentServiceComments(azureApi);
                 let currentIterationCommentThread: azureGitInterfaces.GitPullRequestCommentThread = await pullRequest.getCurrentIterationCommentThread(serviceThreads, configurations.getBuildIteration());
-                let currentPipelineCommentContent: string = commentFactory.createTableSection(currentPipeline, targetBranch.getMostRecentCompletePipeline(), targetBranch, type, longRunningValidations, thresholdTimes);
+                let currentPipelineCommentContent: string = commentFactory.createTableSection(currentPipeline, targetBranch.getMostRecentCompletePipeline(), targetBranch, configurations.getHostType(), longRunningValidations, thresholdTimes);
                 if (currentIterationCommentThread) {
                     pullRequest.editMatchingCommentInThread(azureApi, currentIterationCommentThread, currentPipelineCommentContent, configurations.getBuildIteration());
                 }

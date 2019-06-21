@@ -5,9 +5,9 @@ import { BuildAzureApi } from './BuildAzureApi'
 import { ReleaseAzureApi } from './ReleaseAzureApi'
 import { HostTypeError } from './HostTypeError';
 
-export class AzureApiFactory{
-    private static readonly BUILD = "build";
-    private static readonly RELEASE = "release";
+export class AzureApiFactory {
+    public static readonly BUILD = "build";
+    public static readonly RELEASE = "release";
 
     public async create(configurations: EnvironmentConfigurations): Promise<AbstractAzureApi>{
      let type: string = configurations.getHostType();

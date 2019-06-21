@@ -20,7 +20,7 @@ export class CommentContentFactory {
     public createTableSection(current: IPipeline, mostRecent: IPipeline, target: Branch, type: string, longRunningValidations: Map<string, number>, thresholdTimes: Map<string, number>): string {
         if (current.isFailure()) {
             if (mostRecent.isFailure()) {
-                return messages.failureCommentRow.format(current.getDisplayName(), current.getLink(), String(target.getPipelineFailStreak()), target.getTruncatedName(), type, target.getTruncatedName(), mostRecent.getDisplayName(), mostRecent.getLink());
+                return messages.failureCommentRow.format(current.getDisplayName(), current.getLink(), String(target.getPipelineFailStreak()), target.getTruncatedName(), type, mostRecent.getDisplayName(), mostRecent.getLink()).interpolate();
         }
         return messages.successCommentRow.format(current.getDisplayName(), current.getLink(), target.getTruncatedName(), type);
         }
