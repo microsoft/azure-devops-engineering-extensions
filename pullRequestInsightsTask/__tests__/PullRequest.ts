@@ -74,7 +74,7 @@ describe("PullRequest Tests", () => {
         let commentContent:string = makeCommentContentOfCorrectForm("500");
         let expectedThread: azureGitInterfaces.GitPullRequestCommentThread = makeThread([commentContent], false);
         let callback: jest.SpyInstance = jest.spyOn(mockApi, "postNewCommentThread");
-        pullRequest.addNewComment(mockApi, commentContent);
+        pullRequest.addNewComment(mockApi, commentContent, "500");
         expect(callback).toBeCalledWith({comments: expectedThread.comments}, 2, "repo", "project");
     });
 

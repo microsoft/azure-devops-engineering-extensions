@@ -1,5 +1,6 @@
 import * as azureGitInterfaces from "azure-devops-node-api/interfaces/GitInterfaces";
-import messages from "./user_messages.json"
+import messages from "./user_messages.json";
+import commentProperties from "./service_comment_properties.json";
 import { AbstractAzureApi } from "./AbstractAzureApi.js";
 import tl = require('azure-pipelines-task-lib/task');
 
@@ -16,8 +17,8 @@ export class PullRequest {
         this.projectName = projectName;    
     }
 
-    public async addNewComment(apiCaller: AbstractAzureApi, commentContent: string): Promise<azureGitInterfaces.GitPullRequestCommentThread>{
-        let thread: azureGitInterfaces.CommentThread = {comments: new Array({content: commentContent})};
+    public async addNewComment(apiCaller: AbstractAzureApi, commentContent: string, buildIteration: string): Promise<azureGitInterfaces.GitPullRequestCommentThread>{
+        let thread: azureGitInterfaces.CommentThread = {comments: new Array({content: commentContent}), properties: new Map([[commentProperties.taskPropertyName, commentProperties.taskPropertyValue], [commentProperties.iterationPropertyName, buildIteration]])};
         tl.debug(messages.commentCompletedMessage);
         return apiCaller.postNewCommentThread(thread, this.id, this.repository, this.projectName);
     }
@@ -44,6 +45,7 @@ export class PullRequest {
 
     public async getCurrentIterationCommentThread(serviceComments: azureGitInterfaces.GitPullRequestCommentThread[], currentBuildIteration: string): Promise<azureGitInterfaces.GitPullRequestCommentThread | null> {
         for (let commentThread of serviceComments) {
+          //  tl.debug("service props: " + (serviceCommentProperties.properties, currentBuildIteration));
             for (let comment of commentThread.comments){
                 if (this.getBuildIterationFromServiceComment(comment.content) === currentBuildIteration){
                     tl.debug("comment thread id of thread of current build iteration " + currentBuildIteration + ": thread id = " + commentThread.id + ", comment id = " + comment.id);

@@ -1,0 +1,5 @@
+{
+  "taskPropertyName": "fromTask",
+  "taskPropertyValue": "PullRequestInsights",
+  "iterationPropertyName": "buildIteration"       
+}
