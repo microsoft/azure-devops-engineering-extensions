@@ -35,14 +35,14 @@ async function run() {
             let thresholdTimes: Map<string, number> = new Map();
             let longRunningValidations: Map<string, number> = new Map();
             
-            if (!currentPipeline.isFailure()){
-                thresholdTimes = targetBranch.getPercentileTimesForPipelineTasks(percentile, currentPipeline.getTaskIds());
-                longRunningValidations = currentPipeline.getLongRunningValidations(thresholdTimes);
-                tl.debug("Number of longRunningValidations = " + longRunningValidations.size);
-                for (let taskId of Array.from(longRunningValidations.keys())) {
-                    tl.debug("long running validation: " + taskId);
-                }
-            }
+            // if (!currentPipeline.isFailure()){
+            //     thresholdTimes = targetBranch.getPercentileTimesForPipelineTasks(percentile, currentPipeline.getTaskIds());
+            //     longRunningValidations = currentPipeline.getLongRunningValidations(thresholdTimes);
+            //     tl.debug("Number of longRunningValidations = " + longRunningValidations.size);
+            //     for (let taskId of Array.from(longRunningValidations.keys())) {
+            //         tl.debug("long running validation: " + taskId);
+            //     }
+            // }
             if (currentPipeline.isFailure() || longRunningValidations.size > 0) {
                 let serviceThreads: azureGitInterfaces.GitPullRequestCommentThread[] = await pullRequest.getCurrentServiceComments(azureApi);
                 let currentIterationCommentThread: azureGitInterfaces.GitPullRequestCommentThread = await pullRequest.getCurrentIterationCommentThread(serviceThreads, configurations.getBuildIteration());
