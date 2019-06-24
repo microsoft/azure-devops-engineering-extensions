@@ -35,17 +35,7 @@ export abstract class Table {
         }
     }
 
-    private getNumberColumns(line: string): number {
-        let numberColumns: number = -1;
-        for (let char of line) {
-            if (char === Table.COLUMN_DIVIDER) {
-                numberColumns++;
-            }
-        }
-        return numberColumns;
-    }
-
-    public abstract addSection(current: IPipeline, mostRecent: IPipeline, target: Branch, type: string, thresholdTimes: Map<string, number>): void;
+    public abstract addSection(current: IPipeline, mostRecent: IPipeline, target: Branch, thresholdTimes: Map<string, number>): void;
 
     public getTableAsString(): string {
         return this.currentData;
@@ -67,6 +57,21 @@ export abstract class Table {
         return this.addExtraInformationToRow(messages.releaseRowColumn.format(String(currentPipeline.getDefinitionId())), 0, currentMessage);
     }
 
+    protected getType(): string {
+        return this.pipelineType;
+    }
+
+    private getNumberColumns(line: string): number {
+        let numberColumns: number = -1;
+        for (let char of line) {
+            if (char === Table.COLUMN_DIVIDER) {
+                numberColumns++;
+            }
+        }
+        return numberColumns;
+    }
+
+
     private addExtraInformationToRow(informationToAdd: string, index: number, currentMessage: string): string {
         if (this.pipelineType === AzureApiFactory.RELEASE) {
             return currentMessage.slice(0, index) + informationToAdd + currentMessage.slice(index, currentMessage.length);
@@ -83,13 +88,13 @@ export class FailureTable extends Table {
         super(messages.failureCommentTableHeading, pipelineType, currentData);
     }
 
-    public addSection(current: IPipeline, mostRecent: IPipeline, target: Branch, type: string, thresholdTimes: Map<string, number>): void {
+    public addSection(current: IPipeline, mostRecent: IPipeline, target: Branch, thresholdTimes: Map<string, number>): void {
         if (this.tableHasData()) {
             let messageString = messages.successCommentRow;
             if (mostRecent.isFailure()) {
                 messageString = messages.failureCommentRow;
             }
-            messageString = messageString.format(current.getDisplayName(), current.getLink(), String(target.getPipelineFailStreak()), target.getTruncatedName(), type, mostRecent.getDisplayName(), mostRecent.getLink());
+            messageString = messageString.format(current.getDisplayName(), current.getLink(), String(target.getPipelineFailStreak()), target.getTruncatedName(), this.getType(), mostRecent.getDisplayName(), mostRecent.getLink());
             this.addTableData(Table.NEW_LINE + this.editRowForPipelineType(current, messageString));
         }
     }
@@ -101,17 +106,17 @@ export class LongRunningValidationsTable extends Table {
         super(messages.longRunningValidationCommentTableHeading, pipelineType, currentData);
     }
 
-    public addSection(current: IPipeline, mostRecent: IPipeline, target: Branch, type: string, thresholdTimes: Map<string, number>): void {
+    public addSection(current: IPipeline, mostRecent: IPipeline, target: Branch, thresholdTimes: Map<string, number>): void {
         if (this.tableHasData()) {
             let longRunningValidations: Map<string, number> = current.getLongRunningValidations(thresholdTimes);
             for (let index = 0; index < longRunningValidations.size; index++) {
                 let taskId: string = Array.from(longRunningValidations.keys())[index];
-                let messageString: string = messages.longRunningValidationCommentFirstSectionRow;
+                let messageString: string = this.editRowForPipelineType(current, messages.longRunningValidationCommentFirstSectionRow);
                 if (index > 0) {
                     messageString = messages.longRunningValidationCommentLowerSectionRow;
                 }
-                messageString = messageString.format(taskId, String(longRunningValidations.get(taskId)), String(thresholdTimes.get(taskId)));
-                this.addTableData(Table.NEW_LINE + this.editRowForPipelineType(current, messageString));
+                messageString = messageString.format(current.getDisplayName(), taskId, String(longRunningValidations.get(taskId)), String(thresholdTimes.get(taskId)), mostRecent.getDisplayName(), mostRecent.getLink());
+                this.addTableData(Table.NEW_LINE + messageString);
             }
         }
     }
