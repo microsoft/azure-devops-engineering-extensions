@@ -6,6 +6,7 @@ import { ReleaseAzureApi } from "../ReleaseAzureApi";
 import sinon, { assert } from "sinon";
 import messages from '../user_messages.json';
 import '../StringExtensions';
+import tl = require('azure-pipelines-task-lib/task');
 
 
 describe("PullRequest Tests", () => {
@@ -39,7 +40,7 @@ describe("PullRequest Tests", () => {
         if (!pipelineName){
             pipelineName = "fake";
         }
-        return messages.newIterationCommentHeading.format(buildIteration) + messages.failureCommentRow.format(pipelineName, "fake", "fake", "fake", "fake", "fake", "fake", "fake");
+        return messages.newIterationCommentHeading.format(buildIteration) + "\n" + messages.failureCommentTableHeading + "\n" + messages.failureCommentRow.format(pipelineName, "fake", "fake", "fake", "fake", "fake", "fake", "fake");
     }
 
     function makeCommentContentRow(pipelineName: string){
@@ -53,20 +54,20 @@ describe("PullRequest Tests", () => {
 
     test("Does not find a comment thread when comments are of wrong format", async () => {
         setThreads([makeThread(["|jk jk hj| failure |", "fake comment"], false), makeThread(["|jk jk hj| failure |", "fake comment"], false)]);
-        expect(pullRequest.getCurrentIterationCommentThread(mockApi, await pullRequest.getCurrentServiceComments(mockApi), "thisBuild")).toBeNull; 
+        expect(pullRequest.getCurrentIterationCommentThread(await pullRequest.getCurrentServiceComments(mockApi), "thisBuild")).toBeNull; 
     });
 
     test("Finds comment thread when comment of same build iteration in correct format exists", async () => {
         let expectedThread: azureGitInterfaces.GitPullRequestCommentThread = makeThread([makeCommentContentOfCorrectForm("345")], true , 5);
         console.log("comment: " + expectedThread.comments[0].content)
         setThreads([makeThread(["|jk jk hj| failure |", "fake comment"], true), expectedThread]);
-        expect((await pullRequest.getCurrentIterationCommentThread(mockApi,  await pullRequest.getCurrentServiceComments(mockApi), "345"))).toBe(expectedThread); 
+        expect((await pullRequest.getCurrentIterationCommentThread(await pullRequest.getCurrentServiceComments(mockApi), "345"))).toBe(expectedThread); 
     });
 
     test("Finds correct comment thread when many comment threads of correct format exist", async () => {
         let expectedThread: azureGitInterfaces.GitPullRequestCommentThread = makeThread([makeCommentContentOfCorrectForm("400")], false, 7);
         setThreads([makeThread(["fake comment"], false), makeThread([makeCommentContentOfCorrectForm("345")], false, 5), expectedThread]);
-        expect((await pullRequest.getCurrentIterationCommentThread(mockApi,  await pullRequest.getCurrentServiceComments(mockApi), "400"))).toBe(expectedThread); 
+        expect((await pullRequest.getCurrentIterationCommentThread( await pullRequest.getCurrentServiceComments(mockApi), "400"))).toBe(expectedThread); 
     });
 
     test("Calls to create new thread when adding comment", () => {

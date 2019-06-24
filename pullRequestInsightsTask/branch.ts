@@ -37,10 +37,6 @@ export class Branch{
         return null;
     }
 
-    public tooManyPipelinesFailed(failureThreshold: number): boolean {
-        return this.getPipelineFailStreak() >= failureThreshold;
-    }
-
     public getFullName(): string{
         return this.name;
     }
@@ -63,7 +59,10 @@ export class Branch{
         if (times.length > 0) {
             percentileTimesForTasks.set(taskId, stats.percentile(times, percentileToFind));
         }
-        tl.debug(`no tasks with id ${taskId} found on pipelines of branch ${this.name}`)
+        else {
+            percentileTimesForTasks.set(taskId, null);
+            tl.debug(`no tasks with id ${taskId} found on pipelines of branch ${this.name}`);
+        }
     }
     return percentileTimesForTasks;
     }
