@@ -14,20 +14,40 @@ describe("PullRequest Tests", () => {
     let pullRequest: PullRequest;
     let threads: azureGitInterfaces.GitPullRequestCommentThread[];
     let mockApi: AbstractAzureApi;
+    const desiredAuthor: string =  "Project Collection Build Service (vscsepsteam)";
+    const desiredTask: string = "PullRequestInsights"
+    const active: azureGitInterfaces.CommentThreadStatus = azureGitInterfaces.CommentThreadStatus.Active;
 
-    function makeThread(commentsContents: string[], includeCommentIds: boolean, threadStatus?: azureGitInterfaces.CommentThreadStatus, threadId?: number): azureGitInterfaces.GitPullRequestCommentThread {
-        let threadComments = [];
-        for (let i = 0; i < commentsContents.length; i++){
-            let comment: azureGitInterfaces.Comment = {content: commentsContents[i]};
-            if (includeCommentIds){
-                comment.id = i;
-            }
-            threadComments.push(comment);
+
+    function makeThread(comments: azureGitInterfaces.Comment[], threadProperties?: any, id?: number, status?: azureGitInterfaces.CommentThreadStatus): azureGitInterfaces.GitPullRequestCommentThread {
+        let thread: azureGitInterfaces.GitPullRequestCommentThread = {
+            comments: comments,
+            properties: threadProperties
         }
+        if (id) {
+          thread.id = id;
+        }
+        if (status) {
+            thread.status = status;
+        }
+        return thread;
+    }
+
+    function makeComment(content?: string, author?: string, id?: number) {
+       let comment: azureGitInterfaces.Comment = {content: content};
+       if (author) {
+           comment.author = {displayName: author};
+       }
+       if (id) {
+           comment.id = id;
+       }
+        return comment;
+    }
+
+    function makeProperties(buildIteration: string) {
         return {
-            comments: threadComments,
-            status: threadStatus, 
-            id: threadId
+            fromTask: "PullRequestInsights",
+            buildIteration: buildIteration
         }
     }
 
@@ -36,55 +56,31 @@ describe("PullRequest Tests", () => {
         sinon.stub(mockApi, "getCommentThreads").resolves(threads);
     }
 
-    function makeCommentContentOfCorrectForm(buildIteration: string, pipelineName?: string): string {
-        if (!pipelineName){
-            pipelineName = "fake";
-        }
-        return messages.newIterationCommentHeading.format(buildIteration) + "\n" + messages.failureCommentTableHeading + "\n" + messages.failureCommentRow.format(pipelineName, "fake", "fake", "fake", "fake", "fake", "fake", "fake");
-    }
-
-    function makeCommentContentRow(pipelineName: string){
-        return messages.failureCommentRow.format(pipelineName, "fake", "fake", "fake", "fake", "fake", "fake", "fake");
-    }
-
     beforeEach (() => {
         pullRequest = new PullRequest(2, "repo", "project");
         mockApi = mock(ReleaseAzureApi);
-    })
-
-    test("Does not find a comment thread when comments are of wrong format", async () => {
-        setThreads([makeThread(["|jk jk hj| failure |", "fake comment"], false), makeThread(["|jk jk hj| failure |", "fake comment"], false)]);
-        expect(pullRequest.getCurrentIterationCommentThread(await pullRequest.getCurrentServiceComments(mockApi), "thisBuild")).toBeNull; 
-    });
-
-    test("Finds comment thread when comment of same build iteration in correct format exists", async () => {
-        let expectedThread: azureGitInterfaces.GitPullRequestCommentThread = makeThread([makeCommentContentOfCorrectForm("345")], true , 5);
-        console.log("comment: " + expectedThread.comments[0].content)
-        setThreads([makeThread(["|jk jk hj| failure |", "fake comment"], true), expectedThread]);
-        expect((await pullRequest.getCurrentIterationCommentThread(await pullRequest.getCurrentServiceComments(mockApi), "345"))).toBe(expectedThread); 
-    });
-
-    test("Finds correct comment thread when many comment threads of correct format exist", async () => {
-        let expectedThread: azureGitInterfaces.GitPullRequestCommentThread = makeThread([makeCommentContentOfCorrectForm("400")], false, 7);
-        setThreads([makeThread(["fake comment"], false), makeThread([makeCommentContentOfCorrectForm("345")], false, 5), expectedThread]);
-        expect((await pullRequest.getCurrentIterationCommentThread( await pullRequest.getCurrentServiceComments(mockApi), "400"))).toBe(expectedThread); 
     });
 
     test("Calls to create new thread when adding comment", () => {
-        let commentContent:string = makeCommentContentOfCorrectForm("500");
-        let expectedThread: azureGitInterfaces.GitPullRequestCommentThread = makeThread([commentContent], false);
         let callback: jest.SpyInstance = jest.spyOn(mockApi, "postNewCommentThread");
-        pullRequest.addNewComment(mockApi, commentContent, "500");
-        expect(callback).toBeCalledWith({comments: expectedThread.comments}, 2, "repo", "project");
+        pullRequest.addNewComment(mockApi, "", "500");
+        expect(callback).toBeCalled();
+    });
+
+    test("Calls to create thread with correct properties when adding comment", async () => {
+        let callback: jest.SpyInstance = jest.spyOn(mockApi, "postNewCommentThread");
+        let expectedThread: azureGitInterfaces.GitPullRequestCommentThread = makeThread([makeComment("")], makeProperties("500"));
+        pullRequest.addNewComment(mockApi, "", "500");
+        expect(callback).toBeCalledWith(expectedThread, 2, "repo", "project");
+
     });
 
     test("Only calls to deactivate comments that do not match current build iteration", async () => {
-        let threadsToDeactivate: azureGitInterfaces.GitPullRequestCommentThread[] = [makeThread([makeCommentContentOfCorrectForm("90")], false, azureGitInterfaces.CommentThreadStatus.Active, 16), makeThread([makeCommentContentOfCorrectForm("800")], false, azureGitInterfaces.CommentThreadStatus.Active, 18)];
-        let threadNotToDeactivate: azureGitInterfaces.GitPullRequestCommentThread[] =  [makeThread([makeCommentContentOfCorrectForm("750")], false, azureGitInterfaces.CommentThreadStatus.Active, 5)];
+        let threadsToDeactivate: azureGitInterfaces.GitPullRequestCommentThread[] = [makeThread([makeComment("", desiredAuthor)], makeProperties("900"), 0), makeThread([makeComment("", desiredAuthor)], makeProperties("800"), 1)];
+        let threadNotToDeactivate: azureGitInterfaces.GitPullRequestCommentThread[] = [makeThread([makeComment("", desiredAuthor)], makeProperties("500"), 2)];
         let callback: jest.SpyInstance = jest.spyOn(mockApi, "updateCommentThread");
         setThreads(threadNotToDeactivate.concat(threadsToDeactivate));
-        console.log("number threads: " + (await mockApi.getCommentThreads(2, "repo", "project")).length);
-        await pullRequest.deactivateOldComments(mockApi,  await pullRequest.getCurrentServiceComments(mockApi), 5); 
+        await pullRequest.deactivateOldComments(mockApi,  await pullRequest.getCurrentServiceCommentThreads(mockApi), 2); 
         for (let thread of threadsToDeactivate) {
            expect(callback).toBeCalledWith({status: azureGitInterfaces.CommentThreadStatus.Closed}, 2, "repo", "project", thread.id);
         }
@@ -92,11 +88,11 @@ describe("PullRequest Tests", () => {
     });
 
     test("Only calls to deactivate comments that are active or undefined", async () =>{
-        let threadsToDeactivate: azureGitInterfaces.GitPullRequestCommentThread[] = [makeThread([makeCommentContentOfCorrectForm("90")], false, azureGitInterfaces.CommentThreadStatus.Active, 600), makeThread([makeCommentContentOfCorrectForm("800")], false, undefined, 800)];
-        let threadsNotToDeactivate: azureGitInterfaces.GitPullRequestCommentThread[] =  [makeThread([makeCommentContentOfCorrectForm("750")], false, azureGitInterfaces.CommentThreadStatus.Closed, 1000), makeThread([makeCommentContentOfCorrectForm("750")], false, azureGitInterfaces.CommentThreadStatus.WontFix, 900)];
+        let threadsToDeactivate: azureGitInterfaces.GitPullRequestCommentThread[] = [makeThread([makeComment("", desiredAuthor)], makeProperties("900"), 0, active), makeThread([makeComment("", desiredAuthor)], makeProperties("800"), 1, undefined)];
+        let threadsNotToDeactivate: azureGitInterfaces.GitPullRequestCommentThread[] = [makeThread([makeComment("", desiredAuthor)], makeProperties("500"), 2, azureGitInterfaces.CommentThreadStatus.Closed), makeThread([makeComment("", desiredAuthor)], makeProperties("500"), 2, azureGitInterfaces.CommentThreadStatus.ByDesign)];
         let callback: jest.SpyInstance = jest.spyOn(mockApi, "updateCommentThread");
         setThreads(threadsNotToDeactivate.concat(threadsToDeactivate));
-        await pullRequest.deactivateOldComments(mockApi,  await pullRequest.getCurrentServiceComments(mockApi), 5); 
+        await pullRequest.deactivateOldComments(mockApi, await pullRequest.getCurrentServiceCommentThreads(mockApi), 2); 
         for (let thread of threadsToDeactivate) {
            expect(callback).toBeCalledWith({status: azureGitInterfaces.CommentThreadStatus.Closed}, 2, "repo", "project", thread.id);
         }
@@ -105,29 +101,66 @@ describe("PullRequest Tests", () => {
         }
     });
 
-    test("Calls to edit only matching comment in matching thread", async () =>{
-        let commentContentToAddTo: string = makeCommentContentOfCorrectForm("500");
-        let commentContentToAdd: string = makeCommentContentRow("release-77");
-        let commentContentNotToAddTo: string = makeCommentContentOfCorrectForm("800");
-        let threadToEdit: azureGitInterfaces.GitPullRequestCommentThread = makeThread([commentContentNotToAddTo, commentContentToAddTo], true, azureGitInterfaces.CommentThreadStatus.Active, 10);
+    test("Calls to edit only correct comment in correct thread", async () => {
         let callback: jest.SpyInstance = jest.spyOn(mockApi, "updateComment");
-        await pullRequest.editMatchingCommentInThread(mockApi, threadToEdit, commentContentToAdd, "500");
-        expect(callback).toBeCalledWith({content: commentContentToAddTo + commentContentToAdd}, 2, "repo", "project", 10, 1);
-        expect(callback).not.toBeCalledWith({content: commentContentNotToAddTo + commentContentToAdd}, 2, "repo", "project", 10, 0);
-    });
-
-    test("Only edits one comment in matching comment thread", async () =>{
-        let threadToEdit: azureGitInterfaces.GitPullRequestCommentThread = makeThread([makeCommentContentOfCorrectForm("build98"), makeCommentContentOfCorrectForm("build99"), makeCommentContentOfCorrectForm("build100")], true);
-        let callback: jest.SpyInstance = jest.spyOn(mockApi, "updateComment");
-        await pullRequest.editMatchingCommentInThread(mockApi, threadToEdit, makeCommentContentRow("release897"), "build98");
+        let thread: azureGitInterfaces.GitPullRequestCommentThread = makeThread([makeComment("hello", "", 2), makeComment("hi", "", 1)], undefined, 5);
+        pullRequest.editCommentInThread(mockApi, thread, 2, "goodbye");
         expect(callback).toHaveBeenCalledTimes(1);
+        expect(callback).toBeCalledWith({content: "hellogoodbye"}, 2, "repo", "project", 5, 2);
     });
 
-    test("Does not edit thread if no comment matches", () =>{
-        let threadToEdit: azureGitInterfaces.GitPullRequestCommentThread = makeThread([makeCommentContentOfCorrectForm("build98"), makeCommentContentOfCorrectForm("build99"), makeCommentContentOfCorrectForm("build100")], true);
+    test("Does not edit any other comments in thread if thread is empty", async () => {
         let callback: jest.SpyInstance = jest.spyOn(mockApi, "updateComment");
-        pullRequest.editMatchingCommentInThread(mockApi, threadToEdit, makeCommentContentRow("release897"), "build97");
+        let thread: azureGitInterfaces.GitPullRequestCommentThread = makeThread([], undefined, 5);
+        pullRequest.editCommentInThread(mockApi, thread, 1, "goodbye");
         expect(callback).toHaveBeenCalledTimes(0);
     });
-    
+
+
+    test("Correct comment thread is found for build iteration", () => {
+        let expectedThread: azureGitInterfaces.GitPullRequestCommentThread = makeThread([makeComment("", desiredAuthor)], makeProperties("11"), 12, active);
+        let threads: azureGitInterfaces.GitPullRequestCommentThread[] = [makeThread([makeComment("", desiredAuthor)], makeProperties("1"), 2, active), expectedThread, makeThread([makeComment("", desiredAuthor)], makeProperties("111"), 112, active)];
+        expect(pullRequest.getCurrentIterationCommentThread(threads, "11")).toBe(expectedThread);
+    });
+
+    test("No comment thread is found when build iteration is not present", () => {
+        let threads: azureGitInterfaces.GitPullRequestCommentThread[] = [makeThread([makeComment("", desiredAuthor)], makeProperties("1"), 2, active), makeThread([makeComment("", desiredAuthor)], makeProperties("111"), 112, active)];
+        expect(pullRequest.getCurrentIterationCommentThread(threads, "11")).toBeNull();
+    });
+
+    test("No comment thread is found when comment thread is missing properties", () => {
+        let threads: azureGitInterfaces.GitPullRequestCommentThread[] = [makeThread([makeComment("", desiredAuthor)], 2, active), makeThread([makeComment("", desiredAuthor)], makeProperties("111"), 112, active)];
+        expect(pullRequest.getCurrentIterationCommentThread(threads, "1")).toBeNull();
+    });
+
+    test("No comment thread is found when comment thread has iteration but is missing other properties data", () => {
+        let threads: azureGitInterfaces.GitPullRequestCommentThread[] = [makeThread([makeComment("", desiredAuthor)], {buildIteration: "1"}, 2, active), makeThread([makeComment("", desiredAuthor)], makeProperties("111"), 112, active)];
+        expect(pullRequest.getCurrentIterationCommentThread(threads, "1")).toBeNull();
+    });
+
+    test("No comment thread is found when comment thread does not have comments", () => {
+        let threads: azureGitInterfaces.GitPullRequestCommentThread[] = [makeThread([], makeProperties("1"), 2, active), makeThread([makeComment("", desiredAuthor)], makeProperties("111"), 112, active)];
+        expect(pullRequest.getCurrentIterationCommentThread(threads, "1")).toBeNull();
+    });
+
+     test("No comment thread is found when comment thread first comment is not authored by service", () => {
+        let threads: azureGitInterfaces.GitPullRequestCommentThread[] = [makeThread([makeComment("", "me")], makeProperties("1"), 2, active), makeThread([makeComment("", desiredAuthor)], makeProperties("111"), 112, active)];
+        expect(pullRequest.getCurrentIterationCommentThread(threads, "1")).toBeNull();
+    });
+
+    test("All comment threads are found as service comments when all match criteria", async () => {
+        setThreads([makeThread([makeComment("", desiredAuthor)], makeProperties("111"), 2, active), makeThread([makeComment("", desiredAuthor)], makeProperties("111"), 112, active)]);
+        expect(await pullRequest.getCurrentServiceCommentThreads(mockApi)).toEqual(threads);
+    });
+
+    test("Some comment threads are found as service comments when only some match service criteria", async () => {
+        setThreads([makeThread([makeComment("", desiredAuthor)], makeProperties("111"), 2, active), makeThread([makeComment("", desiredAuthor)], undefined, 112, active), makeThread([makeComment("", "someoneElse")], makeProperties("111"), 112, active)]);
+        expect(await pullRequest.getCurrentServiceCommentThreads(mockApi)).toEqual([threads[0]]);
+    });
+
+    test("Null is returned when no comment threads are from service", async () => {
+        setThreads([makeThread([makeComment("", desiredAuthor)], {fromTask: desiredTask}, 2, active), makeThread([makeComment("", desiredAuthor)], undefined, 112, active), makeThread([makeComment("", "someoneElse")], makeProperties("111"), 112, active)]);
+        expect(await pullRequest.getCurrentServiceCommentThreads(mockApi)).toEqual([]);
+    });
+
 });

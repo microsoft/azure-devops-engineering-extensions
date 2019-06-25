@@ -1,5 +1,4 @@
 {
-  "taskPropertyName": "fromTask",
   "taskPropertyValue": "PullRequestInsights",
-  "iterationPropertyName": "buildIteration"       
+  "author": "Project Collection Build Service (vscsepsteam)"  
 }
