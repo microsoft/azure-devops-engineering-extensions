@@ -25,7 +25,7 @@ export class PullRequest {
 
     public async deactivateOldComments(apiCaller: AbstractAzureApi, serviceComments: azureGitInterfaces.GitPullRequestCommentThread[], currentIterationCommentId: number): Promise<void> {
         for (let commentThread of serviceComments) {
-            if (commentThread.id != currentIterationCommentId && (commentThread.status === azureGitInterfaces.CommentThreadStatus.Active || commentThread.status === undefined)) {
+            if (commentThread.id !== currentIterationCommentId && (commentThread.status === azureGitInterfaces.CommentThreadStatus.Active || commentThread.status === undefined)) {
                 tl.debug("comment thread id to be deactivated: " + commentThread.id);
                 apiCaller.updateCommentThread({ status: azureGitInterfaces.CommentThreadStatus.Closed }, this.id, this.repository, this.projectName, commentThread.id);
             }
@@ -59,6 +59,7 @@ export class PullRequest {
         let commentThreads: azureGitInterfaces.GitPullRequestCommentThread[] = await apiCaller.getCommentThreads(this.id, this.repository, this.projectName);
         let serviceThreads: azureGitInterfaces.GitPullRequestCommentThread[] = [];
         for (let commentThread of commentThreads) {
+            tl.debug(commentThread.id + " has service properties: " + this.threadHasServiceProperties(commentThread) + " has comments: " + this.threadHasComments(commentThread) + " has comment with correct author: " + this.commentWasWrittenByService(commentThread.comments[0]));
             if (this.threadIsFromService(commentThread)) {
                 serviceThreads.push(commentThread);
             }
@@ -71,7 +72,7 @@ export class PullRequest {
 
     private getBuildIterationFromServiceCommentThread(thread: azureGitInterfaces.GitPullRequestCommentThread): string {
          if (this.threadHasServiceProperties(thread)) {
-             return thread.properties.buildIteration;
+             return thread.properties.buildIteration.$value;
          }
          return null;
     }
@@ -81,7 +82,7 @@ export class PullRequest {
     }
 
     private threadHasServiceProperties(thread: azureGitInterfaces.GitPullRequestCommentThread): boolean {
-        return thread.properties && thread.properties.fromTask && thread.properties.fromTask === commentProperties.taskPropertyValue && thread.properties.buildIteration;
+        return thread.properties && thread.properties.fromTask && thread.properties.fromTask.$value === commentProperties.taskPropertyValue && thread.properties.buildIteration;
     }
 
     private commentWasWrittenByService(comment: azureGitInterfaces.Comment): boolean {

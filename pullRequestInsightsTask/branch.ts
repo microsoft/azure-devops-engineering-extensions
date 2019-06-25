@@ -56,8 +56,10 @@ export class Branch{
                     times.push(taskLength);
                 } 
             }
+        tl.debug("times on target for " + taskId + " = " + times.toString())
         if (times.length > 0) {
-            percentileTimesForTasks.set(taskId, stats.percentile(times, percentileToFind));
+            tl.debug("input for stats library " + percentileToFind/100);
+            percentileTimesForTasks.set(taskId, stats.percentile(times, percentileToFind/10));
         }
         else {
             percentileTimesForTasks.set(taskId, null);
@@ -66,4 +68,5 @@ export class Branch{
     }
     return percentileTimesForTasks;
     }
+
 }

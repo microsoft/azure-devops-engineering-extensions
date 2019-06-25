@@ -11,7 +11,7 @@ import { CommentContentFactory } from './CommentContentFactory';
 
 async function run() {
     try {
-        const percentile: number = 95; 
+        const percentile: number = 1; 
         const numberBuildsToQuery: number = 10;
         let configurations: EnvironmentConfigurations = new EnvironmentConfigurations();
 
@@ -37,10 +37,13 @@ async function run() {
             
             if (!currentPipeline.isFailure() && type === "build"){ // temporary second condition, present since long running validations only functional for builds as of now
                 thresholdTimes = targetBranch.getPercentileTimesForPipelineTasks(percentile, currentPipeline.getTaskIds());
+                for (let taskId of Array.from(thresholdTimes.keys())) {
+                    tl.debug(percentile + " percentile time for: " + taskId + " = " + thresholdTimes.get(taskId));
+                }
                 longRunningValidations = currentPipeline.getLongRunningValidations(thresholdTimes);
                 tl.debug("Number of longRunningValidations = " + longRunningValidations.size);
                 for (let taskId of Array.from(longRunningValidations.keys())) {
-                    tl.debug("long running validation: " + taskId);
+                    tl.debug("long running validation: " + taskId + " took " + longRunningValidations.get(taskId) + " ms");
                 }
             }
             if (currentPipeline.isFailure() || longRunningValidations.size > 0) {
