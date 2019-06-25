@@ -59,7 +59,7 @@ export class Branch{
         tl.debug("times on target for " + taskId + " = " + times.toString())
         if (times.length > 0) {
             tl.debug("input for stats library " + percentileToFind/100);
-            percentileTimesForTasks.set(taskId, stats.percentile(times, percentileToFind/10));
+            percentileTimesForTasks.set(taskId, stats.percentile(times, percentileToFind/100));
         }
         else {
             percentileTimesForTasks.set(taskId, null);

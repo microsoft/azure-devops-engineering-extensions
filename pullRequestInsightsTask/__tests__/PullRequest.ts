@@ -44,12 +44,20 @@ describe("PullRequest Tests", () => {
         return comment;
     }
 
-    function makeProperties(buildIteration: string) {
+    function makeRetrievedProperties(buildIteration: string) {
+        return {
+            fromTask: {$value: "PullRequestInsights"},
+            buildIteration: {$value: buildIteration}
+        }
+    }
+
+    function makeSentProperties(buildIteration: string) {
         return {
             fromTask: "PullRequestInsights",
             buildIteration: buildIteration
         }
     }
+
 
     function setThreads(threadsToGet: azureGitInterfaces.GitPullRequestCommentThread[]): void {
         threads = threadsToGet;
@@ -69,15 +77,15 @@ describe("PullRequest Tests", () => {
 
     test("Calls to create thread with correct properties when adding comment", async () => {
         let callback: jest.SpyInstance = jest.spyOn(mockApi, "postNewCommentThread");
-        let expectedThread: azureGitInterfaces.GitPullRequestCommentThread = makeThread([makeComment("")], makeProperties("500"));
+        let expectedThread: azureGitInterfaces.GitPullRequestCommentThread = makeThread([makeComment("")], makeSentProperties("500"));
         pullRequest.addNewComment(mockApi, "", "500");
         expect(callback).toBeCalledWith(expectedThread, 2, "repo", "project");
 
     });
 
     test("Only calls to deactivate comments that do not match current build iteration", async () => {
-        let threadsToDeactivate: azureGitInterfaces.GitPullRequestCommentThread[] = [makeThread([makeComment("", desiredAuthor)], makeProperties("900"), 0), makeThread([makeComment("", desiredAuthor)], makeProperties("800"), 1)];
-        let threadNotToDeactivate: azureGitInterfaces.GitPullRequestCommentThread[] = [makeThread([makeComment("", desiredAuthor)], makeProperties("500"), 2)];
+        let threadsToDeactivate: azureGitInterfaces.GitPullRequestCommentThread[] = [makeThread([makeComment("", desiredAuthor)], makeRetrievedProperties("900"), 0), makeThread([makeComment("", desiredAuthor)], makeRetrievedProperties("800"), 1)];
+        let threadNotToDeactivate: azureGitInterfaces.GitPullRequestCommentThread[] = [makeThread([makeComment("", desiredAuthor)], makeRetrievedProperties("500"), 2)];
         let callback: jest.SpyInstance = jest.spyOn(mockApi, "updateCommentThread");
         setThreads(threadNotToDeactivate.concat(threadsToDeactivate));
         await pullRequest.deactivateOldComments(mockApi,  await pullRequest.getCurrentServiceCommentThreads(mockApi), 2); 
@@ -88,8 +96,8 @@ describe("PullRequest Tests", () => {
     });
 
     test("Only calls to deactivate comments that are active or undefined", async () =>{
-        let threadsToDeactivate: azureGitInterfaces.GitPullRequestCommentThread[] = [makeThread([makeComment("", desiredAuthor)], makeProperties("900"), 0, active), makeThread([makeComment("", desiredAuthor)], makeProperties("800"), 1, undefined)];
-        let threadsNotToDeactivate: azureGitInterfaces.GitPullRequestCommentThread[] = [makeThread([makeComment("", desiredAuthor)], makeProperties("500"), 2, azureGitInterfaces.CommentThreadStatus.Closed), makeThread([makeComment("", desiredAuthor)], makeProperties("500"), 2, azureGitInterfaces.CommentThreadStatus.ByDesign)];
+        let threadsToDeactivate: azureGitInterfaces.GitPullRequestCommentThread[] = [makeThread([makeComment("", desiredAuthor)], makeRetrievedProperties("900"), 0, active), makeThread([makeComment("", desiredAuthor)], makeRetrievedProperties("800"), 1, undefined)];
+        let threadsNotToDeactivate: azureGitInterfaces.GitPullRequestCommentThread[] = [makeThread([makeComment("", desiredAuthor)], makeRetrievedProperties("500"), 2, azureGitInterfaces.CommentThreadStatus.Closed), makeThread([makeComment("", desiredAuthor)], makeRetrievedProperties("500"), 2, azureGitInterfaces.CommentThreadStatus.ByDesign)];
         let callback: jest.SpyInstance = jest.spyOn(mockApi, "updateCommentThread");
         setThreads(threadsNotToDeactivate.concat(threadsToDeactivate));
         await pullRequest.deactivateOldComments(mockApi, await pullRequest.getCurrentServiceCommentThreads(mockApi), 2); 
@@ -118,48 +126,48 @@ describe("PullRequest Tests", () => {
 
 
     test("Correct comment thread is found for build iteration", () => {
-        let expectedThread: azureGitInterfaces.GitPullRequestCommentThread = makeThread([makeComment("", desiredAuthor)], makeProperties("11"), 12, active);
-        let threads: azureGitInterfaces.GitPullRequestCommentThread[] = [makeThread([makeComment("", desiredAuthor)], makeProperties("1"), 2, active), expectedThread, makeThread([makeComment("", desiredAuthor)], makeProperties("111"), 112, active)];
+        let expectedThread: azureGitInterfaces.GitPullRequestCommentThread = makeThread([makeComment("", desiredAuthor)], makeRetrievedProperties("11"), 12, active);
+        let threads: azureGitInterfaces.GitPullRequestCommentThread[] = [makeThread([makeComment("", desiredAuthor)], makeRetrievedProperties("1"), 2, active), expectedThread, makeThread([makeComment("", desiredAuthor)], makeRetrievedProperties("111"), 112, active)];
         expect(pullRequest.getCurrentIterationCommentThread(threads, "11")).toBe(expectedThread);
     });
 
     test("No comment thread is found when build iteration is not present", () => {
-        let threads: azureGitInterfaces.GitPullRequestCommentThread[] = [makeThread([makeComment("", desiredAuthor)], makeProperties("1"), 2, active), makeThread([makeComment("", desiredAuthor)], makeProperties("111"), 112, active)];
+        let threads: azureGitInterfaces.GitPullRequestCommentThread[] = [makeThread([makeComment("", desiredAuthor)], makeRetrievedProperties("1"), 2, active), makeThread([makeComment("", desiredAuthor)], makeRetrievedProperties("111"), 112, active)];
         expect(pullRequest.getCurrentIterationCommentThread(threads, "11")).toBeNull();
     });
 
     test("No comment thread is found when comment thread is missing properties", () => {
-        let threads: azureGitInterfaces.GitPullRequestCommentThread[] = [makeThread([makeComment("", desiredAuthor)], 2, active), makeThread([makeComment("", desiredAuthor)], makeProperties("111"), 112, active)];
+        let threads: azureGitInterfaces.GitPullRequestCommentThread[] = [makeThread([makeComment("", desiredAuthor)], 2, active), makeThread([makeComment("", desiredAuthor)], makeRetrievedProperties("111"), 112, active)];
         expect(pullRequest.getCurrentIterationCommentThread(threads, "1")).toBeNull();
     });
 
     test("No comment thread is found when comment thread has iteration but is missing other properties data", () => {
-        let threads: azureGitInterfaces.GitPullRequestCommentThread[] = [makeThread([makeComment("", desiredAuthor)], {buildIteration: "1"}, 2, active), makeThread([makeComment("", desiredAuthor)], makeProperties("111"), 112, active)];
+        let threads: azureGitInterfaces.GitPullRequestCommentThread[] = [makeThread([makeComment("", desiredAuthor)], {buildIteration: "1"}, 2, active), makeThread([makeComment("", desiredAuthor)], makeRetrievedProperties("111"), 112, active)];
         expect(pullRequest.getCurrentIterationCommentThread(threads, "1")).toBeNull();
     });
 
     test("No comment thread is found when comment thread does not have comments", () => {
-        let threads: azureGitInterfaces.GitPullRequestCommentThread[] = [makeThread([], makeProperties("1"), 2, active), makeThread([makeComment("", desiredAuthor)], makeProperties("111"), 112, active)];
+        let threads: azureGitInterfaces.GitPullRequestCommentThread[] = [makeThread([], makeRetrievedProperties("1"), 2, active), makeThread([makeComment("", desiredAuthor)], makeRetrievedProperties("111"), 112, active)];
         expect(pullRequest.getCurrentIterationCommentThread(threads, "1")).toBeNull();
     });
 
      test("No comment thread is found when comment thread first comment is not authored by service", () => {
-        let threads: azureGitInterfaces.GitPullRequestCommentThread[] = [makeThread([makeComment("", "me")], makeProperties("1"), 2, active), makeThread([makeComment("", desiredAuthor)], makeProperties("111"), 112, active)];
+        let threads: azureGitInterfaces.GitPullRequestCommentThread[] = [makeThread([makeComment("", "me")], makeRetrievedProperties("1"), 2, active), makeThread([makeComment("", desiredAuthor)], makeRetrievedProperties("111"), 112, active)];
         expect(pullRequest.getCurrentIterationCommentThread(threads, "1")).toBeNull();
     });
 
     test("All comment threads are found as service comments when all match criteria", async () => {
-        setThreads([makeThread([makeComment("", desiredAuthor)], makeProperties("111"), 2, active), makeThread([makeComment("", desiredAuthor)], makeProperties("111"), 112, active)]);
+        setThreads([makeThread([makeComment("", desiredAuthor)], makeRetrievedProperties("111"), 2, active), makeThread([makeComment("", desiredAuthor)], makeRetrievedProperties("111"), 112, active)]);
         expect(await pullRequest.getCurrentServiceCommentThreads(mockApi)).toEqual(threads);
     });
 
     test("Some comment threads are found as service comments when only some match service criteria", async () => {
-        setThreads([makeThread([makeComment("", desiredAuthor)], makeProperties("111"), 2, active), makeThread([makeComment("", desiredAuthor)], undefined, 112, active), makeThread([makeComment("", "someoneElse")], makeProperties("111"), 112, active)]);
+        setThreads([makeThread([makeComment("", desiredAuthor)], makeRetrievedProperties("111"), 2, active), makeThread([makeComment("", desiredAuthor)], undefined, 112, active), makeThread([makeComment("", "someoneElse")], makeRetrievedProperties("111"), 112, active)]);
         expect(await pullRequest.getCurrentServiceCommentThreads(mockApi)).toEqual([threads[0]]);
     });
 
     test("Null is returned when no comment threads are from service", async () => {
-        setThreads([makeThread([makeComment("", desiredAuthor)], {fromTask: desiredTask}, 2, active), makeThread([makeComment("", desiredAuthor)], undefined, 112, active), makeThread([makeComment("", "someoneElse")], makeProperties("111"), 112, active)]);
+        setThreads([makeThread([makeComment("", desiredAuthor)], {fromTask: desiredTask}, 2, active), makeThread([makeComment("", desiredAuthor)], undefined, 112, active), makeThread([makeComment("", "someoneElse")], makeRetrievedProperties("111"), 112, active)]);
         expect(await pullRequest.getCurrentServiceCommentThreads(mockApi)).toEqual([]);
     });
 
