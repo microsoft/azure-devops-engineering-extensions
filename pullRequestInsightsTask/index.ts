@@ -9,10 +9,9 @@ import { PullRequest } from './PullRequest';
 import './StringExtensions';
 import { CommentContentFactory } from './CommentContentFactory';
 
-
 async function run() {
     try {
-        const percentile: number = 95; 
+        const percentile: number = 1; 
         const numberBuildsToQuery: number = 10;
         let configurations: EnvironmentConfigurations = new EnvironmentConfigurations();
 
@@ -36,23 +35,27 @@ async function run() {
             let thresholdTimes: Map<string, number> = new Map();
             let longRunningValidations: Map<string, number> = new Map();
             
-            if (!currentPipeline.isFailure()){
+            if (!currentPipeline.isFailure() && type === "build"){ // temporary second condition, present since long running validations only functional for builds as of now
                 thresholdTimes = targetBranch.getPercentileTimesForPipelineTasks(percentile, currentPipeline.getTaskIds());
+                for (let taskId of Array.from(thresholdTimes.keys())) {
+                    tl.debug(percentile + " percentile time for: " + taskId + " = " + thresholdTimes.get(taskId));
+                }
                 longRunningValidations = currentPipeline.getLongRunningValidations(thresholdTimes);
                 tl.debug("Number of longRunningValidations = " + longRunningValidations.size);
                 for (let taskId of Array.from(longRunningValidations.keys())) {
-                    tl.debug("long running validation: " + taskId);
+                    tl.debug("long running validation: " + taskId + " took " + longRunningValidations.get(taskId) + " ms");
                 }
             }
             if (currentPipeline.isFailure() || longRunningValidations.size > 0) {
-                let serviceThreads: azureGitInterfaces.GitPullRequestCommentThread[] = await pullRequest.getCurrentServiceComments(azureApi);
-                let currentIterationCommentThread: azureGitInterfaces.GitPullRequestCommentThread = await pullRequest.getCurrentIterationCommentThread(serviceThreads, configurations.getBuildIteration());
+                let serviceThreads: azureGitInterfaces.GitPullRequestCommentThread[] = await pullRequest.getCurrentServiceCommentThreads(azureApi);
+                let currentIterationCommentThread: azureGitInterfaces.GitPullRequestCommentThread = pullRequest.getCurrentIterationCommentThread(serviceThreads, configurations.getBuildIteration());
                 let currentPipelineCommentContent: string = commentFactory.createTableSection(currentPipeline, targetBranch.getMostRecentCompletePipeline(), targetBranch, type, longRunningValidations, thresholdTimes);
                 if (currentIterationCommentThread) {
-                    pullRequest.editMatchingCommentInThread(azureApi, currentIterationCommentThread, currentPipelineCommentContent, configurations.getBuildIteration());
+                    pullRequest.editCommentInThread(azureApi, currentIterationCommentThread, currentIterationCommentThread.comments[0].id, currentPipelineCommentContent);
                 }
                 else {
-                    let currentIterationCommentThreadId: number = (await pullRequest.addNewComment(azureApi, commentFactory.createIterationHeader(configurations.getBuildIteration()) + "\n" + commentFactory.createTableHeader(currentPipeline.isFailure(), targetBranch.getTruncatedName(), String(percentile)) + "\n" + currentPipelineCommentContent)).id;
+                    currentPipelineCommentContent = commentFactory.createIterationHeader(configurations.getBuildIteration()) + "\n" + commentFactory.createTableHeader(currentPipeline.isFailure(), targetBranch.getTruncatedName(), String(percentile)) + "\n" + currentPipelineCommentContent;
+                    let currentIterationCommentThreadId: number = (await pullRequest.addNewComment(azureApi, currentPipelineCommentContent, configurations.getBuildIteration())).id;
                     pullRequest.deactivateOldComments(azureApi, serviceThreads, currentIterationCommentThreadId);
                 }
             }   
