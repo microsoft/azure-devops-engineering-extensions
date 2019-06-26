@@ -44,6 +44,17 @@ export class Build implements IPipeline{
         return this.buildData.buildNumber;
     }
 
+
+    public getTaskLengthWithName(taskId: string, taskName: string): number | null{
+        for (let taskRecord of this.timelineData.records) {
+            if (taskRecord.id === taskId && taskRecord.name === taskName && this.taskRan(taskRecord)){
+               // tl.debug("task: " + taskId + " " + taskRecord.startTime.getTime() + " " + taskRecord.finishTime.getTime() + " " + (taskRecord.finishTime.getTime() - taskRecord.startTime.getTime()));
+                return taskRecord.finishTime.getTime() - taskRecord.startTime.getTime();
+            }
+        }
+        return null;
+    }
+
     public getTaskLength(taskId: string): number | null{
         for (let taskRecord of this.timelineData.records) {
             if (taskRecord.id === taskId && this.taskRan(taskRecord)){
@@ -52,6 +63,13 @@ export class Build implements IPipeline{
             }
         }
         return null;
+    }
+
+    public getTasks(): azureBuildInterfaces.TimelineRecord[] {
+        if (!this.timelineData.records) {
+            return null;
+        }
+        return this.timelineData.records;
     }
 
     public getTaskIds(): string[] {
@@ -73,6 +91,14 @@ export class Build implements IPipeline{
             }
         }
         return longRunningValidations;
+    }
+
+    public isLongRunning(task: azureBuildInterfaces.TimelineRecord, thresholdTime: number): boolean {
+        let taskLength = this.getTaskLengthWithName(task.id, task.name);
+        if (thresholdTime != null && taskLength > thresholdTime) {
+            return true;
+        }
+        return false;
     }
 
     private taskRan(task: azureBuildInterfaces.TimelineRecord): boolean {
