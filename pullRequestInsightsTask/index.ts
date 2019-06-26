@@ -8,7 +8,7 @@ import { AzureApiFactory } from './AzureApiFactory';
 import { PullRequest } from './PullRequest';
 import './StringExtensions';
 import { CommentContentFactory } from './CommentContentFactory';
-import { IPipelineTask } from './PipelineTask';
+import { IPipelineTask } from './IPipelineTask';
 
 async function run() {
     try {
@@ -17,12 +17,12 @@ async function run() {
         let configurations: EnvironmentConfigurations = new EnvironmentConfigurations();
 
         tl.debug("pull request id: " + configurations.getPullRequestId());
-        if (!configurations.getPullRequestId()){
+        if (!configurations.getPullRequestId()) {
             tl.debug(messages.notInPullRequestMessage);
         }
         else {
             let azureApiFactory: AzureApiFactory = new AzureApiFactory();
-            let azureApi = await azureApiFactory.create(configurations); 
+            let azureApi = await azureApiFactory.create(configurations);
             let currentProject: string = configurations.getProjectName();
             let currentPipeline: IPipeline = await azureApi.getCurrentPipeline(configurations);
             let type: string = configurations.getHostType();
@@ -32,20 +32,18 @@ async function run() {
             tl.debug("target branch of pull request: " + targetBranchName);
             let retrievedPipelines: IPipeline[] = await azureApi.getMostRecentPipelinesOfCurrentType(currentProject, currentPipeline, numberBuildsToQuery, targetBranchName);
             tl.debug(`Number of retrieved pipelines for ${targetBranchName} = ` + retrievedPipelines.length);
-            let targetBranch: Branch = new Branch(targetBranchName, retrievedPipelines); 
+            let targetBranch: Branch = new Branch(targetBranchName, retrievedPipelines);
             let thresholdTimes: number[] = [];
             let longRunningValidations: IPipelineTask[] = [];
-            
-            if (!currentPipeline.isFailure() && type === "build"){ // temporary second condition, present since long running validations only functional for builds as of now
+
+            if (!currentPipeline.isFailure() && type === "build") { // temporary second condition, present since long running validations only functional for builds as of now
                 for (let task of currentPipeline.getAllTasks()) {
                     let percentileTime: number = targetBranch.getPercentileTimeForPipelineTask(percentile, task);
-                    if (task.isLongRunning(percentileTime)){
+                    if (task.isLongRunning(percentileTime)) {
                         longRunningValidations.push(task);
                         thresholdTimes.push(percentileTime);
                     }
                 }
-          //      thresholdTimes = targetBranch.getPercentileTimesForPipelineTasks(percentile, currentPipeline.getAllTasks());
-           //     longRunningValidations = currentPipeline.getLongRunningValidations(thresholdTimes);
                 tl.debug("Number of longRunningValidations = " + longRunningValidations.length);
             }
             if (currentPipeline.isFailure() || longRunningValidations.length > 0) {
@@ -60,7 +58,7 @@ async function run() {
                     let currentIterationCommentThreadId: number = (await pullRequest.addNewComment(azureApi, currentPipelineCommentContent, configurations.getBuildIteration())).id;
                     pullRequest.deactivateOldComments(azureApi, serviceThreads, currentIterationCommentThreadId);
                 }
-            }   
+            }
         }
     }
     catch (err) {

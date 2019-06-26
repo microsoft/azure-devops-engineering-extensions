@@ -1,7 +1,6 @@
 import * as azureBuildInterfaces from "azure-devops-node-api/interfaces/BuildInterfaces";
-import { IPipelineTask, BuildTask } from "../PipelineTask";
 import sinon from "sinon";
-import { TimelineRecordState } from "azure-devops-node-api/interfaces/TaskAgentInterfaces";
+import { BuildTask } from "../BuildTask";
 
 
 describe('BuildTask Tests', () => {

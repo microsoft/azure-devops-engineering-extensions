@@ -2,8 +2,8 @@ import { Build } from '../Build';
 import * as sinon from 'sinon';
 import { Branch } from '../Branch';
 import { IPipeline } from '../IPipeline';
-import { stringify } from 'querystring';
-import { IPipelineTask, BuildTask } from '../PipelineTask';
+import { IPipelineTask } from '../IPipelineTask';
+import { BuildTask } from '../BuildTask';
 
 describe('Branch Tests', () => {
     
@@ -101,18 +101,4 @@ describe('Branch Tests', () => {
         branch = new Branch("", [makePipeline(undefined, undefined, [makeTask("jkl", "id", 4)]), makePipeline(undefined, undefined, [makeTask("jkl", "id", 2)]), makePipeline(undefined, undefined, [makeTask("jkl", "id", 3)]), makePipeline(undefined, undefined, [makeTask("jkl", "id", 1)])]);
         expect(branch.getPercentileTimeForPipelineTask(40, makeTask("jkl", "id", 4))).toBeCloseTo(2.1);
     });
-
-    // test("Correct percentiles returned for multiple valid tasks when percentile does not fall on exact length", () => {
-    //     branch = new Branch("", [makePipeline(undefined, undefined, new Map([["jkl", 4], ["abc", 5]])), makePipeline(undefined, undefined, new Map([["jkl", 2], ["abc", 25]])), makePipeline(undefined, undefined, new Map([["jkl", 3], ["abc", 10]])), makePipeline(undefined, undefined, new Map([["jkl", 1], ["abc", 30]]))]);
-    //     let percentiles: Map<string, number> = branch.getPercentileTimesForPipelineTasks(40, ["jkl", "abc"]);
-    //     expect(percentiles.get("jkl")).toBeCloseTo(2.1);
-    //     expect(percentiles.get("abc")).toBeCloseTo(11.5);
-    // });
-
-    // test("Correct percentiles returned for multiple valid and invalid tasks", () => {
-    //     branch = new Branch("", [makePipeline(undefined, undefined, new Map([["jkl", 4]])), makePipeline(undefined, undefined, new Map([["jkl", 2]])), makePipeline(undefined, undefined, new Map([["jkl", 3]])), makePipeline(undefined, undefined, new Map([["jkl", 1]]))]);
-    //     let percentiles: Map<string, number> = branch.getPercentileTimesForPipelineTasks(40, ["jkl", "abc"]);
-    //     expect(percentiles.get("jkl")).toBeCloseTo(2.1);
-    //     expect(percentiles.get("abc")).toBeNull();
-    // });
 })

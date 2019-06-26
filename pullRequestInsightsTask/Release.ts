@@ -1,6 +1,6 @@
 import * as azureReleaseInterfaces from "azure-devops-node-api/interfaces/ReleaseInterfaces";
 import { IPipeline } from "./IPipeline";
-import { IPipelineTask } from "./PipelineTask";
+import { IPipelineTask } from "./IPipelineTask";
 
 export class Release implements IPipeline{
 

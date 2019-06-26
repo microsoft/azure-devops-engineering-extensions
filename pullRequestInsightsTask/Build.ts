@@ -1,7 +1,8 @@
 import { IPipeline } from "./IPipeline";
 import * as azureBuildInterfaces from "azure-devops-node-api/interfaces/BuildInterfaces";
 import tl = require('azure-pipelines-task-lib/task');
-import { IPipelineTask, BuildTask } from "./PipelineTask";
+import { IPipelineTask } from "./IPipelineTask";
+import { BuildTask } from "./BuildTask";
 
 export class Build implements IPipeline{
 
@@ -66,15 +67,4 @@ export class Build implements IPipeline{
         }
         return null;
     }
-
-    // public getLongRunningValidations(taskThresholdTimes: number[]): IPipelineTask[] {
-    //     let longRunningValidations: IPipelineTask[] = []; 
-    //     for (let i = 0; i < taskThresholdTimes.length; i++) {
-    //         if (taskThresholdTimes[i] && this.tasks[i].getDuration() > taskThresholdTimes[i]) {
-    //             longRunningValidations.push(this.tasks[i]);
-    //         }
-    //     }
-    //     return longRunningValidations;
-    // }
-
 } 

@@ -1,4 +1,4 @@
-import { IPipelineTask } from "./PipelineTask";
+import { IPipelineTask } from "./IPipelineTask";
 
 export interface IPipeline{
     getDefinitionId: ()=> number;

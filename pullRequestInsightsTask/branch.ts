@@ -1,7 +1,7 @@
 import { IPipeline } from "./IPipeline";
 import tl = require('azure-pipelines-task-lib/task');
 import stats from "stats-lite";
-import { IPipelineTask, BuildTask } from "./PipelineTask";
+import { IPipelineTask } from "./IPipelineTask";
 
  
 

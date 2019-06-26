@@ -1,8 +1,8 @@
 import * as azureBuildInterfaces from "azure-devops-node-api/interfaces/BuildInterfaces";
 import { Build } from "../Build";
-import { IPipelineTask, BuildTask } from "../PipelineTask";
 import sinon from "sinon";
-import { TimelineRecordState } from "azure-devops-node-api/interfaces/TaskAgentInterfaces";
+import { IPipelineTask } from "../IPipelineTask";
+import { BuildTask } from "../BuildTask";
 
 
 describe('Build Tests', () => {
@@ -85,7 +85,7 @@ describe('Build Tests', () => {
         build = new Build(null, mockBuildTimeline);
         expect(build.getAllTasks()).toEqual([]);
     });
-    
+
     test('Equivalent task retrieved from build when present', () => {
         let record: azureBuildInterfaces.TimelineRecord = makeTimelineRecord(azureBuildInterfaces.TaskResult.Failed, undefined, undefined, undefined, "name", "abc");
         let taskToGet: IPipelineTask = new BuildTask(record);
