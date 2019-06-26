@@ -1,23 +1,26 @@
 import { IPipeline } from "./IPipeline";
 import * as azureBuildInterfaces from "azure-devops-node-api/interfaces/BuildInterfaces";
 import tl = require('azure-pipelines-task-lib/task');
+import { IPipelineTask, BuildTask } from "./PipelineTask";
 
 export class Build implements IPipeline{
 
     private buildData: azureBuildInterfaces.Build; 
-    private timelineData: azureBuildInterfaces.Timeline;
+    private tasks: IPipelineTask[] = [];
 
     constructor(buildData: azureBuildInterfaces.Build, timelineData: azureBuildInterfaces.Timeline) {
         this.buildData = buildData;
-        this.timelineData = timelineData;
+        for (let taskRecord of timelineData.records) {
+           this.tasks.push(new BuildTask(taskRecord));
+        }
     }
 
     public isFailure() : boolean {
         if (this.isComplete()){
             return this.buildData.result === azureBuildInterfaces.BuildResult.Failed;
         }
-        for (let taskRecord of this.timelineData.records){
-            if (this.taskRan(taskRecord) && this.taskFailed(taskRecord)){
+        for (let task of this.tasks){
+            if (task.ran() && task.wasFailure()){
                 return true;
             }
         }
@@ -44,68 +47,31 @@ export class Build implements IPipeline{
         return this.buildData.buildNumber;
     }
 
+    public getAllTasks(): IPipelineTask[] {
+        if (!this.tasks) {
+            return null;
+        }
+        return this.tasks;
+    }
 
-    public getTaskLengthWithName(taskId: string, taskName: string): number | null{
-        for (let taskRecord of this.timelineData.records) {
-            if (taskRecord.id === taskId && taskRecord.name === taskName && this.taskRan(taskRecord)){
-               // tl.debug("task: " + taskId + " " + taskRecord.startTime.getTime() + " " + taskRecord.finishTime.getTime() + " " + (taskRecord.finishTime.getTime() - taskRecord.startTime.getTime()));
-                return taskRecord.finishTime.getTime() - taskRecord.startTime.getTime();
+    public getTask(taskToGet: IPipelineTask): IPipelineTask {
+        for (let task of this.tasks) {
+            console.log(taskToGet.getName() + " = " + task.getName() + " ? " + task.equals(taskToGet))
+            if (task.equals(taskToGet)) {
+                return task;
             }
         }
         return null;
     }
 
-    public getTaskLength(taskId: string): number | null{
-        for (let taskRecord of this.timelineData.records) {
-            if (taskRecord.id === taskId && this.taskRan(taskRecord)){
-               // tl.debug("task: " + taskId + " " + taskRecord.startTime.getTime() + " " + taskRecord.finishTime.getTime() + " " + (taskRecord.finishTime.getTime() - taskRecord.startTime.getTime()));
-                return taskRecord.finishTime.getTime() - taskRecord.startTime.getTime();
-            }
-        }
-        return null;
-    }
-
-    public getTasks(): azureBuildInterfaces.TimelineRecord[] {
-        if (!this.timelineData.records) {
-            return null;
-        }
-        return this.timelineData.records;
-    }
-
-    public getTaskIds(): string[] {
-        if (!this.timelineData.records) {
-            return null;
-        }
-        let taskIds: string[] = [];
-        for (let taskRecord of this.timelineData.records) {
-            taskIds.push(taskRecord.id);
-        }
-        return taskIds;
-    }
-
-    public getLongRunningValidations(taskThresholdTimes: Map<string, number>): Map<string, number> {
-        let longRunningValidations: Map<string, number> = new Map(); 
-        for (let taskId of this.getTaskIds()) {
-            if (taskThresholdTimes.get(taskId) && this.getTaskLength(taskId) > taskThresholdTimes.get(taskId)) {
-                longRunningValidations.set(taskId, this.getTaskLength(taskId));
+    public getLongRunningValidations(taskThresholdTimes: number[]): IPipelineTask[] {
+        let longRunningValidations: IPipelineTask[] = []; 
+        for (let i = 0; i < taskThresholdTimes.length; i++) {
+            if (taskThresholdTimes[i] && this.tasks[i].getDuration() > taskThresholdTimes[i]) {
+                longRunningValidations.push(this.tasks[i]);
             }
         }
         return longRunningValidations;
     }
 
-    public isLongRunning(task: azureBuildInterfaces.TimelineRecord, thresholdTime: number): boolean {
-        let taskLength = this.getTaskLengthWithName(task.id, task.name);
-        if (thresholdTime != null && taskLength > thresholdTime) {
-            return true;
-        }
-        return false;
-    }
-
-    private taskRan(task: azureBuildInterfaces.TimelineRecord): boolean {
-        return task.state === azureBuildInterfaces.TimelineRecordState.Completed && task.startTime !== null && task.finishTime !== null;
-    }
-
-    private taskFailed(task: azureBuildInterfaces.TimelineRecord): boolean {
-        return task.result === azureBuildInterfaces.TaskResult.Failed; 
-    }
 } 

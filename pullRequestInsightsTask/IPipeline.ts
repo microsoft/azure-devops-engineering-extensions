@@ -1,3 +1,5 @@
+import { IPipelineTask } from "./PipelineTask";
+
 export interface IPipeline{
     getDefinitionId: ()=> number;
     isFailure: ()=> boolean;
@@ -5,8 +7,10 @@ export interface IPipeline{
     getLink: ()=> string;
     getId: ()=> number;
     getDisplayName: ()=> string;
-    getTaskLength(taskId: string): number | null;
-    getLongRunningValidations(taskThresholdTimes: Map<string, number>): Map<string, number>
-    getTaskIds: () => string[]
+   // getTaskLength: (taskId: string) => number | null;
+    getLongRunningValidations: (taskThresholdTimes: number[]) => IPipelineTask[]
+    // getTaskIds: () => string[]
+    getTask: (taskToGet: IPipelineTask) => IPipelineTask;
+    getAllTasks: () => IPipelineTask[];
 }
 

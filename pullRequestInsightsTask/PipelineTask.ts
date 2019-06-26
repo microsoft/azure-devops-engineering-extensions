@@ -4,6 +4,7 @@ import * as azureBuildInterfaces from "azure-devops-node-api/interfaces/BuildInt
 export interface IPipelineTask {
     getDuration: () => number;
     getName: () => string;
+    getId: () => string;
     equals: (other: IPipelineTask) => boolean;
     isLongRunning: (thresholdTime: number) => boolean;
     ran: () => boolean;
@@ -13,35 +14,59 @@ export interface IPipelineTask {
 
 export class BuildTask implements IPipelineTask {
 
-    constructor(buildTaskRecord: azureBuildInterfaces.TimelineRecord) {
+    private record: azureBuildInterfaces.TimelineRecord;
 
+    constructor(buildTaskRecord: azureBuildInterfaces.TimelineRecord) {
+        this.record = buildTaskRecord;
     }
 
     public getDuration(): number {
-        return null; // TODO
+        if (this.ran()) {
+            return this.getFinishTime() - this.getStartTime();
+        }
+        return null;
     }
 
     public getName(): string {
-        return null; // TODO
+        return this.record.name;
     }
 
     public isLongRunning(thresholdTime: number): boolean {
-        return null; // TODO
+        let taskLength = this.getDuration();
+        if (thresholdTime != null && taskLength > thresholdTime) {
+            return true;
+        }
+        return false;
     }
 
     public ran(): boolean {
-        return null; // TODO
+        return (this.record.state === azureBuildInterfaces.TimelineRecordState.Completed) && this.getStartTime() != null && this.getFinishTime() != null;
     }
 
     public wasFailure(): boolean {
-        return null; // TODO
+        return this.record.result === azureBuildInterfaces.TaskResult.Failed;
     }
 
     public equals(other: IPipelineTask): boolean {
-        return null; // TODO
+        return this.getName() === other.getName() && this.getId() === other.getId();
     }
 
-    private getId(): number {
-        return null; // TODO
+    public getId(): string {
+       return this.record.id;
+    }
+
+    private getStartTime(): number {
+        return this.getTimeFromDate(this.record.startTime);
+    }
+
+    private getFinishTime(): number {
+        return this.getTimeFromDate(this.record.finishTime);
+    }
+
+    private getTimeFromDate(date: Date) {
+        if (date) {
+            return date.getTime();
+        }
+        return null;
     }
 }

@@ -1,6 +1,8 @@
 import { IPipeline } from "./IPipeline";
 import tl = require('azure-pipelines-task-lib/task');
 import stats from "stats-lite";
+import { IPipelineTask, BuildTask } from "./PipelineTask";
+
  
 
 export class Branch{
@@ -46,24 +48,23 @@ export class Branch{
         return seperatedName.slice(2).join("");
     }
 
-    public getPercentileTimesForPipelineTasks(percentileToFind: number, taskIds: string[]): Map<string, number> {
-        let percentileTimesForTasks: Map<string, number> = new Map();
-        for (let taskId of taskIds) {
+    public getPercentileTimesForPipelineTasks(percentileToFind: number, tasks: IPipelineTask[]): number[] {
+        let percentileTimesForTasks: number[] = [];
+        for (let task of tasks) {
             let times: number[] = [];
             for (let pipeline of this.pipelines) {
-                let taskLength: number = pipeline.getTaskLength(taskId);
-                if (taskLength) {
-                    times.push(taskLength);
-                } 
-            }
-        tl.debug("times on target for " + taskId + " = " + times.toString())
+                if (pipeline.getTask(task)){
+                    times.push(pipeline.getTask(task).getDuration());
+            } 
+        }
+        tl.debug("times on target for " + task.getName() + " = " + times.toString())
         if (times.length > 0) {
             tl.debug("input for stats library " + percentileToFind/100);
-            percentileTimesForTasks.set(taskId, stats.percentile(times, percentileToFind/100));
+            percentileTimesForTasks.push(stats.percentile(times, percentileToFind/100));
         }
         else {
-            percentileTimesForTasks.set(taskId, null);
-            tl.debug(`no tasks with id ${taskId} found on pipelines of branch ${this.name}`);
+            percentileTimesForTasks.push(null);
+            tl.debug("no tasks with name " + task.getName() +  "found on pipelines of branch " + this.name);
         }
     }
     return percentileTimesForTasks;
