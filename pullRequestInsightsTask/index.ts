@@ -12,7 +12,7 @@ import { IPipelineTask } from './PipelineTask';
 
 async function run() {
     try {
-        const percentile: number = 100; 
+        const percentile: number = 1; 
         const numberBuildsToQuery: number = 10;
         let configurations: EnvironmentConfigurations = new EnvironmentConfigurations();
 
