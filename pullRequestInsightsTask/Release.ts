@@ -1,5 +1,6 @@
 import * as azureReleaseInterfaces from "azure-devops-node-api/interfaces/ReleaseInterfaces";
 import { IPipeline } from "./IPipeline";
+import { IPipelineTask } from "./IPipelineTask";
 
 export class Release implements IPipeline{
 
@@ -64,12 +65,16 @@ export class Release implements IPipeline{
         return 5; // TODO
     }
 
-    public getTaskIds(): string[] {
+    public getAllTasks(): IPipelineTask[] {
         return []; // TODO
     }
 
-    public getLongRunningValidations(): Map<string, number> {
-        return new Map(); // TODO
+    public getTask(): IPipelineTask {
+        return null; // TODO
+    }
+
+    public getLongRunningValidations(): IPipelineTask[] {
+        return []; // TODO
     }
 
     private taskFailed(task: azureReleaseInterfaces.ReleaseTask): boolean {

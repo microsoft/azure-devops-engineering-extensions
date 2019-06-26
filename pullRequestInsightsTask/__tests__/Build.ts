@@ -1,6 +1,8 @@
 import * as azureBuildInterfaces from "azure-devops-node-api/interfaces/BuildInterfaces";
 import { Build } from "../Build";
-import { stringify } from "querystring";
+import sinon from "sinon";
+import { IPipelineTask } from "../IPipelineTask";
+import { BuildTask } from "../BuildTask";
 
 
 describe('Build Tests', () => {
@@ -9,17 +11,25 @@ describe('Build Tests', () => {
     let mockBuildData: azureBuildInterfaces.Build;
     let mockBuildTimeline: azureBuildInterfaces.Timeline;
 
-    const failedTask: azureBuildInterfaces.TimelineRecord = makeTask(azureBuildInterfaces.TaskResult.Failed, azureBuildInterfaces.TimelineRecordState.Completed);
-    const succeededTask: azureBuildInterfaces.TimelineRecord = makeTask(azureBuildInterfaces.TaskResult.Succeeded, azureBuildInterfaces.TimelineRecordState.Completed);
+    const failedTask: azureBuildInterfaces.TimelineRecord = makeTimelineRecord(azureBuildInterfaces.TaskResult.Failed, azureBuildInterfaces.TimelineRecordState.Completed, new Date(), new Date());
+    const succeededTask: azureBuildInterfaces.TimelineRecord = makeTimelineRecord(azureBuildInterfaces.TaskResult.Succeeded, azureBuildInterfaces.TimelineRecordState.Completed, new Date(), new Date());
 
-    function makeTask(result?: azureBuildInterfaces.TaskResult, state?: azureBuildInterfaces.TimelineRecordState, startTime?: Date, finishTime?: Date, id?: string){
+    function makeTimelineRecord(result?: azureBuildInterfaces.TaskResult, state?: azureBuildInterfaces.TimelineRecordState, startTime?: Date, finishTime?: Date, name?: string, id?: string): azureBuildInterfaces.TimelineRecord{
         return {
             result: result,
             state: state,
             startTime: startTime,
             finishTime: finishTime,
-            id: id
+            id: id,
+            name: name
         }
+    }
+
+    function makeFakeTaskForComparision(name: string, id: string): IPipelineTask {
+        let fake: IPipelineTask = new BuildTask(null);
+        sinon.stub(fake, "getName").returns(name);
+        sinon.stub(fake, "getId").returns(id);
+        return fake;
     }
 
     function fillMockBuildData(buildStatus: azureBuildInterfaces.BuildStatus, buildResult?: azureBuildInterfaces.BuildResult){
@@ -29,9 +39,9 @@ describe('Build Tests', () => {
         }
     }
 
-    function fillMockBuildTimeline(buildRecords: azureBuildInterfaces.TimelineRecord[]){
+    function fillMockBuildTimeline(timelineRecords: azureBuildInterfaces.TimelineRecord[]){
         mockBuildTimeline = {
-            records: buildRecords
+            records: timelineRecords
         }
     }
 
@@ -58,69 +68,37 @@ describe('Build Tests', () => {
 
     test('Build with incomplete failed task is not a failure', () => {
         fillMockBuildData(azureBuildInterfaces.BuildStatus.InProgress);
-        fillMockBuildTimeline([succeededTask, makeTask(azureBuildInterfaces.TaskResult.Failed, azureBuildInterfaces.TimelineRecordState.InProgress), succeededTask]);
+        fillMockBuildTimeline([succeededTask, makeTimelineRecord(azureBuildInterfaces.TaskResult.Failed, azureBuildInterfaces.TimelineRecordState.InProgress), succeededTask]);
         build = new Build(mockBuildData, mockBuildTimeline);
         expect(build.isFailure()).toBe(false); 
     });
 
-    test('Invalid build task id has null time', () => {
-        fillMockBuildTimeline([{id: "abc"}, {id: "jkl"}, {id: "nop"}]);
+    test('Tasks are properly retrieved', () => {
+        fillMockBuildTimeline([makeTimelineRecord(undefined, undefined, undefined, undefined, "yellow", "a"), makeTimelineRecord(undefined, undefined, undefined, undefined, "blue", "b"), makeTimelineRecord(undefined, undefined, undefined, undefined, "red", "c")]);
         build = new Build(null, mockBuildTimeline);
-        expect(build.getTaskLength("def")).toBeNull();
-    });
-
-    test('Incomplete task id has null time', () => {
-        fillMockBuildTimeline([makeTask(undefined, azureBuildInterfaces.TimelineRecordState.InProgress, new Date("2019-05-23 01:14:40.00"), new Date("2019-05-24 02:15:55.00"), "abc")]);
-        build = new Build(null, mockBuildTimeline);
-        expect(build.getTaskLength("abc")).toBeNull();
-    });
-
-    test('Cancelled task id has null time', () => {
-        fillMockBuildTimeline([makeTask(undefined, azureBuildInterfaces.TimelineRecordState.Completed, null, null)]);
-        build = new Build(null, mockBuildTimeline);
-        expect(build.getTaskLength("abc")).toBeNull();
-    });
-
-    test('Length of completed task is properly calculated', () => {
-        fillMockBuildTimeline([makeTask(undefined, azureBuildInterfaces.TimelineRecordState.Completed, new Date("2019-05-23 01:14:40.00"), new Date("2019-05-24 02:15:55.00"), "xyz")]);
-        build = new Build(null, mockBuildTimeline);
-        expect(build.getTaskLength("xyz")).toBe(90075000);
-    });
-
-    test('Task ids are properly retrieved', () => {
-        fillMockBuildTimeline([makeTask(undefined, undefined, undefined, undefined, "yellow"), makeTask(undefined, undefined, undefined, undefined, "blue"), makeTask(undefined, undefined, undefined, undefined, "red")]);
-        build = new Build(null, mockBuildTimeline);
-        expect(build.getTaskIds()).toEqual(["yellow", "blue", "red"]);
+        let expectedTasks: IPipelineTask[] = [new BuildTask(makeTimelineRecord(undefined, undefined, undefined, undefined, "yellow", "a")), new BuildTask(makeTimelineRecord(undefined, undefined, undefined, undefined, "blue", "b")), new BuildTask(makeTimelineRecord(undefined, undefined, undefined, undefined, "red", "c"))];
+        expect(build.getAllTasks()).toEqual(expectedTasks);
     });
     
-    test('Null is returned when there are no task ids to be retrieved', () => {
+    test('Null is returned when there are no tasks to be retrieved', () => {
         fillMockBuildTimeline([]);
         build = new Build(null, mockBuildTimeline);
-        expect(build.getTaskIds()).toEqual([]);
+        expect(build.getAllTasks()).toEqual([]);
     });
 
-    test('No long running tasks retrieved without matching threshold times', () => {
-        fillMockBuildTimeline([makeTask(undefined, azureBuildInterfaces.TimelineRecordState.Completed, new Date("2019-05-23 01:14:40.00"), new Date("2019-05-24 02:15:55.00"), "abc")]);
+    test('Equivalent task retrieved from build when present', () => {
+        let record: azureBuildInterfaces.TimelineRecord = makeTimelineRecord(azureBuildInterfaces.TaskResult.Failed, undefined, undefined, undefined, "name", "abc");
+        let taskToGet: IPipelineTask = new BuildTask(record);
+        expect(taskToGet.equals(makeFakeTaskForComparision("name", "abc"))).toBe(true)
+        fillMockBuildTimeline([record, makeTimelineRecord(undefined, undefined, undefined, undefined, "name1", "efg")]);
         build = new Build(null, mockBuildTimeline);
-        expect(build.getLongRunningValidations(new Map<string, number>([["def", 3]]))).toEqual(new Map<string, number>());
+        expect(build.getTask(makeFakeTaskForComparision("name", "abc"))).toEqual(taskToGet);
     });
 
-    test('All tasks returned when all are long running', () => {
-        fillMockBuildTimeline([makeTask(undefined, azureBuildInterfaces.TimelineRecordState.Completed, new Date("2019-05-24 01:15:00.00"), new Date("2019-05-24 01:15:00.05"), "abc"), makeTask(undefined, azureBuildInterfaces.TimelineRecordState.Completed, new Date("2019-05-24 01:15:00.05"), new Date("2019-05-24 01:15:00.15"), "hijk")]);
+    test('Null returned when task cannot be gotten', () => {
+        fillMockBuildTimeline([makeTimelineRecord(undefined, undefined, undefined, undefined, "name1", "efg")]);
         build = new Build(null, mockBuildTimeline);
-        expect(build.getLongRunningValidations(new Map<string, number>([["abc", 48], ["hijk", 70]]))).toEqual(new Map<string, number>([["abc", 50], ["hijk", 100]]));
-    });
-    
-    test('Tasks properly filtered when only some are long running', () => {
-        fillMockBuildTimeline([makeTask(undefined, azureBuildInterfaces.TimelineRecordState.Completed, new Date("2019-05-24 01:15:00.00"), new Date("2019-05-24 01:15:00.05"), "abc"), makeTask(undefined, azureBuildInterfaces.TimelineRecordState.Completed, new Date("2019-05-24 01:15:00.05"), new Date("2019-05-24 01:15:00.15"), "hijk")]);
-        build = new Build(null, mockBuildTimeline);
-        expect(build.getLongRunningValidations(new Map<string, number>([["abc", 2], ["hijk", 500]]))).toEqual(new Map<string, number>([["abc", 50]]));
-    });
-
-    test('Task with same length as threshold is not long running', () => {
-        fillMockBuildTimeline([makeTask(undefined, azureBuildInterfaces.TimelineRecordState.Completed, new Date("2019-05-24 01:15:00.00"), new Date("2019-05-24 01:15:00.05"), "abc"), makeTask(undefined, azureBuildInterfaces.TimelineRecordState.Completed, new Date("2019-05-24 01:15:00.05"), new Date("2019-05-24 01:15:00.15"), "hijk")]);
-        build = new Build(null, mockBuildTimeline);
-        expect(build.getLongRunningValidations(new Map<string, number>([["abc", 50]]))).toEqual(new Map<string, number>());
+        expect(build.getTask(makeFakeTaskForComparision("name", "abc"))).toBeNull();
     });
 
 });
