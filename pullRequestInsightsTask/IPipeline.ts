@@ -8,7 +8,7 @@ export interface IPipeline{
     getId: ()=> number;
     getDisplayName: ()=> string;
    // getTaskLength: (taskId: string) => number | null;
-    getLongRunningValidations: (taskThresholdTimes: number[]) => IPipelineTask[]
+   // getLongRunningValidations: (taskThresholdTimes: number[]) => IPipelineTask[]
     // getTaskIds: () => string[]
     getTask: (taskToGet: IPipelineTask) => IPipelineTask;
     getAllTasks: () => IPipelineTask[];

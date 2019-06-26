@@ -5,13 +5,15 @@ import { IPipelineTask, BuildTask } from "./PipelineTask";
 
 export class Build implements IPipeline{
 
-    private buildData: azureBuildInterfaces.Build; 
+    private buildData: azureBuildInterfaces.Build;
     private tasks: IPipelineTask[] = [];
 
     constructor(buildData: azureBuildInterfaces.Build, timelineData: azureBuildInterfaces.Timeline) {
         this.buildData = buildData;
-        for (let taskRecord of timelineData.records) {
-           this.tasks.push(new BuildTask(taskRecord));
+        if (timelineData) {
+            for (let taskRecord of timelineData.records) {
+                this.tasks.push(new BuildTask(taskRecord));
+            }
         }
     }
 
@@ -55,23 +57,24 @@ export class Build implements IPipeline{
     }
 
     public getTask(taskToGet: IPipelineTask): IPipelineTask {
-        for (let task of this.tasks) {
-            console.log(taskToGet.getName() + " = " + task.getName() + " ? " + task.equals(taskToGet))
-            if (task.equals(taskToGet)) {
-                return task;
+        if (this.getAllTasks()) {
+            for (let task of this.getAllTasks()) {
+                if (task.equals(taskToGet)) {
+                    return task;
+                }
             }
         }
         return null;
     }
 
-    public getLongRunningValidations(taskThresholdTimes: number[]): IPipelineTask[] {
-        let longRunningValidations: IPipelineTask[] = []; 
-        for (let i = 0; i < taskThresholdTimes.length; i++) {
-            if (taskThresholdTimes[i] && this.tasks[i].getDuration() > taskThresholdTimes[i]) {
-                longRunningValidations.push(this.tasks[i]);
-            }
-        }
-        return longRunningValidations;
-    }
+    // public getLongRunningValidations(taskThresholdTimes: number[]): IPipelineTask[] {
+    //     let longRunningValidations: IPipelineTask[] = []; 
+    //     for (let i = 0; i < taskThresholdTimes.length; i++) {
+    //         if (taskThresholdTimes[i] && this.tasks[i].getDuration() > taskThresholdTimes[i]) {
+    //             longRunningValidations.push(this.tasks[i]);
+    //         }
+    //     }
+    //     return longRunningValidations;
+    // }
 
 } 

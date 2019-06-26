@@ -85,29 +85,7 @@ describe('Build Tests', () => {
         build = new Build(null, mockBuildTimeline);
         expect(build.getAllTasks()).toEqual([]);
     });
-
-    test('No long running tasks retrieved without threshold times', () => {
-        fillMockBuildTimeline([makeTimelineRecord(undefined, azureBuildInterfaces.TimelineRecordState.Completed, new Date("2019-05-23 01:14:40.00"), new Date("2019-05-24 02:15:55.00"), "abc")]);
-        build = new Build(null, mockBuildTimeline);
-        expect(build.getLongRunningValidations([])).toEqual([]);
-    });
-
-    test('All tasks returned when all are long running', () => {
-        fillMockBuildTimeline([makeTimelineRecord(undefined, azureBuildInterfaces.TimelineRecordState.Completed, new Date("2019-05-24 01:15:00.00"), new Date("2019-05-24 01:15:00.05"), "name", "abc"), makeTimelineRecord(undefined, azureBuildInterfaces.TimelineRecordState.Completed, new Date("2019-05-24 01:15:00.05"), new Date("2019-05-24 01:15:00.15"), "name1", "efg")]);
-        build = new Build(null, mockBuildTimeline);
-        let longRunnings: IPipelineTask[] = build.getLongRunningValidations([48, 70]);
-        let expected: IPipelineTask[] = [new BuildTask(makeTimelineRecord(undefined, azureBuildInterfaces.TimelineRecordState.Completed, new Date("2019-05-24 01:15:00.00"), new Date("2019-05-24 01:15:00.05"), "name", "abc")), new BuildTask(makeTimelineRecord(undefined, azureBuildInterfaces.TimelineRecordState.Completed, new Date("2019-05-24 01:15:00.05"), new Date("2019-05-24 01:15:00.15"), "name1", "efg"))]
-        expect(longRunnings).toEqual(expected);
-       
-    });
     
-    test('Task with same length as threshold is not long running', () => {
-        fillMockBuildTimeline([makeTimelineRecord(undefined, azureBuildInterfaces.TimelineRecordState.Completed, new Date("2019-05-24 01:15:00.00"), new Date("2019-05-24 01:15:00.05"), "name", "abc"), makeTimelineRecord(undefined, azureBuildInterfaces.TimelineRecordState.Completed, new Date("2019-05-24 01:15:00.05"), new Date("2019-05-24 01:15:00.15"), "name1", "efg")]);
-        build = new Build(null, mockBuildTimeline);
-        let longRunnings: IPipelineTask[] = build.getLongRunningValidations([100, 100]);
-        expect(longRunnings).toEqual([]);
-    });
-
     test('Equivalent task retrieved from build when present', () => {
         let record: azureBuildInterfaces.TimelineRecord = makeTimelineRecord(azureBuildInterfaces.TaskResult.Failed, undefined, undefined, undefined, "name", "abc");
         let taskToGet: IPipelineTask = new BuildTask(record);

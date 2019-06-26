@@ -37,8 +37,15 @@ async function run() {
             let longRunningValidations: IPipelineTask[] = [];
             
             if (!currentPipeline.isFailure() && type === "build"){ // temporary second condition, present since long running validations only functional for builds as of now
-                thresholdTimes = targetBranch.getPercentileTimesForPipelineTasks(percentile, currentPipeline.getAllTasks());
-                longRunningValidations = currentPipeline.getLongRunningValidations(thresholdTimes);
+                for (let task of currentPipeline.getAllTasks()) {
+                    let percentileTime: number = targetBranch.getPercentileTimeForPipelineTask(percentile, task);
+                    if (task.isLongRunning(percentileTime)){
+                        longRunningValidations.push(task);
+                        thresholdTimes.push(percentileTime);
+                    }
+                }
+          //      thresholdTimes = targetBranch.getPercentileTimesForPipelineTasks(percentile, currentPipeline.getAllTasks());
+           //     longRunningValidations = currentPipeline.getLongRunningValidations(thresholdTimes);
                 tl.debug("Number of longRunningValidations = " + longRunningValidations.length);
             }
             if (currentPipeline.isFailure() || longRunningValidations.length > 0) {

@@ -48,26 +48,22 @@ export class Branch{
         return seperatedName.slice(2).join("");
     }
 
-    public getPercentileTimesForPipelineTasks(percentileToFind: number, tasks: IPipelineTask[]): number[] {
-        let percentileTimesForTasks: number[] = [];
-        for (let task of tasks) {
-            let times: number[] = [];
-            for (let pipeline of this.pipelines) {
-                if (pipeline.getTask(task)){
-                    times.push(pipeline.getTask(task).getDuration());
-            } 
+    public getPercentileTimeForPipelineTask(percentileToFind: number, task: IPipelineTask): number {
+        let times: number[] = [];
+        for (let pipeline of this.pipelines) {
+            if (pipeline.getTask(task)) {
+                times.push(pipeline.getTask(task).getDuration());
+            }
         }
         tl.debug("times on target for " + task.getName() + " = " + times.toString())
         if (times.length > 0) {
-            tl.debug("input for stats library " + percentileToFind/100);
-            percentileTimesForTasks.push(stats.percentile(times, percentileToFind/100));
+            tl.debug("input for stats library " + percentileToFind / 100);
+            return stats.percentile(times, percentileToFind / 100)
         }
         else {
-            percentileTimesForTasks.push(null);
-            tl.debug("no tasks with name " + task.getName() +  "found on pipelines of branch " + this.name);
+            tl.debug("no tasks with name " + task.getName() + "found on pipelines of branch " + this.name);
+            return null;
         }
-    }
-    return percentileTimesForTasks;
     }
 
 }
