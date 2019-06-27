@@ -21,6 +21,7 @@ async function run() {
             tl.debug(messages.notInPullRequestMessage);
         }
         else {
+            let supportLink: string = tl.getInput('SupportContactLink', true);
             let azureApiFactory: AzureApiFactory = new AzureApiFactory();
             let azureApi = await azureApiFactory.create(configurations);
             let currentProject: string = configurations.getProjectName();
@@ -49,14 +50,15 @@ async function run() {
             if (currentPipeline.isFailure() || longRunningValidations.length > 0) {
                 let serviceThreads: azureGitInterfaces.GitPullRequestCommentThread[] = await pullRequest.getCurrentServiceCommentThreads(azureApi);
                 let currentIterationCommentThread: azureGitInterfaces.GitPullRequestCommentThread = pullRequest.getCurrentIterationCommentThread(serviceThreads, configurations.getBuildIteration());
-                let currentPipelineCommentContent: string = commentFactory.createTableSection(currentPipeline, targetBranch.getMostRecentCompletePipeline(), targetBranch, type, longRunningValidations, thresholdTimes);
+                let currentPipelineCommentContent: string = commentFactory.createTableSection(currentPipeline, targetBranch.getMostRecentCompletePipeline(), targetBranch, supportLink, longRunningValidations, thresholdTimes);
                 if (currentIterationCommentThread) {
                     pullRequest.editCommentInThread(azureApi, currentIterationCommentThread, currentIterationCommentThread.comments[0].id, currentPipelineCommentContent);
                 }
                 else {
                     currentPipelineCommentContent = commentFactory.createIterationHeader(configurations.getBuildIteration()) + "\n" + commentFactory.createTableHeader(currentPipeline.isFailure(), targetBranch.getTruncatedName(), String(percentile)) + "\n" + currentPipelineCommentContent;
                     let currentIterationCommentThreadId: number = (await pullRequest.addNewComment(azureApi, currentPipelineCommentContent, configurations.getBuildIteration())).id;
-                    pullRequest.deactivateOldComments(azureApi, serviceThreads, currentIterationCommentThreadId);
+                    // pullRequest.deactivateOldComments(azureApi, serviceThreads, currentIterationCommentThreadId);
+                    pullRequest.deleteOldComments(azureApi, serviceThreads, currentIterationCommentThreadId);
                 }
             }
         }

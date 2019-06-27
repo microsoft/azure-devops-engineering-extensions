@@ -32,6 +32,14 @@ export class PullRequest {
         }
     }
 
+    public async deleteOldComments(apiCaller: AbstractAzureApi, serviceComments: azureGitInterfaces.GitPullRequestCommentThread[], currentIterationCommentId: number): Promise<void> {
+        for (let commentThread of serviceComments) {
+            if (commentThread.id !== currentIterationCommentId && commentThread.comments.length === 1) {
+                apiCaller.deleteComment(this.id, this.repository, this.projectName, commentThread.id, commentThread.comments[0].id);
+            }
+        }
+    }
+
     public editCommentInThread(apiCaller: AbstractAzureApi, thread: azureGitInterfaces.GitPullRequestCommentThread, commentId: number, contentToAdd: string): void {
         for (let comment of thread.comments) {
             console.log("comment id = " + comment.id)

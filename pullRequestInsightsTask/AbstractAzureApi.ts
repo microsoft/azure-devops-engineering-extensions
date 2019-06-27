@@ -35,6 +35,11 @@ export abstract class AbstractAzureApi {
         return (await this.getConnection().getGitApi()).updateComment(comment, repositoryId, pullRequestId, threadId, commentId, projectName);
     }
 
+    
+    public async deleteComment(pullRequestId: number, repositoryId: string, projectName: string, threadId: number, commentId: number): Promise<void> {
+        (await this.getConnection().getGitApi()).deleteComment(repositoryId, pullRequestId, threadId, commentId, projectName);
+    }
+
     public async getPullRequestData(repositoryId: string, pullRequestId: number, projectName: string): Promise<azureGitInterfaces.GitPullRequest> {
         return (await this.getConnection().getGitApi()).getPullRequest(repositoryId, pullRequestId, projectName);
     }

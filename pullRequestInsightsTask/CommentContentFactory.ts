@@ -20,13 +20,13 @@ export class CommentContentFactory {
         return messages.longRunningValidationCommentTableHeading.format(percentile, targetBranchName);
     }
 
-    public createTableSection(current: IPipeline, mostRecent: IPipeline, target: Branch, type: string, longRunningValidations: IPipelineTask[], thresholdTimes: number[]): string {
+    public createTableSection(current: IPipeline, mostRecent: IPipeline, target: Branch, supportLink: string, longRunningValidations: IPipelineTask[], thresholdTimes: number[]): string {
         if (current.isFailure()) {
             let messageString: string = messages.successCommentRow;
             if (mostRecent.isFailure()) {
                 messageString = messages.failureCommentRow;
         }
-        return messageString.format(current.getDefinitionName(), CommentContentFactory.PLACE_HOLDER, current.getDisplayName(), current.getLink(), target.getTruncatedName(), CommentContentFactory.PLACE_HOLDER, CommentContentFactory.PLACE_HOLDER);
+        return messageString.format(current.getDefinitionName(), CommentContentFactory.PLACE_HOLDER, current.getDisplayName(), current.getLink(), target.getTruncatedName(), CommentContentFactory.PLACE_HOLDER, supportLink);
         }
         let section: string;
         for (let index = 0; index < longRunningValidations.length; index++) {
