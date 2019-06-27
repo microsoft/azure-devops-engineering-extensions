@@ -15,6 +15,8 @@ export abstract class AbstractAzureApi {
 
     public async abstract getMostRecentPipelinesOfCurrentType(project: string, currentPipeline: IPipeline, maxNumber: number, branchName: string): Promise<IPipeline[]>;
 
+    public async abstract getDefinition(project: string, definitionId: number): Promise<any>;
+
     protected getConnection(): WebApi {
         return this.connection;
     }
@@ -33,6 +35,14 @@ export abstract class AbstractAzureApi {
 
     public async updateComment(comment: azureGitInterfaces.Comment, pullRequestId: number, repositoryId: string, projectName: string, threadId: number, commentId: number): Promise<azureGitInterfaces.Comment> {
         return (await this.getConnection().getGitApi()).updateComment(comment, repositoryId, pullRequestId, threadId, commentId, projectName);
+    }
+
+    public async deleteComment(pullRequestId: number, repositoryId: string, projectName: string, threadId: number, commentId: number): Promise<void> {
+        (await this.getConnection().getGitApi()).deleteComment(repositoryId, pullRequestId, threadId, commentId, projectName);
+    }
+
+    public async getComment(pullRequestId: number, repositoryId: string, projectName: string, threadId: number, commentId: number): Promise<azureGitInterfaces.Comment> {
+        return (await this.getConnection().getGitApi()).getComment(repositoryId, pullRequestId, threadId, commentId, projectName)
     }
 
     public async getPullRequestData(repositoryId: string, pullRequestId: number, projectName: string): Promise<azureGitInterfaces.GitPullRequest> {

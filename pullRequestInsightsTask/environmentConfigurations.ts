@@ -10,6 +10,7 @@ export class EnvironmentConfigurations{
     private static readonly PROJECT_KEY = "SYSTEM_TEAMPROJECT";
     private static readonly BUILD_ID_KEY = "BUILD_BUILDID";
     private static readonly BUILD_NUMBER_KEY = "BUILD_BUILDNUMBER";
+    private static readonly SOURCE_COMMIT_ITERATION_KEY = "BUILD_SOURCEVERSION";
     private static readonly RELEASE_ID_KEY = "RELEASE_RELEASEID";
     private static readonly HOST_KEY = "SYSTEM_HOSTTYPE";
     private static readonly TARGET_BRANCH_KEYS = ["SYSTEM_PULLREQUEST_TARGETBRANCH", "BUILD_TARGETBRANCH"];
@@ -70,6 +71,10 @@ export class EnvironmentConfigurations{
 
     public getBuildSourceBranch(): string {
         return this.loadFromEnvironment(EnvironmentConfigurations.BUILD_SOURCE_BRANCH_KEY);
+    }
+
+    public getSourceCommitIteration(): string {
+        return this.loadFromEnvironment(EnvironmentConfigurations.SOURCE_COMMIT_ITERATION_KEY);
     }
 
     public getBuildIteration(): string {

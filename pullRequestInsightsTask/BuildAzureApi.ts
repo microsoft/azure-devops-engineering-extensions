@@ -21,8 +21,12 @@ export class BuildAzureApi extends AbstractAzureApi{
         return this.getBuilds(project, currentPipeline.getDefinitionId(), BuildAzureApi.DESIRED_BUILD_STATUS, maxNumber, branchName);
     }
 
-    public async getBuild(project: string, buildId: number): Promise<IPipeline>{
+    public async getBuild(project: string, buildId: number): Promise<IPipeline> {
         return new Build(await this.getBuildData(project, buildId), await this.getBuildTimeline(project, buildId));
+    }
+
+    public async getDefinition(project: string, definitionId: number): Promise<azureBuildInterfaces.BuildDefinition> {
+        return (await this.getConnection().getBuildApi()).getDefinition(project, definitionId);
     }
 
     public async getBuilds(project: string, definition?: number, status?: number, maxNumber?: number, branchName?: string): Promise<IPipeline[]>{

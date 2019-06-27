@@ -1,5 +1,7 @@
 import * as azureReleaseInterfaces from "azure-devops-node-api/interfaces/ReleaseInterfaces";
 import { IPipeline } from "./IPipeline";
+import { IPipelineTask } from "./IPipelineTask";
+import { AbstractAzureApi } from "./AbstractAzureApi";
 
 export class Release implements IPipeline{
 
@@ -21,6 +23,14 @@ export class Release implements IPipeline{
 
     public getDefinitionId(): number{
         return Number(this.releaseData.releaseDefinition.id); 
+    }
+
+    public getDefinitionName(): string {
+        return this.releaseData.releaseDefinition.name;
+    }
+
+    public async getDefinitionLink(apiCaller: AbstractAzureApi, project: string): Promise<string> {
+        return this.releaseData.releaseDefinition._links.web.href;
     }
 
     public getEnvironmentDefinitionId(): number{
@@ -57,19 +67,23 @@ export class Release implements IPipeline{
     }
 
     public getDisplayName(): string {
-        return this.releaseData.name + "/" + this.environmentData.name;
+        return this.releaseData.name;
     }
 
     public getTaskLength(taskId: string): number | null {
         return 5; // TODO
     }
 
-    public getTaskIds(): string[] {
+    public getAllTasks(): IPipelineTask[] {
         return []; // TODO
     }
 
-    public getLongRunningValidations(): Map<string, number> {
-        return new Map(); // TODO
+    public getTask(): IPipelineTask {
+        return null; // TODO
+    }
+
+    public getLongRunningValidations(): IPipelineTask[] {
+        return []; // TODO
     }
 
     private taskFailed(task: azureReleaseInterfaces.ReleaseTask): boolean {

@@ -1,6 +1,8 @@
 import { IPipeline } from "./IPipeline";
 import tl = require('azure-pipelines-task-lib/task');
 import stats from "stats-lite";
+import { IPipelineTask } from "./IPipelineTask";
+
  
 
 export class Branch{
@@ -42,28 +44,35 @@ export class Branch{
     }
 
     public getTruncatedName(): string{
-        let seperatedName = this.name.split(Branch.NAME_SEPERATOR);
-        return seperatedName.slice(2).join("");
+        let truncatedName = this.name;
+        let seperatedName = (truncatedName.split(Branch.NAME_SEPERATOR));
+        if (seperatedName.length >= 3) {
+           truncatedName =  seperatedName.slice(2).join("");
+        }
+        return truncatedName.charAt(0).toUpperCase() + truncatedName.slice(1);
     }
 
-    public getPercentileTimesForPipelineTasks(percentileToFind: number, taskIds: string[]): Map<string, number> {
-        let percentileTimesForTasks: Map<string, number> = new Map();
-        for (let taskId of taskIds) {
-            let times: number[] = [];
-            for (let pipeline of this.pipelines) {
-                let taskLength: number = pipeline.getTaskLength(taskId);
-                if (taskLength) {
-                    times.push(taskLength);
-                } 
-            }
+    public getPercentileTimeForPipelineTask(percentileToFind: number, task: IPipelineTask): number {
+        let times: number[] = this.getAllPipelineTimesForTask(task);
+        tl.debug("times on target for " + task.getName() + " = " + times.toString())
         if (times.length > 0) {
-            percentileTimesForTasks.set(taskId, stats.percentile(times, percentileToFind));
+            tl.debug("input for stats library " + percentileToFind / 100);
+            return stats.percentile(times, percentileToFind / 100)
         }
         else {
-            percentileTimesForTasks.set(taskId, null);
-            tl.debug(`no tasks with id ${taskId} found on pipelines of branch ${this.name}`);
+            tl.debug("no tasks with name " + task.getName() + "found on pipelines of branch " + this.name);
+            return null;
         }
     }
-    return percentileTimesForTasks;
+
+    private getAllPipelineTimesForTask(task: IPipelineTask): number[] {
+        let times: number[] = [];
+        for (let pipeline of this.pipelines) {
+            if (pipeline.getTask(task)) {
+                times.push(pipeline.getTask(task).getDuration());
+            }
+        }
+        return times;
     }
+
 }
