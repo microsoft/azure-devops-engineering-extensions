@@ -16,9 +16,9 @@ export class PullRequest {
         this.projectName = projectName;    
     }
 
-    public async addNewComment(apiCaller: AbstractAzureApi, commentContent: string, buildIteration: string): Promise<azureGitInterfaces.GitPullRequestCommentThread>{
-        let properties: any = {fromTask: commentProperties.taskPropertyValue, buildIteration: buildIteration};
-        let thread: azureGitInterfaces.CommentThread = {comments: new Array({content: commentContent}), properties: properties};
+    public async addNewComment(apiCaller: AbstractAzureApi, commentContent: string, sourceCommit: string): Promise<azureGitInterfaces.GitPullRequestCommentThread>{
+        let thread: azureGitInterfaces.CommentThread = {comments: new Array({content: commentContent})};
+        thread.properties = {[commentProperties.taskPropertyName]: commentProperties.taskPropertyValue, [commentProperties.iterationPropertyName]: sourceCommit};
         tl.debug(messages.commentCompletedMessage);
         return apiCaller.postNewCommentThread(thread, this.id, this.repository, this.projectName);
     }
@@ -46,20 +46,21 @@ export class PullRequest {
             if (comment.id === commentId) {
                 let updatedContent: string = comment.content + contentToAdd;
                 tl.debug("comment to be updated: thread id = " + thread.id + ", comment id = " + comment.id);
+                tl.debug("updated content: " + updatedContent);
                 apiCaller.updateComment({ content: updatedContent }, this.id, this.repository, this.projectName, thread.id, comment.id);
                 break;
             }
         }
     }
 
-    public getCurrentIterationCommentThread(threads: azureGitInterfaces.GitPullRequestCommentThread[], currentBuildIteration: string): azureGitInterfaces.GitPullRequestCommentThread | null {
+    public getCurrentIterationCommentThread(threads: azureGitInterfaces.GitPullRequestCommentThread[], currentIteration: string): azureGitInterfaces.GitPullRequestCommentThread | null {
         for (let commentThread of threads) {
-            if (this.threadIsFromService(commentThread) && this.getBuildIterationFromServiceCommentThread(commentThread) === currentBuildIteration) {
-                tl.debug("comment thread id of thread of current build iteration " + currentBuildIteration + ": thread id = " + commentThread.id);
+            if (this.threadIsFromService(commentThread) && this.getIterationFromServiceCommentThread(commentThread) === currentIteration) {
+                tl.debug("comment thread id of thread of current source commit " + currentIteration + ": thread id = " + commentThread.id);
                 return commentThread;
             }
         }
-        tl.debug("no comment was found for build iteration " + currentBuildIteration);
+        tl.debug("no comment was found for iteration " + currentIteration);
         return null;
     }
 
@@ -78,9 +79,9 @@ export class PullRequest {
         return serviceThreads;
     }
 
-    private getBuildIterationFromServiceCommentThread(thread: azureGitInterfaces.GitPullRequestCommentThread): string {
+    private getIterationFromServiceCommentThread(thread: azureGitInterfaces.GitPullRequestCommentThread): string {
          if (this.threadHasServiceProperties(thread)) {
-             return thread.properties.buildIteration.$value;
+             return thread.properties[commentProperties.iterationPropertyName].$value;
          }
          return null;
     }
@@ -90,7 +91,7 @@ export class PullRequest {
     }
 
     private threadHasServiceProperties(thread: azureGitInterfaces.GitPullRequestCommentThread): boolean {
-        return thread.properties && thread.properties.fromTask && thread.properties.fromTask.$value === commentProperties.taskPropertyValue && thread.properties.buildIteration;
+        return thread.properties && thread.properties[commentProperties.taskPropertyName] && thread.properties[commentProperties.taskPropertyName].$value === commentProperties.taskPropertyValue && thread.properties[commentProperties.iterationPropertyName];
     }
 
     private commentWasWrittenByService(comment: azureGitInterfaces.Comment): boolean {

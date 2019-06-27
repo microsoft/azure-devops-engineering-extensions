@@ -12,7 +12,7 @@ import { IPipelineTask } from './IPipelineTask';
 
 async function run() {
     try {
-        const percentile: number = 1; 
+        const percentile: number = 1000; 
         const numberBuildsToQuery: number = 10;
         let configurations: EnvironmentConfigurations = new EnvironmentConfigurations();
 
@@ -49,14 +49,15 @@ async function run() {
             }
             if (currentPipeline.isFailure() || longRunningValidations.length > 0) {
                 let serviceThreads: azureGitInterfaces.GitPullRequestCommentThread[] = await pullRequest.getCurrentServiceCommentThreads(azureApi);
-                let currentIterationCommentThread: azureGitInterfaces.GitPullRequestCommentThread = pullRequest.getCurrentIterationCommentThread(serviceThreads, configurations.getBuildIteration());
-                let currentPipelineCommentContent: string = commentFactory.createTableSection(currentPipeline, targetBranch.getMostRecentCompletePipeline(), targetBranch, supportLink, longRunningValidations, thresholdTimes);
+                let currentIterationCommentThread: azureGitInterfaces.GitPullRequestCommentThread = pullRequest.getCurrentIterationCommentThread(serviceThreads, configurations.getSourceCommitIteration());
+                let definitionLink: string = await currentPipeline.getDefinitionLink(azureApi, configurations.getProjectName());
+                let currentPipelineCommentContent: string = commentFactory.createTableSection(currentPipeline, definitionLink, targetBranch.getMostRecentCompletePipeline(), targetBranch, supportLink, longRunningValidations, thresholdTimes);
                 if (currentIterationCommentThread) {
-                    pullRequest.editCommentInThread(azureApi, currentIterationCommentThread, currentIterationCommentThread.comments[0].id, currentPipelineCommentContent);
+                    pullRequest.editCommentInThread(azureApi, currentIterationCommentThread, currentIterationCommentThread.comments[0].id, "\n" + currentPipelineCommentContent);
                 }
                 else {
-                    currentPipelineCommentContent = commentFactory.createIterationHeader(configurations.getBuildIteration()) + "\n" + commentFactory.createTableHeader(currentPipeline.isFailure(), targetBranch.getTruncatedName(), String(percentile)) + "\n" + currentPipelineCommentContent;
-                    let currentIterationCommentThreadId: number = (await pullRequest.addNewComment(azureApi, currentPipelineCommentContent, configurations.getBuildIteration())).id;
+                    currentPipelineCommentContent = commentFactory.createTableHeader(currentPipeline.isFailure(), targetBranch.getTruncatedName(), String(percentile)) + "\n" + currentPipelineCommentContent;
+                    let currentIterationCommentThreadId: number = (await pullRequest.addNewComment(azureApi, currentPipelineCommentContent, configurations.getSourceCommitIteration())).id;
                     // pullRequest.deactivateOldComments(azureApi, serviceThreads, currentIterationCommentThreadId);
                     pullRequest.deleteOldComments(azureApi, serviceThreads, currentIterationCommentThreadId);
                 }

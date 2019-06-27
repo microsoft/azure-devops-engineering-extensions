@@ -1,6 +1,7 @@
 import * as azureReleaseInterfaces from "azure-devops-node-api/interfaces/ReleaseInterfaces";
 import { IPipeline } from "./IPipeline";
 import { IPipelineTask } from "./IPipelineTask";
+import { AbstractAzureApi } from "./AbstractAzureApi";
 
 export class Release implements IPipeline{
 
@@ -26,6 +27,10 @@ export class Release implements IPipeline{
 
     public getDefinitionName(): string {
         return this.releaseData.releaseDefinition.name;
+    }
+
+    public async getDefinitionLink(apiCaller: AbstractAzureApi, project: string): Promise<string> {
+        return this.releaseData.releaseDefinition._links.web.href;
     }
 
     public getEnvironmentDefinitionId(): number{

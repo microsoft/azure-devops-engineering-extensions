@@ -6,8 +6,6 @@ import { IPipelineTask } from "./IPipelineTask.js";
 
 
 export class CommentContentFactory {
-
-    static readonly PLACE_HOLDER: string = "https://www.google.com/"; // temporary
    
     public createIterationHeader(buildIteration: string): string{
         return messages.newIterationCommentHeading.format(buildIteration);
@@ -20,13 +18,13 @@ export class CommentContentFactory {
         return messages.longRunningValidationCommentTableHeading.format(percentile, targetBranchName);
     }
 
-    public createTableSection(current: IPipeline, mostRecent: IPipeline, target: Branch, supportLink: string, longRunningValidations: IPipelineTask[], thresholdTimes: number[]): string {
+    public createTableSection(current: IPipeline, currentDefinitionLink: string, mostRecent: IPipeline, target: Branch, supportLink: string, longRunningValidations: IPipelineTask[], thresholdTimes: number[]): string {
         if (current.isFailure()) {
             let messageString: string = messages.successCommentRow;
-            if (mostRecent.isFailure()) {
+            if (mostRecent != null && mostRecent.isFailure()) {
                 messageString = messages.failureCommentRow;
         }
-        return messageString.format(current.getDefinitionName(), CommentContentFactory.PLACE_HOLDER, current.getDisplayName(), current.getLink(), target.getTruncatedName(), CommentContentFactory.PLACE_HOLDER, supportLink);
+        return messageString.format(current.getDefinitionName(), current.getLink(), target.getTruncatedName(), currentDefinitionLink, supportLink);
         }
         let section: string;
         for (let index = 0; index < longRunningValidations.length; index++) {

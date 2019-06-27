@@ -35,6 +35,10 @@ export class ReleaseAzureApi extends AbstractAzureApi{
         return releases;
     }
 
+    public async getDefinition(project: string, definitionId: number): Promise<azureReleaseInterfaces.ReleaseDefinition> {
+        return (await this.getConnection().getReleaseApi()).getReleaseDefinition(project, definitionId);
+    }
+
     private async getReleaseData(project: string, releaseId: number): Promise<azureReleaseInterfaces.Release> {
         return (await this.getConnection().getReleaseApi()).getRelease(project, releaseId); 
     }
