@@ -24,6 +24,10 @@ export class Release implements IPipeline{
         return Number(this.releaseData.releaseDefinition.id); 
     }
 
+    public getDefinitionName(): string {
+        return this.releaseData.releaseDefinition.name;
+    }
+
     public getEnvironmentDefinitionId(): number{
         return Number(this.environmentData.definitionEnvironmentId);
     }
@@ -58,7 +62,7 @@ export class Release implements IPipeline{
     }
 
     public getDisplayName(): string {
-        return this.releaseData.name + "/" + this.environmentData.name;
+        return this.releaseData.name;
     }
 
     public getTaskLength(taskId: string): number | null {

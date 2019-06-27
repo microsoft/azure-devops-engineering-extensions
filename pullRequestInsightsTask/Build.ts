@@ -38,6 +38,10 @@ export class Build implements IPipeline{
         return Number(this.buildData.definition.id);
     }
 
+    public getDefinitionName(): string {
+        return this.buildData.definition.name;
+    }
+
     public getLink(): string {
         return String(this.buildData._links.web.href);
     }
