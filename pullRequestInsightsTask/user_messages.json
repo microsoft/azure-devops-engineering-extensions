@@ -4,8 +4,8 @@
     "commentCompletedMessage": "Comment was successfully posted",
     "failureCommentTableHeading": "|Pipeline Name|{1} Health|Insights|\n|---|---|---|",
     "newIterationCommentHeading": "__Source Commit: {0}__",
-    "failureCommentRow": "|[{0}]({1})| :x: |{2} is red: <br> [Check Status]({3}) or [Contact Support]({4})|",
-    "successCommentRow": "|[{0}]({1})| :heavy_check_mark: |{2} is green: <br> failure is likely related to changes in PR|",
+    "failureCommentRow": "|[{0}]({1})| :x: |{2} branch is [Red]({3}) <br> You can check latest status [here]({3})|",
+    "successCommentRow": "|[{0}]({1})| :heavy_check_mark: |{2} branch is Green <br> Failure in this PR is likely related to change|",
     "longRunningValidationCommentTableHeading": "|Name|Long Running Pipeline/Task|Pipeline/Task Duration|{0}th Percentile on {1}|Latest {1} Run|\n|---|---|---|---|---|",
     "longRunningValidationCommentFirstSectionRow": "|[{0}]({1})| {2} |{3} ms|{4} ms|[{5}]({6})|",
     "longRunningValidationCommentLowerSectionRow": "| | {0} |{1} ms|{2} ms| |"

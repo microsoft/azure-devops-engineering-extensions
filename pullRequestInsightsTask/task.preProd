@@ -12,16 +12,6 @@
         "Patch": 44
     },
     "instanceNameFormat": "PR Insights",
-    "inputs": [
-        {
-            "name": "supportContactLink",
-            "type": "string",
-            "label": "Support Contact Link",
-            "defaultValue": "",
-            "required": true,
-            "helpMarkDown": "A link that allows user to contact support when target branch health is red"
-        }
-    ],
     "execution": {
         "Node": {
             "target": "Index.js"

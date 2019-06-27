@@ -44,17 +44,16 @@ export class Branch{
     }
 
     public getTruncatedName(): string{
-        let seperatedName = this.name.split(Branch.NAME_SEPERATOR);
-        return seperatedName.slice(2).join("");
+        let truncatedName = this.name;
+        let seperatedName = (truncatedName.split(Branch.NAME_SEPERATOR));
+        if (seperatedName.length >= 3) {
+           truncatedName =  seperatedName.slice(2).join("");
+        }
+        return truncatedName.charAt(0).toUpperCase() + truncatedName.slice(1);
     }
 
     public getPercentileTimeForPipelineTask(percentileToFind: number, task: IPipelineTask): number {
-        let times: number[] = [];
-        for (let pipeline of this.pipelines) {
-            if (pipeline.getTask(task)) {
-                times.push(pipeline.getTask(task).getDuration());
-            }
-        }
+        let times: number[] = this.getAllPipelineTimesForTask(task);
         tl.debug("times on target for " + task.getName() + " = " + times.toString())
         if (times.length > 0) {
             tl.debug("input for stats library " + percentileToFind / 100);
@@ -64,6 +63,16 @@ export class Branch{
             tl.debug("no tasks with name " + task.getName() + "found on pipelines of branch " + this.name);
             return null;
         }
+    }
+
+    private getAllPipelineTimesForTask(task: IPipelineTask): number[] {
+        let times: number[] = [];
+        for (let pipeline of this.pipelines) {
+            if (pipeline.getTask(task)) {
+                times.push(pipeline.getTask(task).getDuration());
+            }
+        }
+        return times;
     }
 
 }

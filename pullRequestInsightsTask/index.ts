@@ -9,6 +9,7 @@ import { PullRequest } from './PullRequest';
 import './StringExtensions';
 import { CommentContentFactory } from './CommentContentFactory';
 import { IPipelineTask } from './IPipelineTask';
+import { RapidCommentTest } from './RapidCommentTest';
 
 async function run() {
     try {
@@ -21,7 +22,7 @@ async function run() {
             tl.debug(messages.notInPullRequestMessage);
         }
         else {
-            let supportLink: string = tl.getInput('SupportContactLink', true);
+           // let supportLink: string = tl.getInput('SupportContactLink', true);
             let azureApiFactory: AzureApiFactory = new AzureApiFactory();
             let azureApi = await azureApiFactory.create(configurations);
             let currentProject: string = configurations.getProjectName();
@@ -29,6 +30,10 @@ async function run() {
             let type: string = configurations.getHostType();
             let commentFactory: CommentContentFactory = new CommentContentFactory();
             let pullRequest: PullRequest = new PullRequest(configurations.getPullRequestId(), configurations.getRepository(), configurations.getProjectName());
+
+            // let rapid: RapidCommentTest = new RapidCommentTest(azureApi);
+            // rapid.test();
+
             let targetBranchName: string = await configurations.getTargetBranch(azureApi);
             tl.debug("target branch of pull request: " + targetBranchName);
             let retrievedPipelines: IPipeline[] = await azureApi.getMostRecentPipelinesOfCurrentType(currentProject, currentPipeline, numberBuildsToQuery, targetBranchName);
@@ -51,7 +56,7 @@ async function run() {
                 let serviceThreads: azureGitInterfaces.GitPullRequestCommentThread[] = await pullRequest.getCurrentServiceCommentThreads(azureApi);
                 let currentIterationCommentThread: azureGitInterfaces.GitPullRequestCommentThread = pullRequest.getCurrentIterationCommentThread(serviceThreads, configurations.getSourceCommitIteration());
                 let definitionLink: string = await currentPipeline.getDefinitionLink(azureApi, configurations.getProjectName());
-                let currentPipelineCommentContent: string = commentFactory.createTableSection(currentPipeline, definitionLink, targetBranch.getMostRecentCompletePipeline(), targetBranch, supportLink, longRunningValidations, thresholdTimes);
+                let currentPipelineCommentContent: string = commentFactory.createTableSection(currentPipeline, definitionLink, targetBranch.getMostRecentCompletePipeline(), targetBranch, longRunningValidations, thresholdTimes);
                 if (currentIterationCommentThread) {
                     pullRequest.editCommentInThread(azureApi, currentIterationCommentThread, currentIterationCommentThread.comments[0].id, "\n" + currentPipelineCommentContent);
                 }

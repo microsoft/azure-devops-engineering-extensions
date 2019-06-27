@@ -13,7 +13,6 @@ describe('Branch Tests', () => {
     let successfulBuildFour: IPipeline;
     let incompleteBuild: IPipeline;
     let branch: Branch;
-    let taskLengthFake: sinon.SinonStub;
 
     beforeEach(() => {
         failedBuildOne = new Build(null, null);
@@ -50,6 +49,16 @@ describe('Branch Tests', () => {
         return fake;
     }
 
+
+    test("Returns capitalized last part of full name as truncated name", ()=> {
+        branch = new Branch("refs/head/master", null);
+        expect(branch.getTruncatedName()).toEqual("Master"); 
+    });
+
+    test("Returns capitalized whole name truncated name when unseperated ", ()=> {
+        branch = new Branch("master", null);
+        expect(branch.getTruncatedName()).toEqual("Master"); 
+    });
 
     test("Counts pipeline failure streak of multiple fails", ()=> {
         branch = new Branch("", [failedBuildOne, failedBuildOne, failedBuildOne, failedBuildOne, successfulBuildTwo, successfulBuildTwo]);
