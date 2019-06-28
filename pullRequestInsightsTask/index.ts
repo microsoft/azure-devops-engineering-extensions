@@ -41,7 +41,7 @@ async function run() {
             let thresholdTimes: number[] = [];
             let longRunningValidations: IPipelineTask[] = [];
 
-            if (!currentPipeline.isFailure() && type === "build") { // temporary second condition, present since long running validations only functional for builds as of now
+            if (!currentPipeline.isFailure() && configurations.getHostType() === "build") { // temporary second condition, present since long running validations only functional for builds as of now
                 for (let task of currentPipeline.getAllTasks()) {
                     let percentileTime: number = targetBranch.getPercentileTimeForPipelineTask(percentile, task);
                     if (task.isLongRunning(percentileTime)) {
