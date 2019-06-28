@@ -3,6 +3,7 @@ import * as azureGitInterfaces from "azure-devops-node-api/interfaces/GitInterfa
 import { WebApi, getPersonalAccessTokenHandler } from 'azure-devops-node-api/WebApi';
 import { IPipeline } from "./IPipeline";
 import { EnvironmentConfigurations } from './EnvironmentConfigurations';
+import { PullRequest } from './PullRequest';
 
 export abstract class AbstractAzureApi {
     private connection: WebApi;
@@ -45,8 +46,8 @@ export abstract class AbstractAzureApi {
         return (await this.getConnection().getGitApi()).getComment(repositoryId, pullRequestId, threadId, commentId, projectName)
     }
 
-    public async getPullRequestData(repositoryId: string, pullRequestId: number, projectName: string): Promise<azureGitInterfaces.GitPullRequest> {
-        return (await this.getConnection().getGitApi()).getPullRequest(repositoryId, pullRequestId, projectName);
+    public async getPullRequest(repositoryId: string, pullRequestId: number, projectName: string): Promise<PullRequest> {
+        return new PullRequest(pullRequestId, repositoryId, projectName, await (await this.getConnection().getGitApi()).getPullRequest(repositoryId, pullRequestId, projectName));
     }
 
     private createConnection(uri: string, accessToken: string): WebApi {

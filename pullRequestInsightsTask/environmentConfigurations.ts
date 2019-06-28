@@ -1,5 +1,4 @@
 import tl = require('azure-pipelines-task-lib/task');
-import { AbstractAzureApi } from './AbstractAzureApi';
 
 export class EnvironmentConfigurations{
     private static readonly TEAM_FOUNDATION_KEY = "SYSTEM_TEAMFOUNDATIONCOLLECTIONURI";
@@ -13,7 +12,6 @@ export class EnvironmentConfigurations{
     private static readonly SOURCE_COMMIT_ITERATION_KEY = "BUILD_SOURCEVERSION";
     private static readonly RELEASE_ID_KEY = "RELEASE_RELEASEID";
     private static readonly HOST_KEY = "SYSTEM_HOSTTYPE";
-    private static readonly TARGET_BRANCH_KEYS = ["SYSTEM_PULLREQUEST_TARGETBRANCH", "BUILD_TARGETBRANCH"];
     private static readonly BUILD_SOURCE_BRANCH_KEY = "BUILD_SOURCEBRANCH"; 
     private static readonly PULL_KEY = "pull";
     private static readonly SEPERATOR = "/";
@@ -46,17 +44,6 @@ export class EnvironmentConfigurations{
         return this.loadFromEnvironment(EnvironmentConfigurations.PROJECT_KEY);
     }
 
-    public async getTargetBranch(apiCaller: AbstractAzureApi): Promise<string> {
-        let targetBranch = this.tryKeys(EnvironmentConfigurations.TARGET_BRANCH_KEYS);
-        if (!targetBranch){
-            targetBranch = (await apiCaller.getPullRequestData(this.getRepository(), this.getPullRequestId(), this.getProjectName())).targetRefName;
-        }
-        if (!targetBranch){
-            return null; 
-        }
-        return targetBranch;
-    }
-
     public getHostType(): string {
         return this.loadFromEnvironment(EnvironmentConfigurations.HOST_KEY);
     }
@@ -73,7 +60,7 @@ export class EnvironmentConfigurations{
         return this.loadFromEnvironment(EnvironmentConfigurations.BUILD_SOURCE_BRANCH_KEY);
     }
 
-    public getSourceCommitIteration(): string {
+    public getCurrentSourceCommitIteration(): string {
         return this.loadFromEnvironment(EnvironmentConfigurations.SOURCE_COMMIT_ITERATION_KEY);
     }
 
