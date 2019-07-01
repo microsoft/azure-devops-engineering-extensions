@@ -110,4 +110,25 @@ describe('Branch Tests', () => {
         branch = new Branch("", [makePipeline(undefined, undefined, [makeTask("jkl", "id", 4)]), makePipeline(undefined, undefined, [makeTask("jkl", "id", 2)]), makePipeline(undefined, undefined, [makeTask("jkl", "id", 3)]), makePipeline(undefined, undefined, [makeTask("jkl", "id", 1)])]);
         expect(branch.getPercentileTimeForPipelineTask(40, makeTask("jkl", "id", 4))).toBeCloseTo(2.1);
     });
+
+    test("Branch with failed pipelines within number to check is not healthy", () => { 
+        branch = new Branch("", [successfulBuildTwo, failedBuildOne, successfulBuildTwo, failedBuildOne, successfulBuildTwo, successfulBuildTwo]);
+        expect(branch.isHealthy(3)).toBe(false);
+
+    });
+
+    test("Branch with no failed pipelines is healthy", () => { 
+        branch = new Branch("", [successfulBuildTwo, successfulBuildTwo, successfulBuildTwo, successfulBuildTwo]);
+        expect(branch.isHealthy(3)).toBe(true);
+    });
+
+    test("Branch with failed pipelines only outside of number to check is healthy", () => { 
+        branch = new Branch("", [successfulBuildTwo, successfulBuildTwo, failedBuildOne, failedBuildOne]);
+        expect(branch.isHealthy(2)).toBe(true);
+    });
+
+    test("Branch given number to check that is higher than number of pipelines checks all pipelines for health", () => { 
+        branch = new Branch("", [successfulBuildTwo, successfulBuildTwo, failedBuildOne]);
+        expect(branch.isHealthy(7)).toBe(false);
+    });
 })

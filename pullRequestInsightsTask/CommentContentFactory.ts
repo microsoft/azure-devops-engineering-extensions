@@ -18,11 +18,11 @@ export class CommentContentFactory {
         return messages.longRunningValidationCommentTableHeading.format(percentile, targetBranchName);
     }
 
-    public createTableSection(current: IPipeline, currentDefinitionLink: string, mostRecent: IPipeline, target: Branch, longRunningValidations: IPipelineTask[], thresholdTimes: number[]): string {
+    public createTableSection(current: IPipeline, currentDefinitionLink: string, mostRecent: IPipeline, target: Branch, numberPipelinesToConsiderForHealth: number, longRunningValidations: IPipelineTask[], thresholdTimes: number[]): string {
         if (current.isFailure()) {
-            let messageString: string = messages.successCommentRow;
-            if (mostRecent != null && mostRecent.isFailure()) {
-                messageString = messages.failureCommentRow;
+            let messageString: string = messages.failureCommentRow;
+            if (target.isHealthy(numberPipelinesToConsiderForHealth)) {
+                messageString = messages.successCommentRow;
         }
         return messageString.format(current.getDefinitionName(), current.getLink(), target.getTruncatedName(), currentDefinitionLink);
         }

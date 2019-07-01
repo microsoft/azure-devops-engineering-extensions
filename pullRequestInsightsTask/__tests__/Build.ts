@@ -56,7 +56,7 @@ describe('Build Tests', () => {
         fillMockBuildData(azureBuildInterfaces.BuildStatus.InProgress);
         fillMockBuildTimeline([succeededTask, failedTask, succeededTask]);
         build = new Build(mockBuildData, mockBuildTimeline);
-        expect(build.isFailure()).toBe(true); 
+        expect(build.isFailure()).toBe(true);
     });
 
     test('Incomplete build without current failures is not failure', () => {

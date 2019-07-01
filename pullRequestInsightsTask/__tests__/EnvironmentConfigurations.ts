@@ -49,26 +49,5 @@ describe("EnvirnmentConfigurations Tests", () => {
         expect(configurations.getPullRequestId()).toBe(null); 
     });
 
-    test("Gets target branch from system", async () =>{
-        setUpGetVariableCall(new Map<string,string>([ ["SYSTEM_PULLREQUEST_TARGETBRANCH", "fakeTarget"]]));
-        expect(await configurations.getTargetBranch(mockApi)).toBe("fakeTarget"); 
-    });
-
-    test("Gets target branch from build", async () =>{
-        setUpGetVariableCall(new Map<string,string>([ ["SYSTEM_PULLREQUEST_TARGETBRANCH", undefined], ["BUILD_TARGETBRANCH", "fakeTarget"]]));
-        expect(await configurations.getTargetBranch(mockApi)).toBe("fakeTarget"); 
-    });
-
-
-    test("Gets target branch by making api call", async () =>{
-        setUpGetVariableCall(new Map<string, any>([["SYSTEM_PULLREQUEST_TARGETBRANCH", undefined], ["BUILD_TARGETBRANCH", undefined], ["BUILD_REPOSITORY_NAME", "fakeRepo"], ["SYSTEM_PULLREQUEST_PULLREQUESTID", 10], ["BUILD_SOURCEBRANCH", "ref/pull/11/master"]]));
-        const mockPullRequest: azureGitInterfaces.GitPullRequest = {
-            targetRefName: "fakeTarget",
-        }
-        sinon.stub(mockApi, "getPullRequestData").resolves(mockPullRequest);
-      //  console.log("pull request data value: " + (await mockApi.getPullRequestData("fakeRepo", 10)).targetRefName);
-        expect(await configurations.getTargetBranch(mockApi)).toBe("fakeTarget"); 
-    });
-
 
 })
