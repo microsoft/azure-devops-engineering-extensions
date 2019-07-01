@@ -3,7 +3,7 @@
     "noFailureMessage": "Nothing occured because the {0} has not failed any tasks",
     "commentCompletedMessage": "Comment was successfully posted",
     "summaryLine": "Pull Request Validation Insights",
-    "failureCommentTableHeading": "|Failed Pipeline Name|{1} Health|Insights|\n|---|---|---|",
+    "failureCommentTableHeading": "|Failed Pipeline|{1} Health|Insights|\n|---|---|---|",
     "newIterationCommentHeading": "__Source Commit: {0}__",
     "failureCommentRow": "|[{0}]({1})| :x: |{2} branch is Unhealthy <br> Please compare {2} branch [failures]({3}) <br> with current and take appropriate action|",
     "successCommentRow": "|[{0}]({1})| :heavy_check_mark: |{2} branch is Healthy <br> Failure in this PR is likely related to change|",
