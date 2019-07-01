@@ -16,6 +16,18 @@ export class Branch{
         this.name = name;
     }
 
+    public isHealthy(pastPipelinesToConsider: number): boolean {
+        if (pastPipelinesToConsider > this.pipelines.length) {
+            pastPipelinesToConsider = this.pipelines.length;
+        }
+        for (let numberPipeline = 0; numberPipeline < pastPipelinesToConsider; numberPipeline++) {
+            if (this.pipelines[numberPipeline].isFailure()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public getPipelineFailStreak(): number {
         let count: number = 0;
         for (let numberPipeline = 0; numberPipeline < this.pipelines.length; numberPipeline++) {

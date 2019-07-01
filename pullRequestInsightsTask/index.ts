@@ -15,6 +15,7 @@ async function run() {
     try {
         const percentile: number = 1000; 
         const numberBuildsToQuery: number = 10;
+        const numberPipelinesToConsiderForHealth = 3;
         let configurations: EnvironmentConfigurations = new EnvironmentConfigurations();
 
         tl.debug("pull request id: " + configurations.getPullRequestId());
@@ -51,7 +52,8 @@ async function run() {
                 let serviceThreads: azureGitInterfaces.GitPullRequestCommentThread[] = await pullRequest.getCurrentServiceCommentThreads(azureApi);
                 let currentIterationCommentThread: azureGitInterfaces.GitPullRequestCommentThread = pullRequest.getCurrentIterationCommentThread(serviceThreads);
                 let checkStatusLink: string = await getStatusLink(currentPipeline, azureApi, configurations.getProjectName());
-                let currentPipelineCommentContent: string = commentFactory.createTableSection(currentPipeline, checkStatusLink, targetBranch.getMostRecentCompletePipeline(), targetBranch, longRunningValidations, thresholdTimes);
+                tl.debug(`Check status link to use: ${checkStatusLink}`);
+                let currentPipelineCommentContent: string = commentFactory.createTableSection(currentPipeline, checkStatusLink, targetBranch.getMostRecentCompletePipeline(), targetBranch, numberPipelinesToConsiderForHealth, longRunningValidations, thresholdTimes);
                 if (currentIterationCommentThread) {
                     pullRequest.editCommentInThread(azureApi, currentIterationCommentThread, currentIterationCommentThread.comments[0].id, "\n" + currentPipelineCommentContent);
                 }
