@@ -40,6 +40,14 @@ export class PullRequest {
         return apiCaller.postNewCommentThread(thread, this.id, this.repository, this.projectName);
     }
 
+    // public async addNewComment(apiCaller: AbstractAzureApi, tableType: string, postStatus: azureGitInterfaces.CommentThreadStatus): Promise<azureGitInterfaces.GitPullRequestCommentThread> {
+    //     let table: Table = await TableFactory.create(tableType);
+    //     let thread: azureGitInterfaces.CommentThread = {comments: new Array({content: commentContent}), status: postStatus};
+    //     thread.properties = {[commentProperties.taskPropertyName]: commentProperties.taskPropertyValue, [commentProperties.iterationPropertyName]: this.mostRecentSourceCommitId};
+    //     tl.debug(messages.commentCompletedMessage);
+    //     return apiCaller.postNewCommentThread(thread, this.id, this.repository, this.projectName);
+    // }
+
     public async deactivateOldComments(apiCaller: AbstractAzureApi, serviceComments: azureGitInterfaces.GitPullRequestCommentThread[], currentIterationCommentId: number): Promise<void> {
         for (let commentThread of serviceComments) {
             if (commentThread.id !== currentIterationCommentId && (commentThread.status === azureGitInterfaces.CommentThreadStatus.Active || commentThread.status === undefined)) {
@@ -57,11 +65,11 @@ export class PullRequest {
         }
     }
 
-    public editCommentInThread(apiCaller: AbstractAzureApi, thread: azureGitInterfaces.GitPullRequestCommentThread, commentId: number, contentToAdd: string): void {
+    public editCommentInThread(apiCaller: AbstractAzureApi, thread: azureGitInterfaces.GitPullRequestCommentThread, commentId: number, newContent: string): void {
         for (let comment of thread.comments) {
             console.log("comment id = " + comment.id)
             if (comment.id === commentId) {
-                let updatedContent: string = comment.content + contentToAdd;
+                let updatedContent: string = newContent;
                 tl.debug("comment to be updated: thread id = " + thread.id + ", comment id = " + comment.id);
                 tl.debug("updated content: " + updatedContent);
                 apiCaller.updateComment({ content: updatedContent }, this.id, this.repository, this.projectName, thread.id, comment.id);
@@ -78,6 +86,13 @@ export class PullRequest {
             }
         }
         tl.debug("no comment was found for iteration " + this.mostRecentSourceCommitId);
+        return null;
+    }
+
+    public getCurrentIterationCommentContent(currentIterationCommentThread: azureGitInterfaces.GitPullRequestCommentThread): string {
+        if (currentIterationCommentThread && currentIterationCommentThread.comments && currentIterationCommentThread.comments[0]) {
+            return currentIterationCommentThread.comments[0].content;
+        }
         return null;
     }
 

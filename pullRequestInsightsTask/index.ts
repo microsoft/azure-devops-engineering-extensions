@@ -10,10 +10,12 @@ import './StringExtensions';
 import { CommentContentFactory } from './CommentContentFactory';
 import { IPipelineTask } from './IPipelineTask';
 import { AbstractAzureApi } from './AbstractAzureApi';
+import { Table } from './Table';
+import { TableFactory } from './TableFactory';
 
 async function run() {
     try {
-        const percentile: number = 1000; 
+        const percentile: number = 1; 
         const numberBuildsToQuery: number = 10;
         const numberPipelinesToConsiderForHealth = 3;
         let configurations: EnvironmentConfigurations = new EnvironmentConfigurations();
@@ -25,9 +27,9 @@ async function run() {
         else {
             let azureApiFactory: AzureApiFactory = new AzureApiFactory();
             let azureApi = await azureApiFactory.create(configurations);
-            let currentProject: string = configurations.getProjectName();
+           // let currentProject: string = configurations.getProjectName();
             let currentPipeline: IPipeline = await azureApi.getCurrentPipeline(configurations);
-            let commentFactory: CommentContentFactory = new CommentContentFactory();
+            //let commentFactory: CommentContentFactory = new CommentContentFactory();
             let pullRequest: PullRequest = await azureApi.getPullRequest(configurations.getRepository(), configurations.getPullRequestId(), configurations.getProjectName());
             let targetBranchName: string = pullRequest.getTargetBranchName();
             tl.debug("target branch of pull request: " + targetBranchName);
@@ -36,32 +38,41 @@ async function run() {
             let targetBranch: Branch = new Branch(targetBranchName, retrievedPipelines);
             let thresholdTimes: number[] = [];
             let longRunningValidations: IPipelineTask[] = [];
+            let tableType: string = TableFactory.FAILURE;
 
-            // if (!currentPipeline.isFailure() && type === "build") { // temporary second condition, present since long running validations only functional for builds as of now
-            //     for (let task of currentPipeline.getAllTasks()) {
-            //         let percentileTime: number = targetBranch.getPercentileTimeForPipelineTask(percentile, task);
-            //         if (task.isLongRunning(percentileTime)) {
-            //             longRunningValidations.push(task);
-            //             thresholdTimes.push(percentileTime);
-            //         }
-            //     }
-            //     tl.debug("Number of longRunningValidations = " + longRunningValidations.length);
-            // }
+            if (!currentPipeline.isFailure() && configurations.getHostType() === "build") { // temporary second condition, present since long running validations only functional for builds as of now
+                tableType = TableFactory.LONG_RUNNING_VALIDATIONS;
+                for (let task of currentPipeline.getAllTasks()) {
+                    let percentileTime: number = targetBranch.getPercentileTimeForPipelineTask(percentile, task);
+                    if (task.isLongRunning(percentileTime)) {
+                        longRunningValidations.push(task);
+                        thresholdTimes.push(percentileTime);
+                    }
+                }
+                tl.debug("Number of longRunningValidations = " + longRunningValidations.length);
+            }
 
             if (pullRequest.mostRecentSourceCommitMatchesCurrent(configurations.getCurrentSourceCommitIteration()) && (currentPipeline.isFailure() || longRunningValidations.length > 0)) {
                 let serviceThreads: azureGitInterfaces.GitPullRequestCommentThread[] = await pullRequest.getCurrentServiceCommentThreads(azureApi);
                 let currentIterationCommentThread: azureGitInterfaces.GitPullRequestCommentThread = pullRequest.getCurrentIterationCommentThread(serviceThreads);
                 let checkStatusLink: string = await getStatusLink(currentPipeline, azureApi, configurations.getProjectName());
                 tl.debug(`Check status link to use: ${checkStatusLink}`);
-                let currentPipelineCommentContent: string = commentFactory.createTableSection(currentPipeline, checkStatusLink, targetBranch.getMostRecentCompletePipeline(), targetBranch, numberPipelinesToConsiderForHealth, longRunningValidations, thresholdTimes);
+              //  let currentPipelineCommentContent: string = commentFactory.createTableSection(currentPipeline, checkStatusLink, targetBranch.getMostRecentCompletePipeline(), targetBranch, numberPipelinesToConsiderForHealth, longRunningValidations, thresholdTimes);
+                tl.debug("type of table to create: " + tableType);
+                let table: Table = TableFactory.create(tableType, pullRequest.getCurrentIterationCommentContent(currentIterationCommentThread)); 
+                tl.debug("table is null?: " + String(table == null));
+                tl.debug("comment data: " + table.getCurrentCommentData);
+                table.addHeader(targetBranch.getTruncatedName(), percentile);
+                table.addSection(currentPipeline, checkStatusLink, targetBranch, numberPipelinesToConsiderForHealth, longRunningValidations, thresholdTimes)
                 if (currentIterationCommentThread) {
-                    pullRequest.editCommentInThread(azureApi, currentIterationCommentThread, currentIterationCommentThread.comments[0].id, "\n" + currentPipelineCommentContent);
+                    pullRequest.editCommentInThread(azureApi, currentIterationCommentThread, currentIterationCommentThread.comments[0].id, table.getCurrentCommentData());
                 }
                 else {
-                    currentPipelineCommentContent = messages.summaryLine + "\n" + commentFactory.createTableHeader(currentPipeline.isFailure(), targetBranch.getTruncatedName(), String(percentile)) + "\n" + currentPipelineCommentContent;
-                    let currentIterationCommentThreadId: number = (await pullRequest.addNewComment(azureApi, currentPipelineCommentContent, azureGitInterfaces.CommentThreadStatus.Closed)).id;
+                   // currentPipelineCommentContent = messages.summaryLine + "\n" + commentFactory.createTableHeader(currentPipeline.isFailure(), targetBranch.getTruncatedName(), String(percentile)) + "\n" + currentPipelineCommentContent;
+                    let currentIterationCommentThreadId: number = (await pullRequest.addNewComment(azureApi, table.getCurrentCommentData(), azureGitInterfaces.CommentThreadStatus.Closed)).id;
                     pullRequest.deleteOldComments(azureApi, serviceThreads, currentIterationCommentThreadId);
                 }
+                
             }
         }
     }

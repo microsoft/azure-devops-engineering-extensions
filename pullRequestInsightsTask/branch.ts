@@ -17,12 +17,12 @@ export class Branch{
     }
 
     public isHealthy(pastPipelinesToConsider: number): boolean {
-        if (pastPipelinesToConsider > this.pipelines.length) {
-            pastPipelinesToConsider = this.pipelines.length;
-        }
-        for (let numberPipeline = 0; numberPipeline < pastPipelinesToConsider; numberPipeline++) {
-            if (this.pipelines[numberPipeline].isFailure()) {
-                return false;
+        if (this.pipelines) {
+            pastPipelinesToConsider = Math.min(this.pipelines.length, pastPipelinesToConsider);
+            for (let numberPipeline = 0; numberPipeline < pastPipelinesToConsider; numberPipeline++) {
+                if (this.pipelines[numberPipeline].isFailure()) {
+                    return false;
+                }
             }
         }
         return true;

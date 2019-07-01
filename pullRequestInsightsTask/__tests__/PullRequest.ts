@@ -123,7 +123,7 @@ describe("PullRequest Tests", () => {
     test("Calls to edit only correct comment in correct thread", async () => {
         let callback: jest.SpyInstance = jest.spyOn(mockApi, "updateComment");
         let thread: azureGitInterfaces.GitPullRequestCommentThread = makeThread([makeComment("hello", "", 2), makeComment("hi", "", 1)], undefined, 5);
-        pullRequest.editCommentInThread(mockApi, thread, 2, "goodbye");
+        pullRequest.editCommentInThread(mockApi, thread, 2, "hellogoodbye");
         expect(callback).toHaveBeenCalledTimes(1);
         expect(callback).toBeCalledWith({ content: "hellogoodbye" }, 2, "repo", "project", 5, 2);
     });
