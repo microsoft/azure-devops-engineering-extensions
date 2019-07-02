@@ -1,9 +1,9 @@
 import * as azureReleaseInterfaces from "azure-devops-node-api/interfaces/ReleaseInterfaces";
 import { AbstractAzureApi } from "./AbstractAzureApi";
-import { EnvironmentConfigurations } from "./EnvironmentConfigurations";
 import { IPipeline } from "./IPipeline";
 import { Release } from "./Release";
 import tl = require('azure-pipelines-task-lib/task');
+import { PipelineData } from "./PipelineData";
 
 export class ReleaseAzureApi extends AbstractAzureApi{
 
@@ -13,8 +13,8 @@ export class ReleaseAzureApi extends AbstractAzureApi{
         super(uri, accessKey);
      }
  
-     public async getCurrentPipeline(configurations: EnvironmentConfigurations): Promise<IPipeline> {
-         return this.getRelease(configurations.getProjectName(), configurations.getReleaseId()); 
+     public async getCurrentPipeline(data: PipelineData): Promise<IPipeline> {
+         return this.getRelease(data.getProjectName(), data.getReleaseId()); 
      }
  
      public async getMostRecentPipelinesOfCurrentType(project: string, currentPipeline: IPipeline, maxNumber: number, branchName: string): Promise<IPipeline[]> {

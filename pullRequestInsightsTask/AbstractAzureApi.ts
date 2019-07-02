@@ -2,8 +2,8 @@ import tl = require('azure-pipelines-task-lib/task');
 import * as azureGitInterfaces from "azure-devops-node-api/interfaces/GitInterfaces";
 import { WebApi, getPersonalAccessTokenHandler } from 'azure-devops-node-api/WebApi';
 import { IPipeline } from "./IPipeline";
-import { EnvironmentConfigurations } from './EnvironmentConfigurations';
 import { PullRequest } from './PullRequest';
+import { PipelineData } from './PipelineData';
 
 export abstract class AbstractAzureApi {
     private connection: WebApi;
@@ -12,7 +12,7 @@ export abstract class AbstractAzureApi {
         this.connection = this.createConnection(uri, accessKey);
     }
 
-    public async abstract getCurrentPipeline(configurations: EnvironmentConfigurations): Promise<IPipeline>;
+    public async abstract getCurrentPipeline(data: PipelineData): Promise<IPipeline>;
 
     public async abstract getMostRecentPipelinesOfCurrentType(project: string, currentPipeline: IPipeline, maxNumber: number, branchName: string): Promise<IPipeline[]>;
 
