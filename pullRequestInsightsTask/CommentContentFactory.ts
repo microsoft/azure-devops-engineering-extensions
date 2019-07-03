@@ -1,6 +1,6 @@
 import messages from "./user_messages.json"
 import './StringExtensions';
-import { IPipeline } from "./IPipeline.js";
+import { AbstractPipeline } from "./AbstractPipeline.js";
 import { Branch } from "./Branch.js";
 import { AbstractPipelineTask } from "./AbstractPipelineTask.js";
 
@@ -18,7 +18,7 @@ export class CommentContentFactory {
         return messages.longRunningValidationCommentTableHeading.format(percentile, targetBranchName);
     }
 
-    public createTableSection(current: IPipeline, currentDefinitionLink: string, mostRecent: IPipeline, target: Branch, numberPipelinesToConsiderForHealth: number, longRunningValidations: IPipelineTask[], thresholdTimes: number[]): string {
+    public createTableSection(current: AbstractPipeline, currentDefinitionLink: string, mostRecent: AbstractPipeline, target: Branch, numberPipelinesToConsiderForHealth: number, longRunningValidations: AbstractPipelineTask[], thresholdTimes: number[]): string {
         if (current.isFailure()) {
             let messageString: string = messages.failureCommentRow;
             if (target.isHealthy(numberPipelinesToConsiderForHealth)) {

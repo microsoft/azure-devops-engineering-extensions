@@ -1,17 +1,17 @@
 import { Build } from '../Build';
 import * as sinon from 'sinon';
 import { Branch } from '../Branch';
-import { IPipeline } from '../IPipeline';
+import { AbstractPipeline } from '../AbstractPipeline';
 import { AbstractPipelineTask } from '../AbstractPipelineTask';
 import { BuildTask } from '../BuildTask';
 
 describe('Branch Tests', () => {
     
-    let failedBuildOne: IPipeline;
-    let successfulBuildTwo: IPipeline;
-    let failedBuildThree: IPipeline;
-    let successfulBuildFour: IPipeline;
-    let incompleteBuild: IPipeline;
+    let failedBuildOne: AbstractPipeline;
+    let successfulBuildTwo: AbstractPipeline;
+    let failedBuildThree: AbstractPipeline;
+    let successfulBuildFour: AbstractPipeline;
+    let incompleteBuild: AbstractPipeline;
     let branch: Branch;
 
     beforeEach(() => {
@@ -21,7 +21,7 @@ describe('Branch Tests', () => {
         successfulBuildFour = new Build(null, null);
         incompleteBuild = new Build(null, null);
 
-        let builds: IPipeline[] = [failedBuildOne, successfulBuildTwo, failedBuildThree, successfulBuildFour];
+        let builds: AbstractPipeline[] = [failedBuildOne, successfulBuildTwo, failedBuildThree, successfulBuildFour];
         for (let buildNumber = 0; buildNumber < builds.length; buildNumber++){
             sinon.stub(builds[buildNumber], "getId").returns(buildNumber);
             sinon.stub(builds[buildNumber], "isComplete").returns(true);
@@ -33,8 +33,8 @@ describe('Branch Tests', () => {
         sinon.stub(incompleteBuild, "isComplete").returns(false);
     });
 
-    function makePipeline(isFailure?: boolean, isComplete?: boolean, tasks?: AbstractPipelineTask[]): IPipeline {
-        let pipeline: IPipeline = new Build(null, null);
+    function makePipeline(isFailure?: boolean, isComplete?: boolean, tasks?: AbstractPipelineTask[]): AbstractPipeline {
+        let pipeline: AbstractPipeline = new Build(null, null);
         sinon.stub(pipeline, "isFailure").returns(isFailure);
         sinon.stub(pipeline, "isComplete").returns(isComplete);
         sinon.stub(pipeline, "getAllTasks").returns(tasks);

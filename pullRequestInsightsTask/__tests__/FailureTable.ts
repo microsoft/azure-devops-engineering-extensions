@@ -1,5 +1,5 @@
 import { FailureTable } from "../Table";
-import { IPipeline } from "../IPipeline";
+import { AbstractPipeline } from "../AbstractPipeline";
 import sinon from "sinon";
 import { Branch } from "../branch";
 import { Release } from "../Release";
@@ -14,8 +14,8 @@ describe("FailureTable Tests", () => {
        
     });
 
-    function makeFakePipeline(name: string, link: string, isFailure: boolean, definitionId: number): IPipeline {
-       let pipeline: IPipeline = mock(Release);
+    function makeFakePipeline(name: string, link: string, isFailure: boolean, definitionId: number): AbstractPipeline {
+       let pipeline: AbstractPipeline = mock(Release);
        sinon.stub(pipeline, "isFailure").returns(isFailure);
        sinon.stub(pipeline, "getDefinitionName").returns(name);
        sinon.stub(pipeline, "getLink").returns(link);

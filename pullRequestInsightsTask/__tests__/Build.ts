@@ -77,13 +77,13 @@ describe('Build Tests', () => {
         fillMockBuildTimeline([makeTimelineRecord(undefined, undefined, undefined, undefined, "yellow", "a"), makeTimelineRecord(undefined, undefined, undefined, undefined, "blue", "b"), makeTimelineRecord(undefined, undefined, undefined, undefined, "red", "c")]);
         build = new Build(null, mockBuildTimeline);
         let expectedTasks: AbstractPipelineTask[] = [new BuildTask(makeTimelineRecord(undefined, undefined, undefined, undefined, "yellow", "a")), new BuildTask(makeTimelineRecord(undefined, undefined, undefined, undefined, "blue", "b")), new BuildTask(makeTimelineRecord(undefined, undefined, undefined, undefined, "red", "c"))];
-        expect(build.getAllTasks()).toEqual(expectedTasks);
+        expect(build.getTasks()).toEqual(expectedTasks);
     });
     
     test('Null is returned when there are no tasks to be retrieved', () => {
         fillMockBuildTimeline([]);
         build = new Build(null, mockBuildTimeline);
-        expect(build.getAllTasks()).toEqual([]);
+        expect(build.getTasks()).toEqual([]);
     });
 
     test('Equivalent task retrieved from build when present', () => {

@@ -3,7 +3,7 @@ import * as azureGitInterfaces from "azure-devops-node-api/interfaces/GitInterfa
 import { EnvironmentConfigurations } from './EnvironmentConfigurations';
 import messages from './user_messages.json';
 import { Branch } from './Branch';
-import { IPipeline } from './IPipeline';
+import { AbstractPipeline } from './AbstractPipeline';
 import { AzureApiFactory } from './AzureApiFactory';
 import { PullRequest } from './PullRequest';
 import './StringExtensions';
@@ -28,12 +28,12 @@ async function run() {
             let azureApiFactory: AzureApiFactory = new AzureApiFactory();
             let azureApi = await azureApiFactory.create(configurations);
            // let currentProject: string = configurations.getProjectName();
-            let currentPipeline: IPipeline = await azureApi.getCurrentPipeline(configurations);
+            let currentPipeline: AbstractPipeline = await azureApi.getCurrentPipeline(configurations);
             //let commentFactory: CommentContentFactory = new CommentContentFactory();
             let pullRequest: PullRequest = await azureApi.getPullRequest(configurations.getRepository(), configurations.getPullRequestId(), configurations.getProjectName());
             let targetBranchName: string = pullRequest.getTargetBranchName();
             tl.debug("target branch of pull request: " + targetBranchName);
-            let retrievedPipelines: IPipeline[] = await azureApi.getMostRecentPipelinesOfCurrentType(configurations.getProjectName(), currentPipeline, numberBuildsToQuery, targetBranchName);
+            let retrievedPipelines: AbstractPipeline[] = await azureApi.getMostRecentPipelinesOfCurrentType(configurations.getProjectName(), currentPipeline, numberBuildsToQuery, targetBranchName);
             tl.debug(`Number of retrieved pipelines for ${targetBranchName} = ` + retrievedPipelines.length);
             let targetBranch: Branch = new Branch(targetBranchName, retrievedPipelines);
             let thresholdTimes: number[] = [];
@@ -44,7 +44,7 @@ async function run() {
 
             if (!currentPipeline.isFailure() && configurations.getHostType() === "build") { // temporary second condition, present since long running validations only functional for builds as of now
                 tableType = TableFactory.LONG_RUNNING_VALIDATIONS;
-                for (let task of currentPipeline.getAllTasks()) {
+                for (let task of currentPipeline.getTasks()) {
                     let percentileTime: number = targetBranch.getPercentileTimeForPipelineTask(percentile, task);
                     if (task.isLongRunning(percentileTime)) {
                         longRunningValidations.push(task);
@@ -82,7 +82,7 @@ async function run() {
     }
 }
 
-async function getStatusLink(currentPipeline: IPipeline, apiCaller: AbstractAzureApi, project: string): Promise<string> {
+async function getStatusLink(currentPipeline: AbstractPipeline, apiCaller: AbstractAzureApi, project: string): Promise<string> {
     let statusLink: string = tl.getInput("checkStatusLink", false);
     if (!statusLink) {
        statusLink = await currentPipeline.getDefinitionLink(apiCaller, project);

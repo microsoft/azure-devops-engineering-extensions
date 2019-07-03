@@ -1,6 +1,6 @@
 import { AzureApiFactory } from "./AzureApiFactory";
 import messages from './user_messages.json';
-import { IPipeline } from "./IPipeline";
+import { AbstractPipeline } from "./AbstractPipeline";
 import { Branch } from "./branch";
 import './StringExtensions';
 import { AbstractPipelineTask } from "./AbstractPipelineTask";
@@ -37,7 +37,7 @@ export abstract class Table {
         }
     }
 
-    public abstract addSection(current: IPipeline, currentDefinitionLink: string, target: Branch, numberPipelinesToConsiderForHealth: number, longRunningValidations: IPipelineTask[], thresholdTimes: number[]): void;
+    public abstract addSection(current: AbstractPipeline, currentDefinitionLink: string, target: Branch, numberPipelinesToConsiderForHealth: number, longRunningValidations: IPipelineTask[], thresholdTimes: number[]): void;
 
     public getCurrentCommentData(): string {
         return this.currentCommentData;
@@ -82,7 +82,7 @@ export class FailureTable extends Table {
         super(messages.failureCommentTableHeading, messages.failureCommentTableEndName, currentCommentData);
     }
 
-    public addSection(current: IPipeline, currentDefinitionLink: string, target: Branch, numberPipelinesToConsiderForHealth: number, longRunningValidations: IPipelineTask[], thresholdTimes: number[]): void {
+    public addSection(current: AbstractPipeline, currentDefinitionLink: string, target: Branch, numberPipelinesToConsiderForHealth: number, longRunningValidations: IPipelineTask[], thresholdTimes: number[]): void {
         if (this.tableHasData()) {
             if (current.isFailure()) {
                 let messageString: string = messages.failureCommentRow;
@@ -101,7 +101,7 @@ export class LongRunningValidationsTable extends Table {
         super(messages.longRunningValidationCommentTableHeading, messages.longRunningValidationTableEndName, currentCommentData);
     }
 
-    public addSection(current: IPipeline, currentDefinitionLink: string, target: Branch, numberPipelinesToConsiderForHealth: number, longRunningValidations: IPipelineTask[], thresholdTimes: number[]): void {
+    public addSection(current: AbstractPipeline, currentDefinitionLink: string, target: Branch, numberPipelinesToConsiderForHealth: number, longRunningValidations: IPipelineTask[], thresholdTimes: number[]): void {
         if (this.tableHasData()) {
             let mostRecent = target.getMostRecentCompletePipeline();
             let section: string = "";

@@ -1,28 +1,30 @@
 import * as azureReleaseInterfaces from "azure-devops-node-api/interfaces/ReleaseInterfaces";
-import { IPipeline } from "./IPipeline";
+import { AbstractPipeline } from "./AbstractPipeline";
 import { AbstractPipelineTask } from "./AbstractPipelineTask";
 import { AbstractAzureApi } from "./AbstractAzureApi";
 import { ReleaseTask } from "./ReleaseTask";
 
-export class Release implements IPipeline{
+export class Release extends AbstractPipeline{
 
     private releaseData: azureReleaseInterfaces.Release;
     private environmentData: azureReleaseInterfaces.ReleaseEnvironment;
     private selectedDeployment: azureReleaseInterfaces.DeploymentAttempt;
-    private tasks: AbstractPipelineTask[] = [];
     private static readonly COMPLETE_DEPLOYMENT_STATUSES = [azureReleaseInterfaces.DeploymentStatus.PartiallySucceeded, azureReleaseInterfaces.DeploymentStatus.Succeeded, azureReleaseInterfaces.DeploymentStatus.Failed];
 
-    constructor(releaseData: azureReleaseInterfaces.Release){
+    constructor(releaseData: azureReleaseInterfaces.Release) {
+        super();
         this.releaseData = releaseData;
         this.environmentData = releaseData.environments[0];
         this.selectedDeployment = this.getSelectedDeployment(this.environmentData.deploySteps);
+        let tasks: AbstractPipelineTask[] = [];
         for (let phase of this.selectedDeployment.releaseDeployPhases){
             for (let job of phase.deploymentJobs){
                 for (let task of job.tasks){
-                    this.tasks.push(new ReleaseTask(task));
+                    tasks.push(new ReleaseTask(task));
                 }
             }
         }
+        this.setTasks(tasks);
     }
 
     private getSelectedDeployment(deploymentAttempts: azureReleaseInterfaces.DeploymentAttempt[]): azureReleaseInterfaces.DeploymentAttempt {
@@ -52,12 +54,7 @@ export class Release implements IPipeline{
         if (this.isComplete()) {
             return this.selectedDeployment.status === azureReleaseInterfaces.DeploymentStatus.Failed;
         }
-        for (let task of this.tasks) {
-            if (task.ran() && task.wasFailure()) {
-                return true;
-            }
-        }
-        return false;
+        return this.taskFailedDuringRun();
     }
     
     public isComplete(): boolean {
@@ -76,23 +73,7 @@ export class Release implements IPipeline{
         return this.releaseData.name;
     }
     
-    public getAllTasks(): AbstractPipelineTask[] {
-        if (!this.tasks) {
-            return null;
-        }
-        return this.tasks;
-    }
-
-    public getTask(taskToGet: AbstractPipelineTask): AbstractPipelineTask {
-        if (this.getAllTasks()) {
-            for (let task of this.getAllTasks()) {
-                if (task.equals(taskToGet)) {
-                    return task;
-                }
-            }
-        }
-        return null;
-    }
+   
 }
 
 
