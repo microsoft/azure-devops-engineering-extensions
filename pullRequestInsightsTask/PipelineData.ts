@@ -1,6 +1,5 @@
 export class PipelineData {
 
-
     private projectName: string;
     private accessKey: string
     private hostType: string;
@@ -11,9 +10,6 @@ export class PipelineData {
     private releaseId: number
     private currentSourceCommitIteration: string
     
-
-
-
     public setProjectName(projectName: string): void {
         this.projectName = projectName;
     }
