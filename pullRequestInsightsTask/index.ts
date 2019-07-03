@@ -8,7 +8,7 @@ import { AzureApiFactory } from './AzureApiFactory';
 import { PullRequest } from './PullRequest';
 import './StringExtensions';
 import { CommentContentFactory } from './CommentContentFactory';
-import { IPipelineTask } from './IPipelineTask';
+import { AbstractPipelineTask } from './AbstractPipelineTask';
 import { AbstractAzureApi } from './AbstractAzureApi';
 import { Table } from './Table';
 import { TableFactory } from './TableFactory';
@@ -37,8 +37,10 @@ async function run() {
             tl.debug(`Number of retrieved pipelines for ${targetBranchName} = ` + retrievedPipelines.length);
             let targetBranch: Branch = new Branch(targetBranchName, retrievedPipelines);
             let thresholdTimes: number[] = [];
-            let longRunningValidations: IPipelineTask[] = [];
+            let longRunningValidations: AbstractPipelineTask[] = [];
             let tableType: string = TableFactory.FAILURE;
+            tl.debug("pipeline is a failure?: " + currentPipeline.isFailure());
+            tl.debug("host type: " + configurations.getHostType())
 
             if (!currentPipeline.isFailure() && configurations.getHostType() === "build") { // temporary second condition, present since long running validations only functional for builds as of now
                 tableType = TableFactory.LONG_RUNNING_VALIDATIONS;
@@ -57,7 +59,6 @@ async function run() {
                 let currentIterationCommentThread: azureGitInterfaces.GitPullRequestCommentThread = pullRequest.getCurrentIterationCommentThread(serviceThreads);
                 let checkStatusLink: string = await getStatusLink(currentPipeline, azureApi, configurations.getProjectName());
                 tl.debug(`Check status link to use: ${checkStatusLink}`);
-              //  let currentPipelineCommentContent: string = commentFactory.createTableSection(currentPipeline, checkStatusLink, targetBranch.getMostRecentCompletePipeline(), targetBranch, numberPipelinesToConsiderForHealth, longRunningValidations, thresholdTimes);
                 tl.debug("type of table to create: " + tableType);
                 let table: Table = TableFactory.create(tableType, pullRequest.getCurrentIterationCommentContent(currentIterationCommentThread)); 
                 tl.debug("table is null?: " + String(table == null));

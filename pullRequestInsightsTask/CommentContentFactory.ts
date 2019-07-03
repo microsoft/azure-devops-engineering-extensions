@@ -2,7 +2,7 @@ import messages from "./user_messages.json"
 import './StringExtensions';
 import { IPipeline } from "./IPipeline.js";
 import { Branch } from "./Branch.js";
-import { IPipelineTask } from "./IPipelineTask.js";
+import { AbstractPipelineTask } from "./AbstractPipelineTask.js";
 
 
 export class CommentContentFactory {

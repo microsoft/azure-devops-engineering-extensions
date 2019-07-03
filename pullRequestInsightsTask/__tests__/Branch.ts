@@ -2,7 +2,7 @@ import { Build } from '../Build';
 import * as sinon from 'sinon';
 import { Branch } from '../Branch';
 import { IPipeline } from '../IPipeline';
-import { IPipelineTask } from '../IPipelineTask';
+import { AbstractPipelineTask } from '../AbstractPipelineTask';
 import { BuildTask } from '../BuildTask';
 
 describe('Branch Tests', () => {
@@ -33,7 +33,7 @@ describe('Branch Tests', () => {
         sinon.stub(incompleteBuild, "isComplete").returns(false);
     });
 
-    function makePipeline(isFailure?: boolean, isComplete?: boolean, tasks?: IPipelineTask[]): IPipeline {
+    function makePipeline(isFailure?: boolean, isComplete?: boolean, tasks?: AbstractPipelineTask[]): IPipeline {
         let pipeline: IPipeline = new Build(null, null);
         sinon.stub(pipeline, "isFailure").returns(isFailure);
         sinon.stub(pipeline, "isComplete").returns(isComplete);
@@ -41,8 +41,8 @@ describe('Branch Tests', () => {
         return pipeline;
     }
 
-    function makeTask(name: string, id: string, duration: number): IPipelineTask {
-        let fake: IPipelineTask = new BuildTask(null);
+    function makeTask(name: string, id: string, duration: number): AbstractPipelineTask {
+        let fake: AbstractPipelineTask = new BuildTask(null);
         sinon.stub(fake, "getName").returns(name);
         sinon.stub(fake, "getId").returns(id);
         sinon.stub(fake, "getDuration").returns(duration);

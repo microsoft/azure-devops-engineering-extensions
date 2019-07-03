@@ -35,19 +35,19 @@ describe("FailureTable Tests", () => {
     test("Header is added to comment without table data", () => {
        failureTable = new FailureTable();
        failureTable.addHeader("FakeTarget", 76);
-       expect(failureTable.getCurrentCommentData()).toBe("|Failed Pipeline Name|FakeTarget Health|Insights|\n|---|---|---|<!--failureTable-->");
+       expect(failureTable.getCurrentCommentData()).toBe("|Failed Pipeline|FakeTarget Health|Insights|\n|---|---|---|<!--failureTable-->");
     });
 
     test("Header is not added to table with existing data", () => {
-        failureTable = new FailureTable("|Failed Pipeline Name|FakeTarget Health|Insights|\n|---|---|---|<!--failureTable-->");
+        failureTable = new FailureTable("|Failed Pipeline|FakeTarget Health|Insights|\n|---|---|---|<!--failureTable-->");
         failureTable.addHeader("fakeTarget", 80);
-        expect(failureTable.getCurrentCommentData()).toBe("|Failed Pipeline Name|FakeTarget Health|Insights|\n|---|---|---|<!--failureTable-->");
+        expect(failureTable.getCurrentCommentData()).toBe("|Failed Pipeline|FakeTarget Health|Insights|\n|---|---|---|<!--failureTable-->");
      });
 
     test("Section is added to table with data", () => {
-       failureTable = new FailureTable("|Failed Pipeline Name|FakeTarget Health|Insights|\n|---|---|---|<!--failureTable-->");
+       failureTable = new FailureTable("|Failed Pipeline|FakeTarget Health|Insights|\n|---|---|---|<!--failureTable-->");
        failureTable.addSection(makeFakePipeline("thisBuild", "h", true, null), "link", makeFakeBranch("thisBranch", 7, true), 5, null, null);
-       expect(failureTable.getCurrentCommentData()).toBe("|Failed Pipeline Name|FakeTarget Health|Insights|\n|---|---|---|\n|[thisBuild](h)| :heavy_check_mark: |thisBranch branch is Healthy <br> Failure in this PR is likely related to change|<!--failureTable-->");
+       expect(failureTable.getCurrentCommentData()).toBe("|Failed Pipeline|FakeTarget Health|Insights|\n|---|---|---|\n|[thisBuild](h)| :heavy_check_mark: |thisBranch branch is Healthy <br> Failure in this PR is likely related to change|<!--failureTable-->");
     });
 
     test("Section is not added to empty table without heading", () => {
@@ -57,8 +57,8 @@ describe("FailureTable Tests", () => {
      });
 
     test("Failure row added when branch unhealthy",  () => {
-        failureTable = new FailureTable("|Failed Pipeline Name|FakeTarget Health|Insights|\n|---|---|---|<!--failureTable-->");
+        failureTable = new FailureTable("|Failed Pipeline|FakeTarget Health|Insights|\n|---|---|---|<!--failureTable-->");
         failureTable.addSection(makeFakePipeline("thisBuild", "h", true, null), "link", makeFakeBranch("thisBranch", 7, false), 5, null, null);
-        expect(failureTable.getCurrentCommentData()).toBe("|Failed Pipeline Name|FakeTarget Health|Insights|\n|---|---|---|\n|[thisBuild](h)| :x: |thisBranch branch is Unhealthy <br> Please compare thisBranch branch [failures](link) <br> with current and take appropriate action|<!--failureTable-->")
+        expect(failureTable.getCurrentCommentData()).toBe("|Failed Pipeline|FakeTarget Health|Insights|\n|---|---|---|\n|[thisBuild](h)| :x: |thisBranch branch is Unhealthy <br> Please compare thisBranch branch [failures](link) <br> with current and take appropriate action|<!--failureTable-->")
     });
 });

@@ -1,4 +1,4 @@
-import { IPipelineTask } from "./IPipelineTask";
+import { IPipelineTask } from "./AbstractPipelineTask";
 import { AbstractAzureApi } from "./AbstractAzureApi";
 
 export interface IPipeline{

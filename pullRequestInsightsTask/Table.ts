@@ -3,7 +3,7 @@ import messages from './user_messages.json';
 import { IPipeline } from "./IPipeline";
 import { Branch } from "./branch";
 import './StringExtensions';
-import { IPipelineTask } from "./IPipelineTask";
+import { AbstractPipelineTask } from "./AbstractPipelineTask";
 
 export abstract class Table {
 
@@ -52,8 +52,15 @@ export abstract class Table {
             this.currentCommentData = this.currentCommentData.replace(this.tableEndLine, data + this.tableEndLine);
         }
         else {
-            this.currentCommentData += Table.NEW_LINE + Table.NEW_LINE + data + this.tableEndLine;
+            if (!this.commentIsEmpty()) {
+                this.currentCommentData += Table.NEW_LINE + Table.NEW_LINE;
+            }
+            this.currentCommentData += data + this.tableEndLine;
         }
+    }
+
+    private commentIsEmpty(): boolean {
+        return !this.currentCommentData || this.currentCommentData === "";
     }
 
     private getNumberColumns(line: string): number {
@@ -103,7 +110,7 @@ export class LongRunningValidationsTable extends Table {
                 if (index > 0) {
                     nextLine = messages.longRunningValidationCommentLowerSectionRow;
                 }
-                section += Table.NEW_LINE + nextLine.format(current.getDisplayName(), current.getLink(), longRunningValidations[index].getName(), String(longRunningValidations[index].getDuration()), String(thresholdTimes[index]), mostRecent.getDisplayName(), mostRecent.getLink());
+                section += Table.NEW_LINE + nextLine.format(current.getDefinitionName(), current.getLink(), longRunningValidations[index].getName(), String(longRunningValidations[index].getDuration()), String(thresholdTimes[index]), mostRecent.getDisplayName(), mostRecent.getLink());
             }
             this.addTableData(section);
         }

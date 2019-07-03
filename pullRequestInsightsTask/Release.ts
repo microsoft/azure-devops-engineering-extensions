@@ -1,21 +1,32 @@
 import * as azureReleaseInterfaces from "azure-devops-node-api/interfaces/ReleaseInterfaces";
 import { IPipeline } from "./IPipeline";
-import { IPipelineTask } from "./IPipelineTask";
+import { AbstractPipelineTask } from "./AbstractPipelineTask";
 import { AbstractAzureApi } from "./AbstractAzureApi";
+import { ReleaseTask } from "./ReleaseTask";
 
 export class Release implements IPipeline{
 
     private releaseData: azureReleaseInterfaces.Release;
     private environmentData: azureReleaseInterfaces.ReleaseEnvironment;
-    private static readonly COMPLETE_STATUSES = [azureReleaseInterfaces.DeploymentStatus.PartiallySucceeded, azureReleaseInterfaces.DeploymentStatus.Succeeded, azureReleaseInterfaces.DeploymentStatus.Failed];
+    private selectedDeployment: azureReleaseInterfaces.DeploymentAttempt;
+    private tasks: AbstractPipelineTask[] = [];
+    private static readonly COMPLETE_DEPLOYMENT_STATUSES = [azureReleaseInterfaces.DeploymentStatus.PartiallySucceeded, azureReleaseInterfaces.DeploymentStatus.Succeeded, azureReleaseInterfaces.DeploymentStatus.Failed];
 
     constructor(releaseData: azureReleaseInterfaces.Release){
         this.releaseData = releaseData;
         this.environmentData = releaseData.environments[0];
+        this.selectedDeployment = this.getSelectedDeployment(this.environmentData.deploySteps);
+        for (let phase of this.selectedDeployment.releaseDeployPhases){
+            for (let job of phase.deploymentJobs){
+                for (let task of job.tasks){
+                    this.tasks.push(new ReleaseTask(task));
+                }
+            }
+        }
     }
 
     private getSelectedDeployment(deploymentAttempts: azureReleaseInterfaces.DeploymentAttempt[]): azureReleaseInterfaces.DeploymentAttempt {
-        if (deploymentAttempts.length > 0){
+        if (deploymentAttempts && deploymentAttempts.length > 0){
             return deploymentAttempts[0];
         }
         throw(new Error("no deployment attempts available for release with id " + this.getId()));
@@ -37,25 +48,20 @@ export class Release implements IPipeline{
         return Number(this.environmentData.definitionEnvironmentId);
     }
 
-    public isFailure() : boolean{
-        let selectedDeployment = this.getSelectedDeployment(this.environmentData.deploySteps);
-        if (this.isComplete()){
-            return selectedDeployment.status === azureReleaseInterfaces.DeploymentStatus.Failed;
+    public isFailure(): boolean {
+        if (this.isComplete()) {
+            return this.selectedDeployment.status === azureReleaseInterfaces.DeploymentStatus.Failed;
         }
-        for (let phase of selectedDeployment.releaseDeployPhases){
-            for (let job of phase.deploymentJobs){
-                for (let task of job.tasks){
-                    if (this.taskFailed(task)){
-                        return true;
-                    }
-                }
+        for (let task of this.tasks) {
+            if (task.ran() && task.wasFailure()) {
+                return true;
             }
         }
         return false;
     }
     
     public isComplete(): boolean {
-        return Release.COMPLETE_STATUSES.includes(this.getSelectedDeployment(this.environmentData.deploySteps).status);
+        return Release.COMPLETE_DEPLOYMENT_STATUSES.includes(this.getSelectedDeployment(this.environmentData.deploySteps).status);
     }
 
     public getLink(): string {
@@ -69,25 +75,23 @@ export class Release implements IPipeline{
     public getDisplayName(): string {
         return this.releaseData.name;
     }
-
-    public getTaskLength(taskId: string): number | null {
-        return 5; // TODO
+    
+    public getAllTasks(): AbstractPipelineTask[] {
+        if (!this.tasks) {
+            return null;
+        }
+        return this.tasks;
     }
 
-    public getAllTasks(): IPipelineTask[] {
-        return []; // TODO
-    }
-
-    public getTask(): IPipelineTask {
-        return null; // TODO
-    }
-
-    public getLongRunningValidations(): IPipelineTask[] {
-        return []; // TODO
-    }
-
-    private taskFailed(task: azureReleaseInterfaces.ReleaseTask): boolean {
-        return task.status === azureReleaseInterfaces.TaskStatus.Failed || task.status === azureReleaseInterfaces.TaskStatus.Failure;
+    public getTask(taskToGet: AbstractPipelineTask): AbstractPipelineTask {
+        if (this.getAllTasks()) {
+            for (let task of this.getAllTasks()) {
+                if (task.equals(taskToGet)) {
+                    return task;
+                }
+            }
+        }
+        return null;
     }
 }
 

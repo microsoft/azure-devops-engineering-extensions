@@ -1,14 +1,14 @@
 import { IPipeline } from "./IPipeline";
 import * as azureBuildInterfaces from "azure-devops-node-api/interfaces/BuildInterfaces";
 import tl = require('azure-pipelines-task-lib/task');
-import { IPipelineTask } from "./IPipelineTask";
+import { AbstractPipelineTask } from "./AbstractPipelineTask";
 import { BuildTask } from "./BuildTask";
 import { AbstractAzureApi } from "./AbstractAzureApi";
 
 export class Build implements IPipeline{
 
     private buildData: azureBuildInterfaces.Build;
-    private tasks: IPipelineTask[] = [];
+    private tasks: AbstractPipelineTask[] = [];
 
     constructor(buildData: azureBuildInterfaces.Build, timelineData: azureBuildInterfaces.Timeline) {
         this.buildData = buildData;
@@ -59,14 +59,14 @@ export class Build implements IPipeline{
         return this.buildData.buildNumber;
     }
 
-    public getAllTasks(): IPipelineTask[] {
+    public getAllTasks(): AbstractPipelineTask[] {
         if (!this.tasks) {
             return null;
         }
         return this.tasks;
     }
 
-    public getTask(taskToGet: IPipelineTask): IPipelineTask {
+    public getTask(taskToGet: AbstractPipelineTask): AbstractPipelineTask {
         if (this.getAllTasks()) {
             for (let task of this.getAllTasks()) {
                 if (task.equals(taskToGet)) {
