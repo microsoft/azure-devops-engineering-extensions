@@ -13,21 +13,21 @@ export class CommentContentFactory {
 
     public createTableHeader(isFailure: boolean, targetBranchName: string, percentile: string): string {
         if (isFailure) {
-            return messages.failureCommentTableHeading.format(targetBranchName, targetBranchName);
+            return messages.failureCommentTableHeading.format(percentile, targetBranchName);
         }
-        return messages.longRunningValidationCommentTableHeading.format(percentile, targetBranchName, targetBranchName);
+        return messages.longRunningValidationCommentTableHeading.format(percentile, targetBranchName);
     }
 
-    public createTableSection(current: IPipeline, mostRecent: IPipeline, target: Branch, type: string, longRunningValidations: IPipelineTask[], thresholdTimes: number[]): string {
+    public createTableSection(current: IPipeline, currentDefinitionLink: string, mostRecent: IPipeline, target: Branch, numberPipelinesToConsiderForHealth: number, longRunningValidations: IPipelineTask[], thresholdTimes: number[]): string {
         if (current.isFailure()) {
-            if (mostRecent.isFailure()) {
-                return messages.failureCommentRow.format(current.getDisplayName(), current.getLink(), String(target.getPipelineFailStreak()), target.getTruncatedName(), type, target.getTruncatedName(), mostRecent.getDisplayName(), mostRecent.getLink());
+            let messageString: string = messages.failureCommentRow;
+            if (target.isHealthy(numberPipelinesToConsiderForHealth)) {
+                messageString = messages.successCommentRow;
         }
-        return messages.successCommentRow.format(current.getDisplayName(), current.getLink(), target.getTruncatedName(), type);
+        return messageString.format(current.getDefinitionName(), current.getLink(), target.getTruncatedName(), currentDefinitionLink);
         }
         let section: string;
         for (let index = 0; index < longRunningValidations.length; index++) {
-            let taskId: string = longRunningValidations[index].getId();
             if (index == 0) {
                 section = messages.longRunningValidationCommentFirstSectionRow.format(current.getDisplayName(), current.getLink(), longRunningValidations[index].getName(), String(longRunningValidations[index].getDuration()), String(thresholdTimes[index]), mostRecent.getDisplayName(), mostRecent.getLink());
             }

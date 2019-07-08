@@ -1,9 +1,10 @@
 import { AbstractAzureApi } from "./AbstractAzureApi";
-import { EnvironmentConfigurations } from "./EnvironmentConfigurations";
 import * as azureBuildInterfaces from "azure-devops-node-api/interfaces/BuildInterfaces";
 import { IPipeline } from "./IPipeline";
 import { Build } from "./Build";
+import { PipelineData } from "./PipelineData";
 import tl = require('azure-pipelines-task-lib/task');
+
 
 export class BuildAzureApi extends AbstractAzureApi{ 
 
@@ -13,21 +14,30 @@ export class BuildAzureApi extends AbstractAzureApi{
        super(uri, accessKey);
     }
 
-    public async getCurrentPipeline(configurations: EnvironmentConfigurations): Promise<IPipeline>{
-        return await this.getBuild(configurations.getProjectName(), configurations.getBuildId()); 
+    public async getCurrentPipeline(data: PipelineData): Promise<IPipeline>{
+        return await this.getBuild(data.getProjectName(), data.getBuildId()); 
     }
 
     public async getMostRecentPipelinesOfCurrentType(project: string, currentPipeline: IPipeline, maxNumber: number, branchName: string): Promise<IPipeline[]>{
         return this.getBuilds(project, currentPipeline.getDefinitionId(), BuildAzureApi.DESIRED_BUILD_STATUS, maxNumber, branchName);
     }
 
-    public async getBuild(project: string, buildId: number): Promise<IPipeline>{
-        return new Build(await this.getBuildData(project, buildId), await this.getBuildTimeline(project, buildId));
+    public async getBuild(project: string, buildId: number): Promise<IPipeline> {
+        let buildData: azureBuildInterfaces.Build = await this.getBuildData(project, buildId);
+        let timelineData: azureBuildInterfaces.Timeline = await this.getBuildTimeline(project, buildId);
+        return new Build(buildData, timelineData);
+    }
+
+    public async getDefinition(project: string, definitionId: number): Promise<azureBuildInterfaces.BuildDefinition> {
+        return (await this.getConnection().getBuildApi()).getDefinition(project, definitionId);
     }
 
     public async getBuilds(project: string, definition?: number, status?: number, maxNumber?: number, branchName?: string): Promise<IPipeline[]>{
+        tl.debug(`getting builds with: ${project}, ${definition}, ${status}, ${maxNumber}, ${branchName}`)
         let builds: Array<IPipeline> = []; 
-        let rawBuildsData: azureBuildInterfaces.Build[] = await (await this.getConnection().getBuildApi()).getBuilds(project, Array(definition), undefined, undefined, undefined, undefined, undefined, undefined, status, undefined, undefined, undefined, maxNumber, undefined, undefined, undefined, undefined, branchName);  
+      
+        let rawBuildsData: azureBuildInterfaces.Build[] = await (await this.getConnection().getBuildApi()).getBuilds(project, [definition], undefined, undefined, undefined, undefined, undefined, undefined, status, undefined, undefined, undefined, maxNumber, undefined, undefined, undefined, undefined, branchName); 
+        tl.debug("builds: " + rawBuildsData) 
         for (let buildData of rawBuildsData) {
             let timeline: azureBuildInterfaces.Timeline = await this.getBuildTimeline(project, buildData.id);
             if (timeline !== null){

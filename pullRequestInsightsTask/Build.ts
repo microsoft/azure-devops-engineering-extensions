@@ -3,6 +3,7 @@ import * as azureBuildInterfaces from "azure-devops-node-api/interfaces/BuildInt
 import tl = require('azure-pipelines-task-lib/task');
 import { IPipelineTask } from "./IPipelineTask";
 import { BuildTask } from "./BuildTask";
+import { AbstractAzureApi } from "./AbstractAzureApi";
 
 export class Build implements IPipeline{
 
@@ -36,6 +37,14 @@ export class Build implements IPipeline{
 
     public getDefinitionId(): number {
         return Number(this.buildData.definition.id);
+    }
+
+    public getDefinitionName(): string {
+        return this.buildData.definition.name;
+    }
+
+    public async getDefinitionLink(apiCaller: AbstractAzureApi, project: string): Promise<string> {
+        return (await apiCaller.getDefinition(project, this.getDefinitionId()))._links.web.href;
     }
 
     public getLink(): string {

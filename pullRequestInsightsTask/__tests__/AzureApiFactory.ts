@@ -2,21 +2,22 @@ import { AzureApiFactory } from "../AzureApiFactory";
 import { EnvironmentConfigurations } from "../EnvironmentConfigurations";
 import sinon from "sinon";
 import { HostTypeError } from "../HostTypeError";
+import { PipelineData } from "../PipelineData";
 
 describe("AzureApiFactory Tests", () => {
     
     let azureApiFactory: AzureApiFactory;
-    let configurations: EnvironmentConfigurations;
+    let data: PipelineData;
 
     beforeEach(() =>{
         azureApiFactory = new AzureApiFactory();
-        configurations = new EnvironmentConfigurations();
-        sinon.stub(configurations, "getAccessKey").returns("fakeKey");
-        sinon.stub(configurations, "getTeamURI").returns("fakeURI");
+        data = new PipelineData();
+        sinon.stub(data, "getAccessKey").returns("fakeKey");
+        sinon.stub(data, "getTeamUri").returns("fakeURI");
     });
 
     test("AzureApiFactory throws error when hostType is not build or release", async () => {
-        sinon.stub(configurations, "getHostType").returns("other");
-        expect(azureApiFactory.create(configurations)).rejects.toThrow(HostTypeError);
+        sinon.stub(data, "getHostType").returns("other");
+        expect(azureApiFactory.create(data)).rejects.toThrow(HostTypeError);
     });
 });
