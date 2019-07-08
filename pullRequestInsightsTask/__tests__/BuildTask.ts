@@ -9,8 +9,7 @@ describe('BuildTask Tests', () => {
     let task: BuildTask;
 
     function makeTask(name: string, id: string, duration: number, ran: boolean): BuildTask {
-        let fake: BuildTask = new BuildTask(null);
-        sinon.stub(fake, "getName").returns(name);
+        let fake: BuildTask = new BuildTask({name: name});
         sinon.stub(fake, "getId").returns(id);
         sinon.stub(fake, "getDuration").returns(duration);
         sinon.stub(fake, "ran").returns(ran);

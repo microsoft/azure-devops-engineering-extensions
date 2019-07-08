@@ -3,6 +3,7 @@ import { Build } from "../Build";
 import sinon from "sinon";
 import { AbstractPipelineTask } from "../AbstractPipelineTask";
 import { BuildTask } from "../BuildTask";
+import { mock } from "ts-mockito";
 
 
 describe('Build Tests', () => {
@@ -26,7 +27,7 @@ describe('Build Tests', () => {
     }
 
     function makeFakeTaskForComparision(name: string, id: string): AbstractPipelineTask {
-        let fake: AbstractPipelineTask = new BuildTask(null);
+        let fake: AbstractPipelineTask = mock(BuildTask);
         sinon.stub(fake, "getName").returns(name);
         sinon.stub(fake, "getId").returns(id);
         return fake;

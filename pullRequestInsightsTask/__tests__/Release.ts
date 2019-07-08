@@ -32,7 +32,9 @@ describe('Release Tests', () => {
 
     function getMockReleaseTask(taskStatus: azureReleaseInterfaces.TaskStatus): azureReleaseInterfaces.ReleaseTask{
         return {
-            status: taskStatus
+            status: taskStatus,
+            startTime: new Date(),
+            finishTime: new Date()
         }
     }
 

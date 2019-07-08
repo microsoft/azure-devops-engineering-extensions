@@ -4,6 +4,7 @@ import { Branch } from '../Branch';
 import { AbstractPipeline } from '../AbstractPipeline';
 import { AbstractPipelineTask } from '../AbstractPipelineTask';
 import { BuildTask } from '../BuildTask';
+import { mock } from 'ts-mockito';
 
 describe('Branch Tests', () => {
     
@@ -37,12 +38,12 @@ describe('Branch Tests', () => {
         let pipeline: AbstractPipeline = new Build(null, null);
         sinon.stub(pipeline, "isFailure").returns(isFailure);
         sinon.stub(pipeline, "isComplete").returns(isComplete);
-        sinon.stub(pipeline, "getAllTasks").returns(tasks);
+        sinon.stub(pipeline, "getTasks").returns(tasks);
         return pipeline;
     }
 
     function makeTask(name: string, id: string, duration: number): AbstractPipelineTask {
-        let fake: AbstractPipelineTask = new BuildTask(null);
+        let fake: AbstractPipelineTask = mock(BuildTask);
         sinon.stub(fake, "getName").returns(name);
         sinon.stub(fake, "getId").returns(id);
         sinon.stub(fake, "getDuration").returns(duration);
@@ -92,7 +93,7 @@ describe('Branch Tests', () => {
     });
 
     test("Null return when invalid task id is given", () => {
-        branch = new Branch("", [makePipeline(undefined, undefined, null), makePipeline(undefined, undefined, null), makePipeline(undefined, undefined, null)]);
+        branch = new Branch("", [makePipeline(undefined, undefined, []), makePipeline(undefined, undefined, []), makePipeline(undefined, undefined, [])]);
         expect(branch.getPercentileTimeForPipelineTask(70, makeTask("abc", "id", 1))).toBeNull();
     });
 

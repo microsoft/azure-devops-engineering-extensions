@@ -25,19 +25,17 @@ export abstract class AbstractPipeline{
 
     public getTasks(): AbstractPipelineTask[] { 
         if (!this.tasks) {
-            return null;
+            return [];
         }
         return this.tasks;
     }
 
     public getTask(taskToGet: AbstractPipelineTask): AbstractPipelineTask { 
-        if (this.tasks) {
-            for (let task of this.tasks) {
+            for (let task of this.getTasks()) {
                 if (task.equals(taskToGet)) {
                     return task;
                 }
             }
-        }
         return null;
     }
 
