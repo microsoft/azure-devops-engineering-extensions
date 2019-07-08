@@ -33,7 +33,7 @@ export abstract class AbstractPipelineTask {
 
     public isLongRunning(thresholdTime: number): boolean {
         let taskLength = this.getDuration();
-        if (thresholdTime != null && taskLength > thresholdTime) {
+        if (thresholdTime && taskLength && taskLength > thresholdTime) {
             return true;
         }
         return false;
