@@ -5,6 +5,7 @@ import tl = require('azure-pipelines-task-lib/task');
 import { EnvironmentConfigurations } from "./EnvironmentConfigurations";
 import { AbstractPipeline } from "./AbstractPipeline";
 
+
 export class ReleaseAzureApi extends AbstractAzureApi{
 
     static readonly DESIRED_RELEASE_ENVIRONMENT_STATUS: number = azureReleaseInterfaces.EnvironmentStatus.Succeeded + azureReleaseInterfaces.EnvironmentStatus.PartiallySucceeded + azureReleaseInterfaces.EnvironmentStatus.Rejected;
@@ -13,8 +14,8 @@ export class ReleaseAzureApi extends AbstractAzureApi{
         super(uri, accessKey);
      }
  
-     public async getCurrentPipeline(configurations: EnvironmentConfigurations): Promise<AbstractPipeline> {
-         return this.getRelease(configurations.getProjectName(), configurations.getReleaseId()); 
+     public async getCurrentPipeline(data: PipelineData): Promise<IPipeline> {
+         return this.getRelease(data.getProjectName(), data.getReleaseId()); 
      }
  
      public async getMostRecentPipelinesOfCurrentType(project: string, currentPipeline: AbstractPipeline, maxNumber: number, branchName: string): Promise<AbstractPipeline[]> {

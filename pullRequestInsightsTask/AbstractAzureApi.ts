@@ -4,6 +4,7 @@ import { WebApi, getPersonalAccessTokenHandler } from 'azure-devops-node-api/Web
 import { AbstractPipeline } from "./AbstractPipeline";
 import { EnvironmentConfigurations } from './EnvironmentConfigurations';
 import { PullRequest } from './PullRequest';
+import { PipelineData } from './PipelineData';
 
 export abstract class AbstractAzureApi {
     private connection: WebApi;
@@ -12,7 +13,8 @@ export abstract class AbstractAzureApi {
         this.connection = this.createConnection(uri, accessKey);
     }
 
-    public async abstract getCurrentPipeline(configurations: EnvironmentConfigurations): Promise<AbstractPipeline>;
+
+    public async abstract getCurrentPipeline(data: PipelineData): Promise<IPipeline>;
 
     public async abstract getMostRecentPipelinesOfCurrentType(project: string, currentPipeline: AbstractPipeline, maxNumber: number, branchName: string): Promise<AbstractPipeline[]>;
 
