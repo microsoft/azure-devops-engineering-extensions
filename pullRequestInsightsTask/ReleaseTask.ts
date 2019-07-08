@@ -1,5 +1,7 @@
 import { AbstractPipelineTask } from "./AbstractPipelineTask";
 import * as azureReleaseInterfaces from "azure-devops-node-api/interfaces/ReleaseInterfaces";
+import tl = require('azure-pipelines-task-lib/task');
+
 
 
 export class ReleaseTask extends AbstractPipelineTask {
@@ -11,6 +13,7 @@ export class ReleaseTask extends AbstractPipelineTask {
 
     constructor(releaseTaskRecord: azureReleaseInterfaces.ReleaseTask) {
         super(releaseTaskRecord.name, String(releaseTaskRecord.id), releaseTaskRecord.startTime, releaseTaskRecord.finishTime);
+        tl.debug("release task: " +  releaseTaskRecord.name + " " + String(releaseTaskRecord.id));
         this.releaseTaskRecord = releaseTaskRecord;
     }
    

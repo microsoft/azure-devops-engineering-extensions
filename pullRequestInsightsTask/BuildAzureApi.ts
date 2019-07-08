@@ -34,11 +34,14 @@ export class BuildAzureApi extends AbstractAzureApi{
         tl.debug(`getting builds with: ${project}, ${definition}, ${status}, ${maxNumber}, ${branchName}`)
         let builds: Array<AbstractPipeline> = []; 
         let rawBuildsData: azureBuildInterfaces.Build[] = await (await this.getConnection().getBuildApi()).getBuilds(project, [definition], undefined, undefined, undefined, undefined, undefined, undefined, status, undefined, undefined, undefined, maxNumber, undefined, undefined, undefined, undefined, branchName); 
-        tl.debug("builds: " + rawBuildsData) 
+        let timelinePromiseData: Promise<azureBuildInterfaces.Timeline>[] = [];
         for (let buildData of rawBuildsData) {
-            let timeline: azureBuildInterfaces.Timeline = await this.getBuildTimeline(project, buildData.id);
-            if (timeline !== null){
-               builds.push(new Build(buildData, timeline));
+            timelinePromiseData.push(this.getBuildTimeline(project, buildData.id));
+        }
+        await Promise.all(timelinePromiseData);
+        for (let index = 0; index < rawBuildsData.length; index++) {
+            if (timelinePromiseData[index] !== null) {
+                builds.push(new Build(rawBuildsData[index], await timelinePromiseData[index]));
             }
         }
         return builds;

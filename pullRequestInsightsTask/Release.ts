@@ -11,7 +11,7 @@ export class Release extends AbstractPipeline{
     private releaseData: azureReleaseInterfaces.Release;
     private environmentData: azureReleaseInterfaces.ReleaseEnvironment;
     private selectedDeployment: azureReleaseInterfaces.DeploymentAttempt;
-    private static readonly COMPLETE_DEPLOYMENT_STATUSES = [azureReleaseInterfaces.DeploymentStatus.PartiallySucceeded, azureReleaseInterfaces.DeploymentStatus.Succeeded, azureReleaseInterfaces.DeploymentStatus.Failed];
+    public static readonly COMPLETE_DEPLOYMENT_STATUSES = [azureReleaseInterfaces.DeploymentStatus.PartiallySucceeded, azureReleaseInterfaces.DeploymentStatus.Succeeded, azureReleaseInterfaces.DeploymentStatus.Failed];
 
     constructor(releaseData: azureReleaseInterfaces.Release) {
         super();

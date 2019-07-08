@@ -1,15 +1,7 @@
 import tl = require('azure-pipelines-task-lib/task');
 import { EnvironmentConfigurations } from './EnvironmentConfigurations';
 import messages from './user_messages.json';
-import { Branch } from './Branch';
-import { AbstractPipeline } from './AbstractPipeline';
-import { AzureApiFactory } from './AzureApiFactory';
-import { PullRequest } from './PullRequest';
 import './StringExtensions';
-import { AbstractPipelineTask } from './AbstractPipelineTask';
-import { AbstractAzureApi } from './AbstractAzureApi';
-import { Table } from './Table';
-import { TableFactory } from './TableFactory';
 import './StringExtensions';
 import { PipelineData } from './PipelineData';
 import { TaskInsights } from './TaskInsights';

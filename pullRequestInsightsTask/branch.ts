@@ -72,7 +72,7 @@ export class Branch{
             return stats.percentile(times, percentileToFind / 100)
         }
         else {
-            tl.debug("no tasks with name " + task.getName() + "found on pipelines of branch " + this.name);
+            tl.debug("no tasks with name " + task.getName() + " found on pipelines of branch " + this.name);
             return null;
         }
     }

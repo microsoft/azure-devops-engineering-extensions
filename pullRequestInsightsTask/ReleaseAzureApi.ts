@@ -28,10 +28,15 @@ export class ReleaseAzureApi extends AbstractAzureApi{
     }
 
     public async getReleases(project: string, definition?: number, environmentDefinition?: number, environmentStatus?: number, maxNumber?: number, branchName?: string):  Promise<AbstractPipeline[]> {
+        tl.debug(`getting releases with: ${project}, ${definition}, ${environmentDefinition}, ${branchName}`);
         let releases: Array<AbstractPipeline> = []; 
-        let rawReleasesData: azureReleaseInterfaces.Release[] = await (await this.getConnection().getReleaseApi()).getReleases(project, definition, environmentDefinition, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, azureReleaseInterfaces.ReleaseExpands.Environments, undefined, undefined, undefined, branchName);  
-        for (let numberRelease = 0; numberRelease < rawReleasesData.length; numberRelease++){
-            releases[numberRelease] = new Release(rawReleasesData[numberRelease]);
+        let rawTemporaryReleasesData: azureReleaseInterfaces.Release[] = await (await this.getConnection().getReleaseApi()).getReleases(project, definition, environmentDefinition, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, azureReleaseInterfaces.ReleaseExpands.Environments, undefined, undefined, undefined, branchName);  
+        let rawIndividualReleaseDataPromises: Promise<azureReleaseInterfaces.Release>[] = [];
+        for (let rawReleaseData of rawTemporaryReleasesData){
+            rawIndividualReleaseDataPromises.push(this.getReleaseData(project, new Release(rawReleaseData).getId()));
+        }
+        for (let releaseData of rawIndividualReleaseDataPromises) {
+            releases.push(new Release(await releaseData));
         }
         return releases;
     }
