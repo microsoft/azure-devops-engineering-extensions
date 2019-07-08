@@ -16,6 +16,16 @@ describe('BuildTask Tests', () => {
         return fake;
     }
 
+    test("Task failed when it has failure status", () => {
+        task = new BuildTask({finishTime: new Date("2019-05-24 02:15:55.00"), startTime: new Date("2019-05-23 01:14:40.00"), result: azureBuildInterfaces.TaskResult.Failed});
+        expect(task.wasFailure()).toBe(true);
+    });
+
+    test("Task did not fail when it does not have failure status", () => {
+        task = new BuildTask({finishTime: new Date("2019-05-24 02:15:55.00"), startTime: new Date("2019-05-23 01:14:40.00"), result: azureBuildInterfaces.TaskResult.Succeeded});
+        expect(task.wasFailure()).toBe(false);
+    });
+
     test("Correct duration is calculated", () => {
         task = new BuildTask({finishTime: new Date("2019-05-24 02:15:55.00"), startTime: new Date("2019-05-23 01:14:40.00")});
         sinon.stub(task, "ran").returns(true);

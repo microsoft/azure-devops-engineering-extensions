@@ -14,7 +14,7 @@ describe('Release Tests', () => {
         }
     }
 
-    function getMockDeployStep(deployStatus: azureReleaseInterfaces.DeploymentStatus, deployReason: azureReleaseInterfaces.DeploymentReason, deployPhases?: azureReleaseInterfaces.ReleaseDeployPhase[]): azureReleaseInterfaces.DeploymentAttempt{
+    function makeMockDeployStep(deployStatus: azureReleaseInterfaces.DeploymentStatus, deployReason: azureReleaseInterfaces.DeploymentReason, deployPhases?: azureReleaseInterfaces.ReleaseDeployPhase[]): azureReleaseInterfaces.DeploymentAttempt{
         return {
             status: deployStatus,
             releaseDeployPhases: deployPhases,
@@ -22,7 +22,7 @@ describe('Release Tests', () => {
         }
     }
 
-    function getMockDeployPhase(releaseTasks: azureReleaseInterfaces.ReleaseTask[]): azureReleaseInterfaces.ReleaseDeployPhase{
+    function makeMockDeployPhase(releaseTasks: azureReleaseInterfaces.ReleaseTask[]): azureReleaseInterfaces.ReleaseDeployPhase{
         return {
             deploymentJobs: [{
                 tasks: releaseTasks
@@ -30,7 +30,7 @@ describe('Release Tests', () => {
         } 
     }
 
-    function getMockReleaseTask(taskStatus: azureReleaseInterfaces.TaskStatus): azureReleaseInterfaces.ReleaseTask{
+    function makeMockReleaseTask(taskStatus: azureReleaseInterfaces.TaskStatus): azureReleaseInterfaces.ReleaseTask{
         return {
             status: taskStatus,
             startTime: new Date(),
@@ -39,41 +39,41 @@ describe('Release Tests', () => {
     }
 
     test('Complete failed release is failure', () => {
-        fillMockReleaseData([getMockDeployStep(azureReleaseInterfaces.DeploymentStatus.Failed, azureReleaseInterfaces.DeploymentReason.Automated)]);
+        fillMockReleaseData([makeMockDeployStep(azureReleaseInterfaces.DeploymentStatus.Failed, azureReleaseInterfaces.DeploymentReason.Automated)]);
         release = new Release(mockReleaseData);
         expect(release.isFailure()).toBe(true); 
     });
 
     test('Incomplete failed release is failure', () => {
-        let deployPhases = [getMockDeployPhase([getMockReleaseTask(azureReleaseInterfaces.TaskStatus.Succeeded), getMockReleaseTask(azureReleaseInterfaces.TaskStatus.Skipped), getMockReleaseTask(azureReleaseInterfaces.TaskStatus.Failed)])];
-        fillMockReleaseData([getMockDeployStep(azureReleaseInterfaces.DeploymentStatus.InProgress, azureReleaseInterfaces.DeploymentReason.Automated, deployPhases)]);
+        let deployPhases = [makeMockDeployPhase([makeMockReleaseTask(azureReleaseInterfaces.TaskStatus.Succeeded), makeMockReleaseTask(azureReleaseInterfaces.TaskStatus.Skipped), makeMockReleaseTask(azureReleaseInterfaces.TaskStatus.Failed)])];
+        fillMockReleaseData([makeMockDeployStep(azureReleaseInterfaces.DeploymentStatus.InProgress, azureReleaseInterfaces.DeploymentReason.Automated, deployPhases)]);
         release = new Release(mockReleaseData);
         expect(release.isFailure()).toBe(true); 
     });
 
     test('Incomplete failed release with multiple deployment phases is failure', () => {
-        let deployPhases = [getMockDeployPhase([getMockReleaseTask(azureReleaseInterfaces.TaskStatus.Succeeded)]), getMockDeployPhase([getMockReleaseTask(azureReleaseInterfaces.TaskStatus.Succeeded), getMockReleaseTask(azureReleaseInterfaces.TaskStatus.Failed)])]
-        fillMockReleaseData([getMockDeployStep(azureReleaseInterfaces.DeploymentStatus.InProgress, azureReleaseInterfaces.DeploymentReason.Automated, deployPhases)]);
+        let deployPhases = [makeMockDeployPhase([makeMockReleaseTask(azureReleaseInterfaces.TaskStatus.Succeeded)]), makeMockDeployPhase([makeMockReleaseTask(azureReleaseInterfaces.TaskStatus.Succeeded), makeMockReleaseTask(azureReleaseInterfaces.TaskStatus.Failed)])]
+        fillMockReleaseData([makeMockDeployStep(azureReleaseInterfaces.DeploymentStatus.InProgress, azureReleaseInterfaces.DeploymentReason.Automated, deployPhases)]);
         release = new Release(mockReleaseData);
         expect(release.isFailure()).toBe(true); 
    });
 
    test('Correct deployment attempt is selected for failure assessment', () => {
-        fillMockReleaseData([getMockDeployStep(azureReleaseInterfaces.DeploymentStatus.Failed, azureReleaseInterfaces.DeploymentReason.Manual), getMockDeployStep(azureReleaseInterfaces.DeploymentStatus.Succeeded, azureReleaseInterfaces.DeploymentReason.Automated)]);
+        fillMockReleaseData([makeMockDeployStep(azureReleaseInterfaces.DeploymentStatus.Failed, azureReleaseInterfaces.DeploymentReason.Manual), makeMockDeployStep(azureReleaseInterfaces.DeploymentStatus.Succeeded, azureReleaseInterfaces.DeploymentReason.Automated)]);
         release = new Release(mockReleaseData);
         expect(release.isFailure()).toBe(true); 
     });
 
     test('Incomplete release without current failures is not failure', () => {
-        let deployPhases = [getMockDeployPhase([getMockReleaseTask(azureReleaseInterfaces.TaskStatus.Succeeded)]), getMockDeployPhase([getMockReleaseTask(azureReleaseInterfaces.TaskStatus.Succeeded)])];
-        fillMockReleaseData([getMockDeployStep(azureReleaseInterfaces.DeploymentStatus.InProgress, azureReleaseInterfaces.DeploymentReason.Automated, deployPhases)]);
+        let deployPhases = [makeMockDeployPhase([makeMockReleaseTask(azureReleaseInterfaces.TaskStatus.Succeeded)]), makeMockDeployPhase([makeMockReleaseTask(azureReleaseInterfaces.TaskStatus.Succeeded)])];
+        fillMockReleaseData([makeMockDeployStep(azureReleaseInterfaces.DeploymentStatus.InProgress, azureReleaseInterfaces.DeploymentReason.Automated, deployPhases)]);
         release = new Release(mockReleaseData);
         expect(release.isFailure()).toBe(false); 
     });
 
     test('Release with incomplete failed task is not a failure', () => {
-        let deployPhases = [getMockDeployPhase([getMockReleaseTask(azureReleaseInterfaces.TaskStatus.InProgress), getMockReleaseTask(azureReleaseInterfaces.TaskStatus.Succeeded), getMockReleaseTask(azureReleaseInterfaces.TaskStatus.Pending)])];
-        fillMockReleaseData([getMockDeployStep(azureReleaseInterfaces.DeploymentStatus.InProgress, azureReleaseInterfaces.DeploymentReason.Automated, deployPhases)]);
+        let deployPhases = [makeMockDeployPhase([makeMockReleaseTask(azureReleaseInterfaces.TaskStatus.InProgress), makeMockReleaseTask(azureReleaseInterfaces.TaskStatus.Succeeded), makeMockReleaseTask(azureReleaseInterfaces.TaskStatus.Pending)])];
+        fillMockReleaseData([makeMockDeployStep(azureReleaseInterfaces.DeploymentStatus.InProgress, azureReleaseInterfaces.DeploymentReason.Automated, deployPhases)]);
         release = new Release(mockReleaseData);
         expect(release.isFailure()).toBe(false); 
     });

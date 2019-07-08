@@ -1,9 +1,9 @@
-import { AzureApiFactory } from "./AzureApiFactory";
 import messages from './user_messages.json';
 import { AbstractPipeline } from "./AbstractPipeline";
 import { Branch } from "./branch";
 import './StringExtensions';
 import { AbstractPipelineTask } from "./AbstractPipelineTask";
+import tl = require('azure-pipelines-task-lib/task');
 
 export abstract class Table {
 
@@ -24,6 +24,7 @@ export abstract class Table {
         else {
             this.currentCommentData = "";
         }
+        tl.debug("table already exists in comment? " + this.tableHasData());
     }
 
     public addHeader(target: string, percentile: number): void {
