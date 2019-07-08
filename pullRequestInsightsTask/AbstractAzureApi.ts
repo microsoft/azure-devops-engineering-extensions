@@ -14,7 +14,7 @@ export abstract class AbstractAzureApi {
     }
 
 
-    public async abstract getCurrentPipeline(data: PipelineData): Promise<IPipeline>;
+    public async abstract getCurrentPipeline(data: PipelineData): Promise<AbstractPipeline>;
 
     public async abstract getMostRecentPipelinesOfCurrentType(project: string, currentPipeline: AbstractPipeline, maxNumber: number, branchName: string): Promise<AbstractPipeline[]>;
 

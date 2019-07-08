@@ -14,7 +14,7 @@ export class BuildAzureApi extends AbstractAzureApi{
        super(uri, accessKey);
     }
 
-    public async getCurrentPipeline(data: PipelineData): Promise<IPipeline>{
+    public async getCurrentPipeline(data: PipelineData): Promise<AbstractPipeline>{
         return await this.getBuild(data.getProjectName(), data.getBuildId()); 
     }
 
@@ -30,9 +30,9 @@ export class BuildAzureApi extends AbstractAzureApi{
         return (await this.getConnection().getBuildApi()).getDefinition(project, definitionId);
     }
 
-    public async getBuilds(project: string, definition?: number, status?: number, maxNumber?: number, branchName?: string): Promise<IPipeline[]>{
+    public async getBuilds(project: string, definition?: number, status?: number, maxNumber?: number, branchName?: string): Promise<AbstractPipeline[]>{
         tl.debug(`getting builds with: ${project}, ${definition}, ${status}, ${maxNumber}, ${branchName}`)
-        let builds: Array<IPipeline> = []; 
+        let builds: Array<AbstractPipeline> = []; 
         let rawBuildsData: azureBuildInterfaces.Build[] = await (await this.getConnection().getBuildApi()).getBuilds(project, [definition], undefined, undefined, undefined, undefined, undefined, undefined, status, undefined, undefined, undefined, maxNumber, undefined, undefined, undefined, undefined, branchName); 
         tl.debug("builds: " + rawBuildsData) 
         for (let buildData of rawBuildsData) {
