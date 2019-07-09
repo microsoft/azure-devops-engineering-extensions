@@ -6,9 +6,9 @@ import { ReleaseAzureApi } from './ReleaseAzureApi'
 import { HostTypeError } from './HostTypeError';
 import { PipelineData } from './PipelineData';
 
-export class AzureApiFactory{
-    private static readonly BUILD = "build";
-    private static readonly RELEASE = "release";
+export class AzureApiFactory {
+    public static readonly BUILD: string = "build";
+    public static readonly RELEASE: string = "release";
 
     public async create(data: PipelineData): Promise<AbstractAzureApi>{
      let type: string = data.getHostType();

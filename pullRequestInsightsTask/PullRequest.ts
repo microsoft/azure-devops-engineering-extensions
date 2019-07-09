@@ -57,11 +57,10 @@ export class PullRequest {
         }
     }
 
-    public editCommentInThread(apiCaller: AbstractAzureApi, thread: azureGitInterfaces.GitPullRequestCommentThread, commentId: number, contentToAdd: string): void {
+    public editCommentInThread(apiCaller: AbstractAzureApi, thread: azureGitInterfaces.GitPullRequestCommentThread, commentId: number, newContent: string): void {
         for (let comment of thread.comments) {
-            console.log("comment id = " + comment.id)
             if (comment.id === commentId) {
-                let updatedContent: string = comment.content + contentToAdd;
+                let updatedContent: string = newContent;
                 tl.debug("comment to be updated: thread id = " + thread.id + ", comment id = " + comment.id);
                 tl.debug("updated content: " + updatedContent);
                 apiCaller.updateComment({ content: updatedContent }, this.id, this.repository, this.projectName, thread.id, comment.id);
@@ -78,6 +77,13 @@ export class PullRequest {
             }
         }
         tl.debug("no comment was found for iteration " + this.mostRecentSourceCommitId);
+        return null;
+    }
+
+    public getCurrentIterationCommentContent(currentIterationCommentThread: azureGitInterfaces.GitPullRequestCommentThread): string {
+        if (currentIterationCommentThread && currentIterationCommentThread.comments && currentIterationCommentThread.comments[0]) {
+            return currentIterationCommentThread.comments[0].content;
+        }
         return null;
     }
 

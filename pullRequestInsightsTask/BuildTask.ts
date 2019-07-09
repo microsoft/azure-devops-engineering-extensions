@@ -1,62 +1,24 @@
-import { IPipelineTask } from "./IPipelineTask";
+import { AbstractPipelineTask } from "./AbstractPipelineTask";
 import * as azureBuildInterfaces from "azure-devops-node-api/interfaces/BuildInterfaces";
 
+export class BuildTask extends AbstractPipelineTask {
 
-export class BuildTask implements IPipelineTask {
+    private state: azureBuildInterfaces.TimelineRecordState;
+    private result: azureBuildInterfaces.TaskResult;
 
-    private record: azureBuildInterfaces.TimelineRecord;
 
-    constructor(buildTaskRecord: azureBuildInterfaces.TimelineRecord) {
-        this.record = buildTaskRecord;
+    constructor(name: string, id: string, startTime: Date, finishTime: Date, state: azureBuildInterfaces.TimelineRecordState, result: azureBuildInterfaces.TaskResult) {
+        super(name, id, startTime, finishTime);
+        this.state = state;
+        this.result = result;
     }
-
-    public getDuration(): number {
-        if (this.ran()) {
-            return this.getFinishTime() - this.getStartTime();
-        }
-        return null;
-    }
-
-    public getName(): string {
-        return this.record.name;
-    }
-
-    public isLongRunning(thresholdTime: number): boolean {
-        let taskLength = this.getDuration();
-        if (thresholdTime != null && taskLength > thresholdTime) {
-            return true;
-        }
-        return false;
-    }
-
-    public ran(): boolean {
-        return (this.record.state === azureBuildInterfaces.TimelineRecordState.Completed) && this.getStartTime() != null && this.getFinishTime() != null;
+   
+    protected hasCompleteStatus(): boolean {
+        return this.state === azureBuildInterfaces.TimelineRecordState.Completed;
     }
 
     public wasFailure(): boolean {
-        return this.record.result === azureBuildInterfaces.TaskResult.Failed;
+        return this.result === azureBuildInterfaces.TaskResult.Failed;
     }
 
-    public equals(other: IPipelineTask): boolean {
-        return this.getName() === other.getName() && this.getId() === other.getId();
-    }
-
-    public getId(): string {
-       return this.record.id;
-    }
-
-    private getStartTime(): number {
-        return this.getTimeFromDate(this.record.startTime);
-    }
-
-    private getFinishTime(): number {
-        return this.getTimeFromDate(this.record.finishTime);
-    }
-
-    private getTimeFromDate(date: Date) {
-        if (date) {
-            return date.getTime();
-        }
-        return null;
-    }
 }

@@ -1,17 +1,18 @@
 import { Build } from '../Build';
 import * as sinon from 'sinon';
 import { Branch } from '../Branch';
-import { IPipeline } from '../IPipeline';
-import { IPipelineTask } from '../IPipelineTask';
+import { AbstractPipeline } from '../AbstractPipeline';
+import { AbstractPipelineTask } from '../AbstractPipelineTask';
 import { BuildTask } from '../BuildTask';
+import { mock } from 'ts-mockito';
 
 describe('Branch Tests', () => {
     
-    let failedBuildOne: IPipeline;
-    let successfulBuildTwo: IPipeline;
-    let failedBuildThree: IPipeline;
-    let successfulBuildFour: IPipeline;
-    let incompleteBuild: IPipeline;
+    let failedBuildOne: AbstractPipeline;
+    let successfulBuildTwo: AbstractPipeline;
+    let failedBuildThree: AbstractPipeline;
+    let successfulBuildFour: AbstractPipeline;
+    let incompleteBuild: AbstractPipeline;
     let branch: Branch;
 
     beforeEach(() => {
@@ -21,7 +22,7 @@ describe('Branch Tests', () => {
         successfulBuildFour = new Build(null, null);
         incompleteBuild = new Build(null, null);
 
-        let builds: IPipeline[] = [failedBuildOne, successfulBuildTwo, failedBuildThree, successfulBuildFour];
+        let builds: AbstractPipeline[] = [failedBuildOne, successfulBuildTwo, failedBuildThree, successfulBuildFour];
         for (let buildNumber = 0; buildNumber < builds.length; buildNumber++){
             sinon.stub(builds[buildNumber], "getId").returns(buildNumber);
             sinon.stub(builds[buildNumber], "isComplete").returns(true);
@@ -33,16 +34,16 @@ describe('Branch Tests', () => {
         sinon.stub(incompleteBuild, "isComplete").returns(false);
     });
 
-    function makePipeline(isFailure?: boolean, isComplete?: boolean, tasks?: IPipelineTask[]): IPipeline {
-        let pipeline: IPipeline = new Build(null, null);
+    function makePipeline(isFailure?: boolean, isComplete?: boolean, tasks?: AbstractPipelineTask[]): AbstractPipeline {
+        let pipeline: AbstractPipeline = new Build(null, null);
         sinon.stub(pipeline, "isFailure").returns(isFailure);
         sinon.stub(pipeline, "isComplete").returns(isComplete);
-        sinon.stub(pipeline, "getAllTasks").returns(tasks);
+        sinon.stub(pipeline, "getTasks").returns(tasks);
         return pipeline;
     }
 
-    function makeTask(name: string, id: string, duration: number): IPipelineTask {
-        let fake: IPipelineTask = new BuildTask(null);
+    function makeTask(name: string, id: string, duration: number): AbstractPipelineTask {
+        let fake: AbstractPipelineTask = mock(BuildTask);
         sinon.stub(fake, "getName").returns(name);
         sinon.stub(fake, "getId").returns(id);
         sinon.stub(fake, "getDuration").returns(duration);
@@ -92,7 +93,7 @@ describe('Branch Tests', () => {
     });
 
     test("Null return when invalid task id is given", () => {
-        branch = new Branch("", [makePipeline(undefined, undefined, null), makePipeline(undefined, undefined, null), makePipeline(undefined, undefined, null)]);
+        branch = new Branch("", [makePipeline(undefined, undefined, []), makePipeline(undefined, undefined, []), makePipeline(undefined, undefined, [])]);
         expect(branch.getPercentileTimeForPipelineTask(70, makeTask("abc", "id", 1))).toBeNull();
     });
 

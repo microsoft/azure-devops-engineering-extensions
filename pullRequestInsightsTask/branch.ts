@@ -1,28 +1,28 @@
-import { IPipeline } from "./IPipeline";
+import { AbstractPipeline } from "./AbstractPipeline";
 import tl = require('azure-pipelines-task-lib/task');
 import stats from "stats-lite";
-import { IPipelineTask } from "./IPipelineTask";
+import { AbstractPipelineTask } from "./AbstractPipelineTask";
 
  
 
 export class Branch{
 
-    private pipelines: IPipeline[]; 
+    private pipelines: AbstractPipeline[]; 
     private name: string;
     private static readonly NAME_SEPERATOR = "/";
 
-    constructor(name: string, pipelines: IPipeline[]) {
+    constructor(name: string, pipelines: AbstractPipeline[]) {
         this.pipelines = pipelines;
         this.name = name;
     }
 
     public isHealthy(pastPipelinesToConsider: number): boolean {
-        if (pastPipelinesToConsider > this.pipelines.length) {
-            pastPipelinesToConsider = this.pipelines.length;
-        }
-        for (let numberPipeline = 0; numberPipeline < pastPipelinesToConsider; numberPipeline++) {
-            if (this.pipelines[numberPipeline].isFailure()) {
-                return false;
+        if (this.pipelines) {
+            pastPipelinesToConsider = Math.min(this.pipelines.length, pastPipelinesToConsider);
+            for (let numberPipeline = 0; numberPipeline < pastPipelinesToConsider; numberPipeline++) {
+                if (this.pipelines[numberPipeline].isFailure()) {
+                    return false;
+                }
             }
         }
         return true;
@@ -42,7 +42,7 @@ export class Branch{
         return count;
     }
 
-    public getMostRecentCompletePipeline(): IPipeline | null {
+    public getMostRecentCompletePipeline(): AbstractPipeline | null {
        for (let pipeline of this.pipelines) {
            if (pipeline.isComplete()){
                return pipeline;
@@ -64,7 +64,7 @@ export class Branch{
         return truncatedName.charAt(0).toUpperCase() + truncatedName.slice(1);
     }
 
-    public getPercentileTimeForPipelineTask(percentileToFind: number, task: IPipelineTask): number {
+    public getPercentileTimeForPipelineTask(percentileToFind: number, task: AbstractPipelineTask): number {
         let times: number[] = this.getAllPipelineTimesForTask(task);
         tl.debug("times on target for " + task.getName() + " = " + times.toString())
         if (times.length > 0) {
@@ -72,12 +72,12 @@ export class Branch{
             return stats.percentile(times, percentileToFind / 100)
         }
         else {
-            tl.debug("no tasks with name " + task.getName() + "found on pipelines of branch " + this.name);
+            tl.debug("no tasks with name " + task.getName() + " found on pipelines of branch " + this.name);
             return null;
         }
     }
 
-    private getAllPipelineTimesForTask(task: IPipelineTask): number[] {
+    private getAllPipelineTimesForTask(task: AbstractPipelineTask): number[] {
         let times: number[] = [];
         for (let pipeline of this.pipelines) {
             if (pipeline.getTask(task)) {

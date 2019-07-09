@@ -2,11 +2,13 @@ import tl = require('azure-pipelines-task-lib/task');
 import { EnvironmentConfigurations } from './EnvironmentConfigurations';
 import messages from './user_messages.json';
 import './StringExtensions';
+import './StringExtensions';
 import { PipelineData } from './PipelineData';
 import { TaskInsights } from './TaskInsights';
 
 async function run() {
     try {
+        
         let environmentConfigurations: EnvironmentConfigurations = new EnvironmentConfigurations();
         let data: PipelineData = new PipelineData();
         data.setAccessKey(environmentConfigurations.getAccessKey());
@@ -20,19 +22,19 @@ async function run() {
         data.setPullRequestId(environmentConfigurations.getPullRequestId());
         tl.debug("pipline data: " + JSON.stringify(data));
 
+
         if (!data.getPullRequestId()) {
             tl.debug(messages.notInPullRequestMessage);
         }
+
         else {
-            let insights = new TaskInsights();
-            insights.invoke(data);
+            let taskInsights = new TaskInsights();
+            taskInsights.invoke(data);
         }
     }
     catch (err) {
         console.log("error!", err); 
     }
 }
-
-
 
 run();

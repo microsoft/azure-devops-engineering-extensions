@@ -1,8 +1,9 @@
 import * as azureBuildInterfaces from "azure-devops-node-api/interfaces/BuildInterfaces";
 import { Build } from "../Build";
 import sinon from "sinon";
-import { IPipelineTask } from "../IPipelineTask";
+import { AbstractPipelineTask } from "../AbstractPipelineTask";
 import { BuildTask } from "../BuildTask";
+import { mock } from "ts-mockito";
 
 
 describe('Build Tests', () => {
@@ -25,8 +26,8 @@ describe('Build Tests', () => {
         }
     }
 
-    function makeFakeTaskForComparision(name: string, id: string): IPipelineTask {
-        let fake: IPipelineTask = new BuildTask(null);
+    function makeFakeTaskForComparision(name: string, id: string): AbstractPipelineTask {
+        let fake: AbstractPipelineTask = mock(BuildTask);
         sinon.stub(fake, "getName").returns(name);
         sinon.stub(fake, "getId").returns(id);
         return fake;
@@ -74,29 +75,29 @@ describe('Build Tests', () => {
     });
 
     test('Tasks are properly retrieved', () => {
-        fillMockBuildTimeline([makeTimelineRecord(undefined, undefined, undefined, undefined, "yellow", "a"), makeTimelineRecord(undefined, undefined, undefined, undefined, "blue", "b"), makeTimelineRecord(undefined, undefined, undefined, undefined, "red", "c")]);
+        fillMockBuildTimeline([makeTimelineRecord(null, null, null, null, "yellow", "a"), makeTimelineRecord(null, null, null, null, "blue", "b"), makeTimelineRecord(null, null, null, null, "red", "c")]);
         build = new Build(null, mockBuildTimeline);
-        let expectedTasks: IPipelineTask[] = [new BuildTask(makeTimelineRecord(undefined, undefined, undefined, undefined, "yellow", "a")), new BuildTask(makeTimelineRecord(undefined, undefined, undefined, undefined, "blue", "b")), new BuildTask(makeTimelineRecord(undefined, undefined, undefined, undefined, "red", "c"))];
-        expect(build.getAllTasks()).toEqual(expectedTasks);
+        let expectedTasks: AbstractPipelineTask[] = [new BuildTask("yellow", "a", null, null, null, null), new BuildTask("blue", "b", null, null, null, null), new BuildTask("red", "c", null, null, null, null)];
+        expect(build.getTasks()).toEqual(expectedTasks);
     });
     
     test('Null is returned when there are no tasks to be retrieved', () => {
         fillMockBuildTimeline([]);
         build = new Build(null, mockBuildTimeline);
-        expect(build.getAllTasks()).toEqual([]);
+        expect(build.getTasks()).toEqual([]);
     });
 
     test('Equivalent task retrieved from build when present', () => {
-        let record: azureBuildInterfaces.TimelineRecord = makeTimelineRecord(azureBuildInterfaces.TaskResult.Failed, undefined, undefined, undefined, "name", "abc");
-        let taskToGet: IPipelineTask = new BuildTask(record);
+        let record: azureBuildInterfaces.TimelineRecord = makeTimelineRecord(azureBuildInterfaces.TaskResult.Failed, null, null, null, "name", "abc");
+        let taskToGet: AbstractPipelineTask = new BuildTask("name", "abc", null, null, null, azureBuildInterfaces.TaskResult.Failed);
         expect(taskToGet.equals(makeFakeTaskForComparision("name", "abc"))).toBe(true)
-        fillMockBuildTimeline([record, makeTimelineRecord(undefined, undefined, undefined, undefined, "name1", "efg")]);
+        fillMockBuildTimeline([record, makeTimelineRecord(null, null, null, null, "name1", "efg")]);
         build = new Build(null, mockBuildTimeline);
         expect(build.getTask(makeFakeTaskForComparision("name", "abc"))).toEqual(taskToGet);
     });
 
     test('Null returned when task cannot be gotten', () => {
-        fillMockBuildTimeline([makeTimelineRecord(undefined, undefined, undefined, undefined, "name1", "efg")]);
+        fillMockBuildTimeline([makeTimelineRecord(null, null, null, null, "name1", "efg")]);
         build = new Build(null, mockBuildTimeline);
         expect(build.getTask(makeFakeTaskForComparision("name", "abc"))).toBeNull();
     });
