@@ -6,15 +6,15 @@ import tl = require('azure-pipelines-task-lib/task');
 
 export class ReleaseTask extends AbstractPipelineTask {
 
-    private releaseTaskRecord: azureReleaseInterfaces.ReleaseTask;
+    private taskStatus: azureReleaseInterfaces.TaskStatus;
     private static readonly COMPLETE_TASK_STATUSES: azureReleaseInterfaces.TaskStatus[] = [azureReleaseInterfaces.TaskStatus.Failed, azureReleaseInterfaces.TaskStatus.Failure, azureReleaseInterfaces.TaskStatus.PartiallySucceeded, azureReleaseInterfaces.TaskStatus.Succeeded, azureReleaseInterfaces.TaskStatus.Success]
     private static readonly FAILED_TASK_STATUSES: azureReleaseInterfaces.TaskStatus[] = [azureReleaseInterfaces.TaskStatus.Failed, azureReleaseInterfaces.TaskStatus.Failure]
 
 
-    constructor(releaseTaskRecord: azureReleaseInterfaces.ReleaseTask) {
-        super(releaseTaskRecord.name, String(releaseTaskRecord.id), releaseTaskRecord.startTime, releaseTaskRecord.finishTime);
-        tl.debug("release task: " +  releaseTaskRecord.name + " " + String(releaseTaskRecord.id));
-        this.releaseTaskRecord = releaseTaskRecord;
+    constructor(name: string, id: string, startTime: Date, finishTime: Date, status: azureReleaseInterfaces.TaskStatus) {
+        super(name, String(id), startTime, finishTime);
+        tl.debug("release task: " +  name + " " + String(id));
+        this.taskStatus = status;
     }
    
     protected hasCompleteStatus(): boolean {
@@ -26,7 +26,7 @@ export class ReleaseTask extends AbstractPipelineTask {
     }
 
     private currentStatusIsIncluded(statusesToCheck: azureReleaseInterfaces.TaskStatus[]) {
-        return statusesToCheck.includes(this.releaseTaskRecord.status);
+        return statusesToCheck.includes(this.taskStatus);
     }
 
 }

@@ -3,19 +3,22 @@ import * as azureBuildInterfaces from "azure-devops-node-api/interfaces/BuildInt
 
 export class BuildTask extends AbstractPipelineTask {
 
-    private buildTaskRecord: azureBuildInterfaces.TimelineRecord;
+    private state: azureBuildInterfaces.TimelineRecordState;
+    private result: azureBuildInterfaces.TaskResult;
 
-    constructor(buildTaskRecord: azureBuildInterfaces.TimelineRecord) {
-        super(buildTaskRecord.name, buildTaskRecord.id, buildTaskRecord.startTime, buildTaskRecord.finishTime);
-        this.buildTaskRecord = buildTaskRecord;
+
+    constructor(name: string, id: string, startTime: Date, finishTime: Date, state: azureBuildInterfaces.TimelineRecordState, result: azureBuildInterfaces.TaskResult) {
+        super(name, id, startTime, finishTime);
+        this.state = state;
+        this.result = result;
     }
    
     protected hasCompleteStatus(): boolean {
-        return this.buildTaskRecord.state === azureBuildInterfaces.TimelineRecordState.Completed;
+        return this.state === azureBuildInterfaces.TimelineRecordState.Completed;
     }
 
     public wasFailure(): boolean {
-        return this.buildTaskRecord.result === azureBuildInterfaces.TaskResult.Failed;
+        return this.result === azureBuildInterfaces.TaskResult.Failed;
     }
 
 }

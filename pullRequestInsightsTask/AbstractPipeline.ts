@@ -4,6 +4,7 @@ import { AbstractAzureApi } from "./AbstractAzureApi";
 export abstract class AbstractPipeline{
 
     private tasks: AbstractPipelineTask[];
+
     
     constructor() {
         
@@ -47,5 +48,6 @@ export abstract class AbstractPipeline{
         }
         return false;
     }
+
 }
 

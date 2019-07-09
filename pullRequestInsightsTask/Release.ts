@@ -4,6 +4,7 @@ import { AbstractPipelineTask } from "./AbstractPipelineTask";
 import { AbstractAzureApi } from "./AbstractAzureApi";
 import { ReleaseTask } from "./ReleaseTask";
 import tl = require('azure-pipelines-task-lib/task');
+import { release } from "os";
 
 
 export class Release extends AbstractPipeline{
@@ -27,7 +28,7 @@ export class Release extends AbstractPipeline{
             for (let phase of this.selectedDeployment.releaseDeployPhases){
                 for (let job of phase.deploymentJobs){
                     for (let task of job.tasks){
-                        tasks.push(new ReleaseTask(task));
+                        tasks.push(new ReleaseTask(task.name, String(task.id), task.startTime, task.finishTime, task.status));
                     }
                 }
             }

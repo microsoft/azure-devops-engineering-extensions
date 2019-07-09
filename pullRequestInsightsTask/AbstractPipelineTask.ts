@@ -1,17 +1,16 @@
 
-
 export abstract class AbstractPipelineTask {
 
     private name: string
     private id: string
-    private startTime: number
-    private finishTime: number
+    private startTime: Date
+    private finishTime: Date
 
     constructor(name: string, id: string, startTime: Date, finishTime: Date) {
         this.name = name
         this.id = id;
-        this.startTime = this.getTimeFromDate(startTime);
-        this.finishTime = this.getTimeFromDate(finishTime);
+        this.startTime = startTime;
+        this.finishTime = finishTime;
     }
 
     
@@ -41,7 +40,7 @@ export abstract class AbstractPipelineTask {
 
     public getDuration(): number {
         if (this.ran()) {
-            return this.finishTime - this.startTime;
+            return this.getTimeFromDate(this.finishTime) - this.getTimeFromDate(this.startTime);
         }
         return null;
     }
