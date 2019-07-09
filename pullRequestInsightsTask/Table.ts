@@ -110,7 +110,7 @@ export class LongRunningValidationsTable extends Table {
                 if (index > 0) {
                     nextLine = messages.longRunningValidationCommentLowerSectionRow;
                 }
-                section += Table.NEW_LINE + nextLine.format(current.getDefinitionName(), current.getLink(), longRunningValidations[index].getName(), String(longRunningValidations[index].getDuration()), String(thresholdTimes[index]));
+                section += Table.NEW_LINE + nextLine.format(current.getDefinitionName(), current.getLink(), longRunningValidations[index].getName(), String(longRunningValidations[index].calculateRegression(thresholdTimes[index])), String(thresholdTimes[index]));
             }
             this.addTableData(section);
         }

@@ -86,7 +86,6 @@ describe('BuildTask Tests', () => {
         expect(task.ran()).toBe(false);
     });
 
-    
     test("Task did not run when necessary field is missing", () => {
         task = new BuildTask(null, null, new Date("2019-05-23 01:14:40.00"), null, azureBuildInterfaces.TimelineRecordState.Completed, null);
         expect(task.ran()).toBe(false);
@@ -105,6 +104,18 @@ describe('BuildTask Tests', () => {
     test("Tasks are not equal when names are different", () => {
         task = new BuildTask("ab", "123", null, null, null, null);
         expect(task.equals(new BuildTask("abc", "123", null, null, null, null))).toBe(false);
+    });
+
+    test("Regression is correctly calculated", () => {
+        task = new BuildTask("abc", "123", null, null, null, null);
+        setTaskDuration(task, 10);
+        expect(task.calculateRegression(9)).toBe(1);
+    });
+
+    test("Regression is negative if task does not have valid duration", () => {
+        task = new BuildTask("abc", "123", null, null, null, null);
+        setTaskDuration(task, null);
+        expect(task.calculateRegression(9)).toBe(-9);
     });
 
 });
