@@ -1,3 +1,4 @@
+import tl = require('azure-pipelines-task-lib/task');
 
 export abstract class AbstractPipelineTask {
 
@@ -32,6 +33,7 @@ export abstract class AbstractPipelineTask {
 
     public isLongRunning(thresholdTime: number, minimumDurationMiliseconds: number, minimumRegressionMilliseconds: number): boolean {
         let taskLength = this.getDuration();
+        tl.debug("For long running calculation for task: " + this.getName() + " : " + this.getId() + " threshold time = " + thresholdTime + "min duration = " + minimumDurationMiliseconds + " min regression = " + minimumRegressionMilliseconds + " duration = " + taskLength + " regression = " + this.calculateRegression(thresholdTime));
         if (thresholdTime && taskLength && this.getDuration() > minimumDurationMiliseconds && this.hasSignificantRegression(thresholdTime, minimumRegressionMilliseconds)) {
             return true;
         }
