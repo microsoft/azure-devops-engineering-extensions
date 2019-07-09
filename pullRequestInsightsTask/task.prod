@@ -9,7 +9,7 @@
     "version": {
         "Major": 0,
         "Minor": 0,
-        "Patch": 58
+        "Patch": 59
     },
     "instanceNameFormat": "PR Insights",
     "inputs": [
@@ -23,7 +23,7 @@
         {
             "name": "longRunningValidationPercentile",
             "type": "number",
-            "default": 90,
+            "defaultValue": 90,
             "label": "Long Running Validation Percentile",
             "required": false,
             "helpMarkDown": "The duration percentile on the target branch to compare validations with in order to determine if the validations are long running"
@@ -31,7 +31,7 @@
         {
             "name": "longRunningValidationMinimumDuration",
             "type": "number",
-            "default": .5,
+            "defaultValue": .5,
             "label": "Long Running Validation Minimum Duration (in minutes)",
             "required": false,
             "helpMarkDown": "The minimum duration (in minutes) of a validation for it to be potentially considered long running"
@@ -39,7 +39,7 @@
         {
             "name": "longRunningValidationMinimumRegression",
             "type": "number",
-            "default": .5,
+            "defaultValue": .5,
             "label": "Long Running Validation Minimum Regression (in minutes)",
             "required": false,
             "helpMarkDown": "The minimum regression (in minutes) of a validation from the given duration percentile on the target branch for it to be potentially considered long running"
