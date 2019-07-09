@@ -20,6 +20,9 @@ async function run() {
         data.setRepository(environmentConfigurations.getValue(EnvironmentConfigurations.REPOSITORY_KEY));
         data.setTeamUri(environmentConfigurations.getValue(EnvironmentConfigurations.TEAM_FOUNDATION_KEY));
         data.setPullRequestId(environmentConfigurations.getPullRequestId());
+        data.setDurationPercentile(Number(tl.getInput("longRunningValidationPercentile", false)));
+        data.setMimimumValidationDurationMinutes(Number(tl.getInput("longRunningValidationMinimumDuration", false)));
+        data.setMimimumValidationRegressionMinutes(Number(tl.getInput("longRunningValidationMinimumRegression", false)));
         tl.debug("pipline data: " + JSON.stringify(data));
 
 

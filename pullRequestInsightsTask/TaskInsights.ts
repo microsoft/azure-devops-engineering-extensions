@@ -17,21 +17,17 @@ export class TaskInsights {
 
     public async invoke(data: PipelineData): Promise<void> {
 
-        const percentile: number = 1;
-        const numberBuildsToQuery: number = 10;
         const numberPipelinesToConsiderForHealth = 3;
-
-
-        let azureApiFactory: AzureApiFactory = new AzureApiFactory();
-        let azureApi = await azureApiFactory.create(data)
+        const numberPipelinesToConsiderForLongRunningValidations = 50;
+       
+        let azureApi = await AzureApiFactory.create(data)
         let pullRequest: PullRequest = await azureApi.getPullRequest(data.getRepository(), data.getPullRequestId(), data.getProjectName());
 
         if (pullRequest.mostRecentSourceCommitMatchesCurrent(data.getCurrentSourceCommitIteration())) {
             let currentPipeline: AbstractPipeline = await azureApi.getCurrentPipeline(data);
-            tl.debug("target branch of pull request: " + pullRequest.getTargetBranchName());
-            let retrievedPipelines: AbstractPipeline[] = await azureApi.getMostRecentPipelinesOfCurrentType(data.getProjectName(), currentPipeline, numberBuildsToQuery, pullRequest.getTargetBranchName());
-            tl.debug("Number of retrieved pipelines for "  + pullRequest.getTargetBranchName() + " = " + retrievedPipelines.length);
-            let targetBranch: Branch = new Branch(pullRequest.getTargetBranchName(), retrievedPipelines);
+            tl.debug("target branch of pull request: " + pullRequest.getTargetBranchName());            
+            let targetBranch: Branch = new Branch(pullRequest.getTargetBranchName());
+            targetBranch.retrievePastPipelines(azureApi, currentPipeline, data.getProjectName(), numberPipelinesToConsiderForHealth);
             let thresholdTimes: number[] = [];
             let longRunningValidations: AbstractPipelineTask[] = [];
             let tableType: string = TableFactory.FAILURE;
@@ -40,9 +36,10 @@ export class TaskInsights {
 
             if (!currentPipeline.isFailure()) {
                 tableType = TableFactory.LONG_RUNNING_VALIDATIONS;
+                targetBranch.retrievePastPipelines(azureApi, currentPipeline, data.getProjectName(), numberPipelinesToConsiderForLongRunningValidations);
                 for (let task of currentPipeline.getTasks()) {
-                    let percentileTime: number = targetBranch.getPercentileTimeForPipelineTask(percentile, task);
-                    if (task.isLongRunning(percentileTime)) {
+                    let percentileTime: number = targetBranch.getPercentileTimeForPipelineTask(data.getDurationPercentile(), task);
+                    if (task.isLongRunning(percentileTime, TaskInsights.getMillisecondsFromMinutes(data.getMimimumValidationDurationMinutes()), TaskInsights.getMillisecondsFromMinutes(data.getMimimumValidationRegressionMinutes()))) {
                         longRunningValidations.push(task);
                         thresholdTimes.push(percentileTime);
                     }
@@ -58,7 +55,7 @@ export class TaskInsights {
                 tl.debug("type of table to create: " + tableType);
                 let table: Table = TableFactory.create(tableType, pullRequest.getCurrentIterationCommentContent(currentIterationCommentThread));
                 tl.debug("comment data: " + table.getCurrentCommentData());
-                table.addHeader(targetBranch.getTruncatedName(), percentile);
+                table.addHeader(targetBranch.getTruncatedName(), data.getDurationPercentile());
                 table.addSection(currentPipeline, checkStatusLink, targetBranch, numberPipelinesToConsiderForHealth, longRunningValidations, thresholdTimes)
                 if (currentIterationCommentThread) {
                     pullRequest.editCommentInThread(azureApi, currentIterationCommentThread, currentIterationCommentThread.comments[0].id, table.getCurrentCommentData());
@@ -78,5 +75,9 @@ export class TaskInsights {
             statusLink = await currentPipeline.getDefinitionLink(apiCaller, project);
         }
         return statusLink;
+    }
+
+    public static getMillisecondsFromMinutes(minutes: number) {
+        return minutes * 60000;
     }
 }

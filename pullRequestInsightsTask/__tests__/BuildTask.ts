@@ -9,6 +9,11 @@ describe('BuildTask Tests', () => {
    
     let task: AbstractPipelineTask;
 
+    function setTaskDuration(task: AbstractPipelineTask, duration: number) {
+        sinon.stub(task, "getDuration").returns(duration);
+        sinon.stub(task, "ran").returns(true);
+    }
+
     test("Task failed when it has failure status", () => {
         task = new BuildTask(" ", "", new Date("2019-05-23 01:14:40.00"), new Date("2019-05-24 02:15:55.00"), azureBuildInterfaces.TimelineRecordState.Completed, azureBuildInterfaces.TaskResult.Failed);
         expect(task.wasFailure()).toBe(true);
@@ -32,23 +37,33 @@ describe('BuildTask Tests', () => {
 
     test("Task is long running when ran took longer than threshold time", () => {
         task = new BuildTask("abc", "123", null, null, null, null);
-        sinon.stub(task, "getDuration").returns(100);
-        sinon.stub(task, "ran").returns(true);
-       expect(task.isLongRunning(90)).toBe(true);
+        setTaskDuration(task, 100);
+       expect(task.isLongRunning(90, 1, 1)).toBe(true);
     });
 
     test("Task is not long running when not complete", () => {
         task = new BuildTask("abc", "123", null, null, null, null);
-        sinon.stub(task, "getDuration").returns(10);
-        sinon.stub(task, "ran").returns(false);
-        expect(task.isLongRunning(90)).toBe(false);
+        setTaskDuration(task, 10);
+        expect(task.isLongRunning(90, 1, 1)).toBe(false);
     });
 
     test("Task is not long running when no threshold time is given", () => {
         task = new BuildTask("abc", "123", null, null, null, null);
-        sinon.stub(task, "getDuration").returns(10);
-        sinon.stub(task, "ran").returns(true);
-        expect(task.isLongRunning(null)).toBe(false);
+        setTaskDuration(task, 10);
+        expect(task.isLongRunning(null, 1, 1)).toBe(false);
+    });
+
+    
+    test("Task is not long running when minimum regression is not reached", () => {
+        task = new BuildTask("abc", "123", null, null, null, null);
+        setTaskDuration(task, 10);
+        expect(task.isLongRunning(9, 1, 2)).toBe(false);
+    });
+
+    test("Task is not long running when minimum duration is not reached", () => {
+        task = new BuildTask("abc", "123", null, null, null, null);
+        setTaskDuration(task, 10);
+       expect(task.isLongRunning(2, 11, 1)).toBe(false);
     });
 
     test("Task ran when it is complete and has times", () => {

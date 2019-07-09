@@ -1,6 +1,6 @@
 import messages from './user_messages.json';
 import { AbstractPipeline } from "./AbstractPipeline";
-import { Branch } from "./branch";
+import { Branch } from "./Branch";
 import './StringExtensions';
 import { AbstractPipelineTask } from "./AbstractPipelineTask";
 import tl = require('azure-pipelines-task-lib/task');
@@ -89,11 +89,11 @@ export class FailureTable extends Table {
                 let messageString: string = messages.failureCommentRow;
                 if (target.isHealthy(numberPipelinesToConsiderForHealth)) {
                     messageString = messages.successCommentRow;
-            }
+                }
             this.addTableData(Table.NEW_LINE + messageString.format(current.getDefinitionName(), current.getLink(), target.getTruncatedName(), currentDefinitionLink));
+            }
         }
     }
-}
 }
 
 export class LongRunningValidationsTable extends Table {
@@ -104,14 +104,13 @@ export class LongRunningValidationsTable extends Table {
 
     public addSection(current: AbstractPipeline, currentDefinitionLink: string, target: Branch, numberPipelinesToConsiderForHealth: number, longRunningValidations: AbstractPipelineTask[], thresholdTimes: number[]): void {
         if (this.tableHasData()) {
-            let mostRecent = target.getMostRecentCompletePipeline();
             let section: string = "";
             for (let index = 0; index < longRunningValidations.length; index++) {
                 let nextLine: string = messages.longRunningValidationCommentFirstSectionRow;
                 if (index > 0) {
                     nextLine = messages.longRunningValidationCommentLowerSectionRow;
                 }
-                section += Table.NEW_LINE + nextLine.format(current.getDefinitionName(), current.getLink(), longRunningValidations[index].getName(), String(longRunningValidations[index].getDuration()), String(thresholdTimes[index]), mostRecent.getDisplayName(), mostRecent.getLink());
+                section += Table.NEW_LINE + nextLine.format(current.getDefinitionName(), current.getLink(), longRunningValidations[index].getName(), String(longRunningValidations[index].getDuration()), String(thresholdTimes[index]));
             }
             this.addTableData(section);
         }

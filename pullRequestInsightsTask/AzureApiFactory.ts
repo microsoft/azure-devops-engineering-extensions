@@ -10,7 +10,7 @@ export class AzureApiFactory {
     public static readonly BUILD: string = "build";
     public static readonly RELEASE: string = "release";
 
-    public async create(data: PipelineData): Promise<AbstractAzureApi>{
+    public static async create(data: PipelineData): Promise<AbstractAzureApi>{
      let type: string = data.getHostType();
      tl.debug("host type: " + type);
         if (type.toLowerCase() === AzureApiFactory.BUILD){

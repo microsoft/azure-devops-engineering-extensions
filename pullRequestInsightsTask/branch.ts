@@ -2,6 +2,7 @@ import { AbstractPipeline } from "./AbstractPipeline";
 import tl = require('azure-pipelines-task-lib/task');
 import stats from "stats-lite";
 import { AbstractPipelineTask } from "./AbstractPipelineTask";
+import { AbstractAzureApi } from "./AbstractAzureApi";
 
  
 
@@ -11,9 +12,14 @@ export class Branch{
     private name: string;
     private static readonly NAME_SEPERATOR = "/";
 
-    constructor(name: string, pipelines: AbstractPipeline[]) {
-        this.pipelines = pipelines;
+    constructor(name: string) {
+        this.pipelines = [];
         this.name = name;
+    }
+
+    public async retrievePastPipelines(apiCaller: AbstractAzureApi, currentPipeline: AbstractPipeline, projectName: string, numberToRetrieve: number): Promise<void> {
+        this.pipelines = await apiCaller.getMostRecentPipelinesOfCurrentType(projectName, currentPipeline, numberToRetrieve, this.name);
+        tl.debug("Number of retrieved pipelines for "  + this.name + " = " + this.pipelines.length);
     }
 
     public isHealthy(pastPipelinesToConsider: number): boolean {

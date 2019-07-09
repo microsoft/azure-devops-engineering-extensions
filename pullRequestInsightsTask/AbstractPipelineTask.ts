@@ -30,9 +30,9 @@ export abstract class AbstractPipelineTask {
         return this.getName() === other.getName() && this.getId() === other.getId();
     }
 
-    public isLongRunning(thresholdTime: number): boolean {
+    public isLongRunning(thresholdTime: number, minimumDurationMiliseconds: number, minimumRegressionMilliseconds: number): boolean {
         let taskLength = this.getDuration();
-        if (thresholdTime && taskLength && taskLength > thresholdTime) {
+        if (thresholdTime && taskLength && this.getDuration() > minimumDurationMiliseconds && this.hasSignificantRegression(thresholdTime, minimumRegressionMilliseconds)) {
             return true;
         }
         return false;
@@ -49,11 +49,19 @@ export abstract class AbstractPipelineTask {
         return (this.hasCompleteStatus()) && this.startTime != null && this.finishTime != null;
     }
 
+    public calculateRegression(thresholdTime: number): number {
+        return this.getDuration() - thresholdTime;
+    }
+
+    private hasSignificantRegression(thresholdTime: number, minimumRegressionMilliseconds: number): boolean {
+        return this.calculateRegression(thresholdTime) > minimumRegressionMilliseconds;
+    }
+
+
     private getTimeFromDate(date: Date) {
         if (date) {
             return date.getTime();
         }
         return null;
     }
-
 }

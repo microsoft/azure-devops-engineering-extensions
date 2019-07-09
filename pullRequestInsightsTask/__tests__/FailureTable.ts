@@ -1,7 +1,7 @@
 import { FailureTable } from "../Table";
 import { AbstractPipeline } from "../AbstractPipeline";
 import sinon from "sinon";
-import { Branch } from "../branch";
+import { Branch } from "../Branch";
 import { Release } from "../Release";
 import { mock } from "ts-mockito";
 

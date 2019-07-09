@@ -9,6 +9,9 @@ export class PipelineData {
     private buildId: number
     private releaseId: number
     private currentSourceCommitIteration: string
+    private durationPercentile: number;
+    private mimimumValidationDuration: number;
+    private mimimumValidationRegression: number;
     
     public setProjectName(projectName: string): void {
         this.projectName = projectName;
@@ -81,5 +84,28 @@ export class PipelineData {
         this.pullRequestId = pullRequestId;
     }
 
-   
+    public getDurationPercentile(): number {
+        return this.durationPercentile;
+    }
+
+    public setDurationPercentile(durationPercentile: number): void {
+        this.durationPercentile = durationPercentile;
+    }
+
+    public getMimimumValidationDurationMinutes(): number {
+        return this.mimimumValidationDuration;
+    }
+
+    public setMimimumValidationDurationMinutes(mimimumValidationDuration: number): void {
+        this.mimimumValidationDuration = mimimumValidationDuration;
+    }
+
+    public setMimimumValidationRegressionMinutes(mimimumValidationRegression: number): void {
+        this.mimimumValidationRegression = mimimumValidationRegression;
+    }
+
+    public getMimimumValidationRegressionMinutes(): number {
+        return this.mimimumValidationRegression;
+    }
+
 }
