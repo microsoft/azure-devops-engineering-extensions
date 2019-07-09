@@ -52,12 +52,12 @@ describe('Branch Tests', () => {
 
 
     test("Returns capitalized last part of full name as truncated name", ()=> {
-        branch = new Branch("refs/head/master", null);
+        branch = new Branch("refs/head/master");
         expect(branch.getTruncatedName()).toEqual("Master"); 
     });
 
     test("Returns capitalized whole name truncated name when unseperated ", ()=> {
-        branch = new Branch("master", null);
+        branch = new Branch("master");
         expect(branch.getTruncatedName()).toEqual("Master"); 
     });
 

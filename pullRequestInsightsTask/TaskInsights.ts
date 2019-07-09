@@ -27,7 +27,7 @@ export class TaskInsights {
             let currentPipeline: AbstractPipeline = await azureApi.getCurrentPipeline(data);
             tl.debug("target branch of pull request: " + pullRequest.getTargetBranchName());            
             let targetBranch: Branch = new Branch(pullRequest.getTargetBranchName());
-            targetBranch.retrievePastPipelines(azureApi, currentPipeline, data.getProjectName(), numberPipelinesToConsiderForHealth);
+            targetBranch.setPipelines(await azureApi.getMostRecentPipelinesOfCurrentType(data.getProjectName(), currentPipeline, numberPipelinesToConsiderForHealth, targetBranch.getFullName()));
             let thresholdTimes: number[] = [];
             let longRunningValidations: AbstractPipelineTask[] = [];
             let tableType: string = TableFactory.FAILURE;
@@ -36,7 +36,7 @@ export class TaskInsights {
 
             if (!currentPipeline.isFailure()) {
                 tableType = TableFactory.LONG_RUNNING_VALIDATIONS;
-                targetBranch.retrievePastPipelines(azureApi, currentPipeline, data.getProjectName(), numberPipelinesToConsiderForLongRunningValidations);
+                targetBranch.setPipelines(await azureApi.getMostRecentPipelinesOfCurrentType(data.getProjectName(), currentPipeline, numberPipelinesToConsiderForLongRunningValidations, targetBranch.getFullName()));
                 for (let task of currentPipeline.getTasks()) {
                     let percentileTime: number = targetBranch.getPercentileTimeForPipelineTask(data.getDurationPercentile(), task);
                     if (task.isLongRunning(percentileTime, TaskInsights.getMillisecondsFromMinutes(data.getMimimumValidationDurationMinutes()), TaskInsights.getMillisecondsFromMinutes(data.getMimimumValidationRegressionMinutes()))) {

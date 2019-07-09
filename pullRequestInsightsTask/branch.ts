@@ -12,13 +12,16 @@ export class Branch{
     private name: string;
     private static readonly NAME_SEPERATOR = "/";
 
-    constructor(name: string) {
+    constructor(name: string, pipelines?: AbstractPipeline[]) {
         this.pipelines = [];
+        if (pipelines) {
+            this.setPipelines(pipelines);
+        }
         this.name = name;
     }
 
-    public async retrievePastPipelines(apiCaller: AbstractAzureApi, currentPipeline: AbstractPipeline, projectName: string, numberToRetrieve: number): Promise<void> {
-        this.pipelines = await apiCaller.getMostRecentPipelinesOfCurrentType(projectName, currentPipeline, numberToRetrieve, this.name);
+    public setPipelines(pipelines: AbstractPipeline[]): void {
+        this.pipelines = pipelines;
         tl.debug("Number of retrieved pipelines for "  + this.name + " = " + this.pipelines.length);
     }
 
@@ -57,7 +60,7 @@ export class Branch{
         return null;
     }
 
-    public getFullName(): string{
+    public getFullName(): string {
         return this.name;
     }
 
