@@ -28,10 +28,10 @@ describe("LongRunningValidationTable Tests", () => {
         return branch;
      }
 
-     function makeFakeTask(name: string, duration: number): AbstractPipelineTask {
+     function makeFakeTask(name: string, regression: number): AbstractPipelineTask {
         let task: AbstractPipelineTask = mock(BuildTask); 
         sinon.stub(task, "getName").returns(name);
-        sinon.stub(task, "getDuration").returns(duration);
+        sinon.stub(task, "calculateRegression").returns(regression);
         return task;
      }
 
