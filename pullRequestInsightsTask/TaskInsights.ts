@@ -40,7 +40,7 @@ export class TaskInsights {
                 for (let task of currentPipeline.getTasks()) {
                     let percentileTime: number = targetBranch.getPercentileTimeForPipelineTask(data.getDurationPercentile(), task);
                     if (task.isLongRunning(percentileTime, TaskInsights.getMillisecondsFromMinutes(data.getMimimumValidationDurationMinutes()), TaskInsights.getMillisecondsFromMinutes(data.getMimimumValidationRegressionMinutes())) && 
-                    data.getTaskTypesForLongRunningValidations().includes(task.getType().toLowerCase())) {
+                    data.getTaskTypesForLongRunningValidations().includes(task.getType())) {
                         longRunningValidations.push(task);
                         thresholdTimes.push(percentileTime);
                     }
@@ -56,7 +56,7 @@ export class TaskInsights {
                 tl.debug("type of table to create: " + tableType);
                 let table: Table = TableFactory.create(tableType, pullRequest.getCurrentIterationCommentContent(currentIterationCommentThread));
                 tl.debug("comment data: " + table.getCurrentCommentData());
-                table.addHeader(targetBranch.getTruncatedName(), data.getDurationPercentile());
+                table.addHeader(targetBranch.getTruncatedName());
                 table.addSection(currentPipeline, checkStatusLink, targetBranch, numberPipelinesToConsiderForHealth, longRunningValidations, thresholdTimes)
                 if (currentIterationCommentThread) {
                     pullRequest.editCommentInThread(azureApi, currentIterationCommentThread, currentIterationCommentThread.comments[0].id, table.getCurrentCommentData());

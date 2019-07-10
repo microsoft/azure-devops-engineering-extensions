@@ -63,7 +63,10 @@ export abstract class AbstractPipelineTask {
     }
 
     public getType() {
-        return this.type;
+        if (this.type) {
+            return this.type.toLowerCase();
+        }
+        return null;
     }
 
     private hasSignificantRegression(thresholdTime: number, minimumRegressionMilliseconds: number): boolean {

@@ -34,13 +34,13 @@ describe("FailureTable Tests", () => {
 
     test("Header is added to comment without table data", () => {
        failureTable = new FailureTable();
-       failureTable.addHeader("FakeTarget", 76);
+       failureTable.addHeader("FakeTarget");
        expect(failureTable.getCurrentCommentData()).toBe("|Failed Pipeline|FakeTarget Health|Insights|\n|---|---|---|<!--failureTable-->");
     });
 
     test("Header is not added to table with existing data", () => {
         failureTable = new FailureTable("|Failed Pipeline|FakeTarget Health|Insights|\n|---|---|---|<!--failureTable-->");
-        failureTable.addHeader("fakeTarget", 80);
+        failureTable.addHeader("fakeTarget");
         expect(failureTable.getCurrentCommentData()).toBe("|Failed Pipeline|FakeTarget Health|Insights|\n|---|---|---|<!--failureTable-->");
      });
 

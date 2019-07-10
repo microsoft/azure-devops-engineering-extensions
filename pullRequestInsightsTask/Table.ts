@@ -27,9 +27,9 @@ export abstract class Table {
         tl.debug("table already exists in comment? " + this.tableHasData());
     }
 
-    public addHeader(target: string, percentile: number): void {
+    public addHeader(target: string): void {
         if (!this.tableHasData()) {
-            this.addTableData(this.headerFormat.format(String(percentile), target));
+            this.addTableData(this.headerFormat.format(target));
             let numberColumns: number = this.getNumberColumns(this.currentCommentData);
             this.addTableData(Table.NEW_LINE + Table.COLUMN_DIVIDER);
             for (let i = 0; i < numberColumns; i++) {
@@ -97,6 +97,8 @@ export class FailureTable extends Table {
 }
 
 export class LongRunningValidationsTable extends Table {
+    
+    private static readonly TIME_LABELS: Map<() => number, string> = new Map([[Date.prototype.getUTCHours, "h"], [Date.prototype.getUTCMinutes, "m"], [Date.prototype.getUTCSeconds, "s"], [Date.prototype.getUTCMilliseconds, "ms"]]);
 
     constructor(currentCommentData?: string) {
         super(messages.longRunningValidationCommentTableHeading, messages.longRunningValidationTableEndName, currentCommentData);
@@ -111,13 +113,29 @@ export class LongRunningValidationsTable extends Table {
                     nextLine = messages.longRunningValidationCommentLowerSectionRow;
                 }
                 let task: AbstractPipelineTask = longRunningValidations[index];
-                section += Table.NEW_LINE + nextLine.format(current.getDefinitionName(), current.getLink(), task.getName(), this.formatTime(task.calculateRegression(thresholdTimes[index])), this.formatTime(thresholdTimes[index]));
+                tl.debug("adding long running task: " + task.getName());
+                tl.debug(task.getName() + " has duration of " + task.getDuration() + " ms and regression is " + task.calculateRegression(thresholdTimes[index]) + " ms based on threshold time of " + thresholdTimes[index] + " ms");
+                section += Table.NEW_LINE + nextLine.format(current.getDefinitionName(), current.getLink(), task.getName(), this.formatTime(task.getDuration()), this.formatTime(task.calculateRegression(thresholdTimes[index])));
             }
             this.addTableData(section);
         }
     }
 
     private formatTime(duration: number): string {
-        return String(Math.round(duration));
+        let formattedTime: string = "";
+        let date: Date = new Date(Math.round(duration));
+        for (let key of Array.from(LongRunningValidationsTable.TIME_LABELS.keys())) {
+            if (key.call(date) > 0) {
+                formattedTime += key.call(date) + LongRunningValidationsTable.TIME_LABELS.get(key) + " ";
+            }   
+        }
+       tl.debug("time to put in table: " + formattedTime);
+       return formattedTime.trim();
     }
+
+    private roundMillisecondsToSeconds(milliseconds: number): number {
+        return 1000 * Math.round(milliseconds/1000); 
+    }
+
+
 }

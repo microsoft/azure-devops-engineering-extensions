@@ -28,40 +28,41 @@ describe("LongRunningValidationTable Tests", () => {
         return branch;
      }
 
-     function makeFakeTask(name: string, regression: number): AbstractPipelineTask {
+     function makeFakeTask(name: string, duration: number, regression: number): AbstractPipelineTask {
         let task: AbstractPipelineTask = mock(BuildTask); 
         sinon.stub(task, "getName").returns(name);
         sinon.stub(task, "calculateRegression").returns(regression);
+        sinon.stub(task, "getDuration").returns(duration);
         return task;
      }
 
     test("Header is added to empty table",  () => {
        longRunTable = new LongRunningValidationsTable();
-       longRunTable.addHeader("master", 98);
-       expect(longRunTable.getCurrentCommentData()).toBe(messages.longRunningValidationCommentTableHeading.format("98", "master") + "\n|---|---|---|---|<!--longRunningValidationTable-->");
+       longRunTable.addHeader("master");
+       expect(longRunTable.getCurrentCommentData()).toBe(messages.longRunningValidationCommentTableHeading.format("master") + "\n|---|---|---|<!--longRunningValidationTable-->");
     });
 
     test("Section is not added to table without header",  () => {
         longRunTable = new LongRunningValidationsTable();
         let current: AbstractPipeline = makeFakePipeline("pipeline", "pipelineLink", 7, "defName", null);
         let recent: AbstractPipeline = makeFakePipeline("otherPipeline", "otherPipelineLink", 7, undefined);
-        longRunTable.addSection(current, "link", makeFakeBranch("branch", recent), 2, [makeFakeTask("abc", 123)], [120]);
+        longRunTable.addSection(current, "link", makeFakeBranch("branch", recent), 2, [makeFakeTask("abc", 123, 11)], [0]);
         expect(longRunTable.getCurrentCommentData()).toBe("");
     });
 
     test("Single task section is added to table with existing data",  () => {
-        longRunTable = new LongRunningValidationsTable(messages.longRunningValidationCommentTableHeading.format("95", "master") + " \n|---|---|---|---|<!--longRunningValidationTable-->");
+        longRunTable = new LongRunningValidationsTable(messages.longRunningValidationCommentTableHeading.format("master") + " \n|---|---|---|<!--longRunningValidationTable-->");
         let current: AbstractPipeline = makeFakePipeline("pipeline", "pipelineLink", 7, "defName", null);
         let recent: AbstractPipeline = makeFakePipeline("otherPipeline", "otherPipelineLink", 7, undefined);
-        longRunTable.addSection(current, "link", makeFakeBranch("branch", recent), 2, [makeFakeTask("abc", 123)], [120]);
-        expect(longRunTable.getCurrentCommentData()).toBe(messages.longRunningValidationCommentTableHeading.format("95", "master") + " \n|---|---|---|---|\n|[defName](pipelineLink)| abc |123 ms|120 ms|<!--longRunningValidationTable-->")
+        longRunTable.addSection(current, "link", makeFakeBranch("branch", recent), 2, [makeFakeTask("abc", 100005, 120)], [0]);
+        expect(longRunTable.getCurrentCommentData()).toBe(messages.longRunningValidationCommentTableHeading.format("master") + " \n|---|---|---|\n|[defName](pipelineLink)| abc |1m 40s 5ms [120ms]|<!--longRunningValidationTable-->")
     });
 
     test("Multi task section is added to table with existing data",  () => {
-        longRunTable = new LongRunningValidationsTable(messages.longRunningValidationCommentTableHeading.format("95", "master") + "\n|---|---|---|---|<!--longRunningValidationTable-->");
+        longRunTable = new LongRunningValidationsTable(messages.longRunningValidationCommentTableHeading.format("master") + "\n|---|---|---|<!--longRunningValidationTable-->");
         let current: AbstractPipeline = makeFakePipeline("pipeline", "pipelineLink", 7, "defName", null);
         let recent: AbstractPipeline = makeFakePipeline("otherPipeline", "otherPipelineLink", 7, undefined);
-        longRunTable.addSection(current, "link", makeFakeBranch("branch", recent), 2, [makeFakeTask("abc", 123), makeFakeTask("xyz", 321)], [120, 130]);
-        expect(longRunTable.getCurrentCommentData()).toBe(messages.longRunningValidationCommentTableHeading.format("95", "master") + "\n|---|---|---|---|\n|[defName](pipelineLink)| abc |123 ms|120 ms|\n| | xyz |321 ms|130 ms|<!--longRunningValidationTable-->");
+        longRunTable.addSection(current, "link", makeFakeBranch("branch", recent), 2, [makeFakeTask("abc", 123, 120), makeFakeTask("xyz", 321, 130)], [0, 0]);
+        expect(longRunTable.getCurrentCommentData()).toBe(messages.longRunningValidationCommentTableHeading.format("master") + "\n|---|---|---|\n|[defName](pipelineLink)| abc |123ms [120ms]|\n| | xyz |321ms [130ms]|<!--longRunningValidationTable-->");
     });
-    });
+});
