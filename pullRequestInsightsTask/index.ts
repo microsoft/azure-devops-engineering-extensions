@@ -23,7 +23,7 @@ async function run() {
         data.setDurationPercentile(Number(tl.getInput("longRunningValidationPercentile", false)));
         data.setMimimumValidationDurationMinutes(Number(tl.getInput("longRunningValidationMinimumDuration", false)));
         data.setMimimumValidationRegressionMinutes(Number(tl.getInput("longRunningValidationMinimumRegression", false)));
-        data.setTaskTypesForLongRunningValidations(tl.getInput("taskTypesForLongRunningValidations", true).toLowerCase().split(","));
+        data.setTaskTypesForLongRunningValidations(tl.getInput("longRunningValidationTaskTypes", true).toLowerCase().split(","));
         tl.debug("pipline data: " + JSON.stringify(data));
 
         if (!data.getPullRequestId()) {

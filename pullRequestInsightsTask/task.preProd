@@ -9,16 +9,16 @@
     "version": {
         "Major": 0,
         "Minor": 0,
-        "Patch": 66
+        "Patch": 67
     },
     "instanceNameFormat": "PR Insights",
     "inputs": [
         {
-            "name": "checkStatusLink",
+            "name": "longRunningValidationTaskTypes",
             "type": "string",
-            "label": "Check Status Link",
-            "required": false,
-            "helpMarkDown": "A link that is offered to users when the target branch is unhealthy \n Note: Default link is to definition summary page"
+            "label": "Long Running Validation Task Types",
+            "required": true,
+            "helpMarkDown": "Types of tasks to be potentially considered as long running \n Note: Seperate each type with a comma"
         },
         {
             "name": "longRunningValidationPercentile",
@@ -27,7 +27,7 @@
             "label": "Long Running Validation Percentile",
             "required": false,
             "helpMarkDown": "The duration percentile on the target branch to compare validations with in order to determine if the validations are long running"
-        }, 
+        },
         {
             "name": "longRunningValidationMinimumDuration",
             "type": "number",
@@ -43,13 +43,13 @@
             "label": "Long Running Validation Minimum Regression (in minutes)",
             "required": false,
             "helpMarkDown": "The minimum regression (in minutes) of a validation from the given duration percentile on the target branch for it to be potentially considered long running"
-        },
+        }, 
         {
-            "name": "longRunningValidationTaskTypes",
+            "name": "checkStatusLink",
             "type": "string",
-            "label": "Long Running Validation Task Types",
-            "required": true,
-            "helpMarkDown": "Types of tasks to be potentially considered as long running \n Note: Seperate each type with a comma"
+            "label": "Check Status Link",
+            "required": false,
+            "helpMarkDown": "A link that is offered to users when the target branch is unhealthy \n Note: Default link is to definition summary page"
         }
     ],
     "execution": {
