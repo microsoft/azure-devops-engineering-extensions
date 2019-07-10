@@ -44,12 +44,12 @@
             "required": false,
             "helpMarkDown": "The minimum regression (in minutes) of a validation from the given duration percentile on the target branch for it to be potentially considered long running"
         }, 
-        {
+       {
             "name": "longRunningValidationTaskTypes,
-            "type": "string[]",
+            "type": "string",
             "label": "Long Running Validation Task Types",
             "required": true,
-            "helpMarkDown": "Types of tasks to be potentially considered as long running"
+            "helpMarkDown": "Types of tasks to be potentially considered as long running \n Note: Seperate each type with a comma"
         }
     ],
     "execution": {
