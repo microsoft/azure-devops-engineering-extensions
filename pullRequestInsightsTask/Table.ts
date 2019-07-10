@@ -111,7 +111,7 @@ export class LongRunningValidationsTable extends Table {
                     nextLine = messages.longRunningValidationCommentLowerSectionRow;
                 }
                 let task: AbstractPipelineTask = longRunningValidations[index];
-                section += Table.NEW_LINE + nextLine.format(current.getDefinitionName(), current.getLink(), task.getName(), this.formatTime(task.calculateRegression(thresholdTimes[index]))), this.formatTime(thresholdTimes[index]);
+                section += Table.NEW_LINE + nextLine.format(current.getDefinitionName(), current.getLink(), task.getName(), this.formatTime(task.calculateRegression(thresholdTimes[index])), this.formatTime(thresholdTimes[index]));
             }
             this.addTableData(section);
         }
