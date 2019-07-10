@@ -12,6 +12,7 @@ export class PipelineData {
     private durationPercentile: number;
     private mimimumValidationDuration: number;
     private mimimumValidationRegression: number;
+    private taskTypesForLongRunningValidations: string[];
     
     public setProjectName(projectName: string): void {
         this.projectName = projectName;
@@ -106,6 +107,14 @@ export class PipelineData {
 
     public getMimimumValidationRegressionMinutes(): number {
         return this.mimimumValidationRegression;
+    }
+
+    public setTaskTypesForLongRunningValidations(taskTypesForLongRunningValidations: string[]): void {
+        this.taskTypesForLongRunningValidations = taskTypesForLongRunningValidations;
+    }
+
+    public getTaskTypesForLongRunningValidations(): string[] {
+        return this.taskTypesForLongRunningValidations;
     }
 
 }

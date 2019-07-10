@@ -94,9 +94,7 @@ export class PullRequest {
             tl.debug(commentThread.id + " has service properties: " + this.threadHasServiceProperties(commentThread) + " has comments: " + this.threadHasComments(commentThread) + " has comment with correct author: " + this.commentWasWrittenByService(commentThread.comments[0]));
             if (this.threadIsFromService(commentThread)) {
                 serviceThreads.push(commentThread);
-            }
-            else {
-                tl.debug("the thread: thread id = " + commentThread.id + " is not from service");
+                tl.debug("the thread: thread id = " + commentThread.id + " is from service");
             }
         }
         return serviceThreads;

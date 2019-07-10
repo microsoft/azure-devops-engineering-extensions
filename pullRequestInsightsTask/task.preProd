@@ -9,7 +9,7 @@
     "version": {
         "Major": 0,
         "Minor": 0,
-        "Patch": 62
+        "Patch": 63
     },
     "instanceNameFormat": "PR Insights",
     "inputs": [
@@ -43,6 +43,13 @@
             "label": "Long Running Validation Minimum Regression (in minutes)",
             "required": false,
             "helpMarkDown": "The minimum regression (in minutes) of a validation from the given duration percentile on the target branch for it to be potentially considered long running"
+        },
+        {
+            "name": "longRunningValidationTaskTypes,
+            "type": "string[]",
+            "label": "Long Running Validation Task Types",
+            "required": true,
+            "helpMarkDown": "Types of tasks to be potentially considered as long running"
         }
     ],
     "execution": {

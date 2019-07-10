@@ -39,7 +39,8 @@ export class TaskInsights {
                 targetBranch.setPipelines(await azureApi.getMostRecentPipelinesOfCurrentType(data.getProjectName(), currentPipeline, numberPipelinesToConsiderForLongRunningValidations, targetBranch.getFullName()));
                 for (let task of currentPipeline.getTasks()) {
                     let percentileTime: number = targetBranch.getPercentileTimeForPipelineTask(data.getDurationPercentile(), task);
-                    if (task.isLongRunning(percentileTime, TaskInsights.getMillisecondsFromMinutes(data.getMimimumValidationDurationMinutes()), TaskInsights.getMillisecondsFromMinutes(data.getMimimumValidationRegressionMinutes()))) {
+                    if (task.isLongRunning(percentileTime, TaskInsights.getMillisecondsFromMinutes(data.getMimimumValidationDurationMinutes()), TaskInsights.getMillisecondsFromMinutes(data.getMimimumValidationRegressionMinutes())) && 
+                    data.getTaskTypesForLongRunningValidations().includes(task.getType())) {
                         longRunningValidations.push(task);
                         thresholdTimes.push(percentileTime);
                     }
@@ -66,6 +67,9 @@ export class TaskInsights {
                 }
 
             }
+        }
+        else {
+            tl.debug(data.getHostType() + " is not for most recent source commit");
         }
     }
 

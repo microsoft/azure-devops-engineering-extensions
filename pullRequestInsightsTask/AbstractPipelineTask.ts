@@ -62,6 +62,10 @@ export abstract class AbstractPipelineTask {
         return this.getDuration() - thresholdTime;
     }
 
+    public getType() {
+        return this.type;
+    }
+
     private hasSignificantRegression(thresholdTime: number, minimumRegressionMilliseconds: number): boolean {
         return this.calculateRegression(thresholdTime) > minimumRegressionMilliseconds;
     }
