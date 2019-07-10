@@ -44,8 +44,8 @@
             "required": false,
             "helpMarkDown": "The minimum regression (in minutes) of a validation from the given duration percentile on the target branch for it to be potentially considered long running"
         }, 
-       {
-            "name": "longRunningValidationTaskTypes,
+        {
+            "name": "longRunningValidationTaskTypes",
             "type": "string",
             "label": "Long Running Validation Task Types",
             "required": true,
