@@ -110,9 +110,14 @@ export class LongRunningValidationsTable extends Table {
                 if (index > 0) {
                     nextLine = messages.longRunningValidationCommentLowerSectionRow;
                 }
-                section += Table.NEW_LINE + nextLine.format(current.getDefinitionName(), current.getLink(), longRunningValidations[index].getName(), String(longRunningValidations[index].calculateRegression(thresholdTimes[index])), String(thresholdTimes[index]));
+                let task: AbstractPipelineTask = longRunningValidations[index];
+                section += Table.NEW_LINE + nextLine.format(current.getDefinitionName(), current.getLink(), task.getName(), this.formatTime(task.calculateRegression(thresholdTimes[index]))), this.formatTime(thresholdTimes[index]);
             }
             this.addTableData(section);
         }
+    }
+
+    private formatTime(duration: number): string {
+        return String(Math.round(duration));
     }
 }

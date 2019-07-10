@@ -40,7 +40,7 @@ export class TaskInsights {
                 for (let task of currentPipeline.getTasks()) {
                     let percentileTime: number = targetBranch.getPercentileTimeForPipelineTask(data.getDurationPercentile(), task);
                     if (task.isLongRunning(percentileTime, TaskInsights.getMillisecondsFromMinutes(data.getMimimumValidationDurationMinutes()), TaskInsights.getMillisecondsFromMinutes(data.getMimimumValidationRegressionMinutes())) && 
-                    data.getTaskTypesForLongRunningValidations().includes(task.getType())) {
+                    data.getTaskTypesForLongRunningValidations().includes(task.getType().toLowerCase())) {
                         longRunningValidations.push(task);
                         thresholdTimes.push(percentileTime);
                     }
