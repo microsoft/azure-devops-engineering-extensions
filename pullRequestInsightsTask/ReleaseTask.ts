@@ -1,6 +1,7 @@
 import { AbstractPipelineTask } from "./AbstractPipelineTask";
 import * as azureReleaseInterfaces from "azure-devops-node-api/interfaces/ReleaseInterfaces";
 import tl = require('azure-pipelines-task-lib/task');
+import { ITaskReference } from "./ITaskReference";
 
 
 
@@ -11,9 +12,8 @@ export class ReleaseTask extends AbstractPipelineTask {
     private static readonly FAILED_TASK_STATUSES: azureReleaseInterfaces.TaskStatus[] = [azureReleaseInterfaces.TaskStatus.Failed, azureReleaseInterfaces.TaskStatus.Failure]
 
 
-    constructor(name: string, id: string, startTime: Date, finishTime: Date, status: azureReleaseInterfaces.TaskStatus) {
-        super(name, String(id), startTime, finishTime);
-        tl.debug("release task: " +  name + " " + String(id));
+    constructor(taskReference: ITaskReference, name: string, startTime: Date, finishTime: Date, status: azureReleaseInterfaces.TaskStatus) {
+        super(taskReference, name, startTime, finishTime);
         this.taskStatus = status;
     }
    

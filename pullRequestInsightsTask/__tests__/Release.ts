@@ -34,7 +34,7 @@ describe('Release Tests', () => {
         return {
             status: taskStatus,
             startTime: new Date(),
-            finishTime: new Date()
+            finishTime: new Date(), 
         }
     }
 

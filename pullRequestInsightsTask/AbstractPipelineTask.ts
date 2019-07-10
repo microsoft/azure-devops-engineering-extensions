@@ -1,17 +1,24 @@
 import tl = require('azure-pipelines-task-lib/task');
+import { ITaskReference } from './ITaskReference';
 
 export abstract class AbstractPipelineTask {
 
     private name: string
     private id: string
+    private type: string
     private startTime: Date
     private finishTime: Date
 
-    constructor(name: string, id: string, startTime: Date, finishTime: Date) {
+    constructor(taskReference: ITaskReference, name: string, startTime: Date, finishTime: Date) {
         this.name = name
-        this.id = id;
+        this.id = null;
+        this.type = null;
         this.startTime = startTime;
         this.finishTime = finishTime;
+        if (taskReference) {
+            this.id = taskReference.id;
+            this.type = taskReference.name;
+        }
     }
 
     
@@ -33,7 +40,7 @@ export abstract class AbstractPipelineTask {
 
     public isLongRunning(thresholdTime: number, minimumDurationMiliseconds: number, minimumRegressionMilliseconds: number): boolean {
         let taskLength = this.getDuration();
-        tl.debug("For long running calculation for task: " + this.getName() + " : " + this.getId() + " threshold time = " + thresholdTime + "min duration = " + minimumDurationMiliseconds + " min regression = " + minimumRegressionMilliseconds + " duration = " + taskLength + " regression = " + this.calculateRegression(thresholdTime));
+        tl.debug("For long running calculation for task: " + this.getName() + " : " + this.getId() + " threshold time = " + thresholdTime + " min duration = " + minimumDurationMiliseconds + " min regression = " + minimumRegressionMilliseconds + " duration = " + taskLength + " regression = " + this.calculateRegression(thresholdTime));
         if (thresholdTime && taskLength && this.getDuration() > minimumDurationMiliseconds && this.hasSignificantRegression(thresholdTime, minimumRegressionMilliseconds)) {
             return true;
         }

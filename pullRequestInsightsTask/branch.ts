@@ -77,7 +77,6 @@ export class Branch{
         let times: number[] = this.getAllPipelineTimesForTask(task);
         tl.debug("times on target for " + task.getName() + " = " + times.toString())
         if (times.length > 0) {
-            tl.debug("input for stats library " + percentileToFind / 100);
             return stats.percentile(times, percentileToFind / 100)
         }
         else {

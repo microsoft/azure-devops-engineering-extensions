@@ -1,5 +1,6 @@
 import { AbstractPipelineTask } from "./AbstractPipelineTask";
 import * as azureBuildInterfaces from "azure-devops-node-api/interfaces/BuildInterfaces";
+import { ITaskReference } from "./ITaskReference";
 
 export class BuildTask extends AbstractPipelineTask {
 
@@ -7,8 +8,8 @@ export class BuildTask extends AbstractPipelineTask {
     private result: azureBuildInterfaces.TaskResult;
 
 
-    constructor(name: string, id: string, startTime: Date, finishTime: Date, state: azureBuildInterfaces.TimelineRecordState, result: azureBuildInterfaces.TaskResult) {
-        super(name, id, startTime, finishTime);
+    constructor(taskReference: ITaskReference, name: string, startTime: Date, finishTime: Date, state: azureBuildInterfaces.TimelineRecordState, result: azureBuildInterfaces.TaskResult) {
+        super(taskReference, name, startTime, finishTime);
         this.state = state;
         this.result = result;
     }

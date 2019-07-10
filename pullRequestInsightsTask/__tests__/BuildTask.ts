@@ -15,11 +15,11 @@ describe('BuildTask Tests', () => {
     }
 
     test("Task failed when it has failure status", () => {
-        task = new BuildTask(" ", "", new Date("2019-05-23 01:14:40.00"), new Date("2019-05-24 02:15:55.00"), azureBuildInterfaces.TimelineRecordState.Completed, azureBuildInterfaces.TaskResult.Failed);
+        task = new BuildTask(null, "", new Date("2019-05-23 01:14:40.00"), new Date("2019-05-24 02:15:55.00"), azureBuildInterfaces.TimelineRecordState.Completed, azureBuildInterfaces.TaskResult.Failed);
         expect(task.wasFailure()).toBe(true);
     });
     test("Task did not fail when it does not have failure status", () => {
-        task = new BuildTask(" ", "", new Date("2019-05-23 01:14:40.00"), new Date("2019-05-24 02:15:55.00"), azureBuildInterfaces.TimelineRecordState.Completed, azureBuildInterfaces.TaskResult.Succeeded);
+        task = new BuildTask(null, "", new Date("2019-05-23 01:14:40.00"), new Date("2019-05-24 02:15:55.00"), azureBuildInterfaces.TimelineRecordState.Completed, azureBuildInterfaces.TaskResult.Succeeded);
         expect(task.wasFailure()).toBe(false);
     });
 
@@ -36,32 +36,32 @@ describe('BuildTask Tests', () => {
     });
 
     test("Task is long running when ran took longer than threshold time", () => {
-        task = new BuildTask("abc", "123", null, null, null, null);
+        task = new BuildTask(null, "abc", null, null, null, null);
         setTaskDuration(task, 100);
        expect(task.isLongRunning(90, 1, 1)).toBe(true);
     });
 
     test("Task is not long running when not complete", () => {
-        task = new BuildTask("abc", "123", null, null, null, null);
+        task = new BuildTask(null, "abc", null, null, null, null);
         setTaskDuration(task, 10);
         expect(task.isLongRunning(90, 1, 1)).toBe(false);
     });
 
     test("Task is not long running when no threshold time is given", () => {
-        task = new BuildTask("abc", "123", null, null, null, null);
+        task = new BuildTask(null, "abc", null, null, null, null);
         setTaskDuration(task, 10);
         expect(task.isLongRunning(null, 1, 1)).toBe(false);
     });
 
     
     test("Task is not long running when minimum regression is not reached", () => {
-        task = new BuildTask("abc", "123", null, null, null, null);
+        task = new BuildTask(null, "abc", null, null, null, null);
         setTaskDuration(task, 10);
         expect(task.isLongRunning(9, 1, 2)).toBe(false);
     });
 
     test("Task is not long running when minimum duration is not reached", () => {
-        task = new BuildTask("abc", "123", null, null, null, null);
+        task = new BuildTask(null, "abc", null, null, null, null);
         setTaskDuration(task, 10);
        expect(task.isLongRunning(2, 11, 1)).toBe(false);
     });
@@ -92,28 +92,28 @@ describe('BuildTask Tests', () => {
     });
 
     test("Tasks are equal when they have same id and name", () => {
-       task = new BuildTask("abc", "123", null, null, azureBuildInterfaces.TimelineRecordState.InProgress, null);
-       expect(task.equals(new BuildTask("abc", "123", null, null, azureBuildInterfaces.TimelineRecordState.Completed, null))).toBe(true);
+       task = new BuildTask({id: "123"},"abc", null, null, azureBuildInterfaces.TimelineRecordState.InProgress, null);
+       expect(task.equals(new BuildTask({id: "123"}, "abc", null, null, azureBuildInterfaces.TimelineRecordState.Completed, null))).toBe(true);
     });
 
     test("Tasks are not equal when ids are different", () => {
-        task = new BuildTask("abc", "13", null, null, null, null);
-        expect(task.equals(new BuildTask("abc", "123", null, null, null, null))).toBe(false);
+        task = new BuildTask({id: "13"}, "abc", null, null, null, null);
+        expect(task.equals(new BuildTask({id: "123"}, "abc", null, null, null, null))).toBe(false);
     });
 
     test("Tasks are not equal when names are different", () => {
-        task = new BuildTask("ab", "123", null, null, null, null);
-        expect(task.equals(new BuildTask("abc", "123", null, null, null, null))).toBe(false);
+        task = new BuildTask({id: "123"}, "ab",null, null, null, null);
+        expect(task.equals(new BuildTask({id: "123"}, "abc", null, null, null, null))).toBe(false);
     });
 
     test("Regression is correctly calculated", () => {
-        task = new BuildTask("abc", "123", null, null, null, null);
+        task = new BuildTask(null, "abc", null, null, null, null);
         setTaskDuration(task, 10);
         expect(task.calculateRegression(9)).toBe(1);
     });
 
     test("Regression is negative if task does not have valid duration", () => {
-        task = new BuildTask("abc", "123", null, null, null, null);
+        task = new BuildTask(null, "abc", null, null, null, null);
         setTaskDuration(task, null);
         expect(task.calculateRegression(9)).toBe(-9);
     });
