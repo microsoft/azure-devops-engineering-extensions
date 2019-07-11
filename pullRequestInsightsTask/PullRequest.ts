@@ -29,10 +29,6 @@ export class PullRequest {
         return this.mostRecentSourceCommitId;
     }
 
-    public mostRecentSourceCommitMatchesCurrent(givenSourceCommit: string) {
-        return this.mostRecentSourceCommitId === givenSourceCommit;
-    }
-
     public async addNewComment(apiCaller: AbstractAzureApi, commentContent: string, postStatus: azureGitInterfaces.CommentThreadStatus): Promise<azureGitInterfaces.GitPullRequestCommentThread> {
         let thread: azureGitInterfaces.CommentThread = {comments: new Array({content: commentContent}), status: postStatus};
         thread.properties = {[commentProperties.taskPropertyName]: commentProperties.taskPropertyValue, [commentProperties.iterationPropertyName]: this.mostRecentSourceCommitId};

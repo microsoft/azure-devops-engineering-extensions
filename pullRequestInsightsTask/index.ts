@@ -24,6 +24,7 @@ async function run() {
         data.setMimimumValidationDurationMinutes(Number(tl.getInput("longRunningValidationMinimumDuration", false)));
         data.setMimimumValidationRegressionMinutes(Number(tl.getInput("longRunningValidationMinimumRegression", false)));
         data.setTaskTypesForLongRunningValidations(tl.getInput("longRunningValidationTaskTypes", true).toLowerCase().split(","));
+        data.setStatusLink(tl.getInput("checkStatusLink", false)); 
         tl.debug("pipline data: " + JSON.stringify(data));
 
         if (!data.getPullRequestId()) {
@@ -31,8 +32,8 @@ async function run() {
         }
 
         else {
-            let taskInsights = new TaskInsights();
-            taskInsights.invoke(data);
+            let taskInsights = new TaskInsights(data);
+            taskInsights.invoke();
         }
     }
     catch (err) {

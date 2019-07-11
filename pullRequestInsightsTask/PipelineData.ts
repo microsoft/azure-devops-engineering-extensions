@@ -9,10 +9,12 @@ export class PipelineData {
     private buildId: number
     private releaseId: number
     private currentSourceCommitIteration: string
+    private isLongRunningValidationsEnabled: boolean;
     private durationPercentile: number;
     private mimimumValidationDuration: number;
     private mimimumValidationRegression: number;
     private taskTypesForLongRunningValidations: string[];
+    private statusLink: string;
     
     public setProjectName(projectName: string): void {
         this.projectName = projectName;
@@ -85,6 +87,13 @@ export class PipelineData {
         this.pullRequestId = pullRequestId;
     }
 
+    public isLongRunningValidationFeatureEnabled(): boolean {
+        return this.isLongRunningValidationsEnabled;
+    }
+    public setIsLongRunningValidationFeatureEnabled(isEnabled: boolean) {
+        this.isLongRunningValidationsEnabled = isEnabled;
+    }
+
     public getDurationPercentile(): number {
         return this.durationPercentile;
     }
@@ -115,6 +124,14 @@ export class PipelineData {
 
     public getTaskTypesForLongRunningValidations(): string[] {
         return this.taskTypesForLongRunningValidations;
+    }
+
+    public getStatusLink(): string {
+        return this.statusLink;
+    }
+
+    public setStatusLink(statusLink: string) {
+        this.statusLink = statusLink;
     }
 
 }

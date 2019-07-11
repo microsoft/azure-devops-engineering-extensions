@@ -14,6 +14,14 @@
     "instanceNameFormat": "PR Insights",
     "inputs": [
         {
+            "name": "enableLongRunningValidationAnalysis",
+            "type": "boolean",
+            "defaultValue": "false",
+            "label": "Enable Long Running Validation Analysis",
+            "required": false,
+            "helpMarkDown": "Enabling this option allows PR Insights to post concerning pipeline tasks that regress a configurable amount over a configurable percentile on the target branch"
+        },
+        {
             "name": "longRunningValidationTaskTypes",
             "type": "string",
             "label": "Long Running Validation Task Types",

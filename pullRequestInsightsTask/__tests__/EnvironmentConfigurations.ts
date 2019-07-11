@@ -11,10 +11,10 @@ describe("EnvirnmentConfigurations Tests", () => {
     let configurations: EnvironmentConfigurations;
     let getVariableFake: sinon.SinonStub;
     let mockApi: AbstractAzureApi;
-    
+
     function setUpGetVariableCall(parametersToOutputs: Map<string, string>): void {
         parametersToOutputs.forEach((value: string, key: string) => {
-        getVariableFake.withArgs(key).returns(value);
+            getVariableFake.withArgs(key).returns(value);
         });
         sinon.stub(tl, "getVariable").callsFake(getVariableFake);
     }

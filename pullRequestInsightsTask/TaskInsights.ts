@@ -5,83 +5,116 @@ import { AbstractAzureApi } from "./AbstractAzureApi";
 import { PullRequest } from "./PullRequest";
 import tl = require('azure-pipelines-task-lib/task');
 import * as azureGitInterfaces from "azure-devops-node-api/interfaces/GitInterfaces";
-import { Table } from "./Table";
+import { AbstractTable } from "./AbstractTable";
 import { AbstractPipeline } from "./AbstractPipeline";
 import { AbstractPipelineTask } from "./AbstractPipelineTask";
 import { TableFactory } from "./TableFactory";
 
-
-
-
 export class TaskInsights {
 
-    public async invoke(data: PipelineData): Promise<void> {
+    private static readonly numberPipelinesToConsiderForHealth = 3;
+    private static readonly numberPipelinesToConsiderForLongRunningValidations = 50;
 
-        const numberPipelinesToConsiderForHealth = 3;
-        const numberPipelinesToConsiderForLongRunningValidations = 50;
-       
-        let azureApi = await AzureApiFactory.create(data)
-        let pullRequest: PullRequest = await azureApi.getPullRequest(data.getRepository(), data.getPullRequestId(), data.getProjectName());
+    private data: PipelineData;
+    private azureApi: AbstractAzureApi;
+    private currentPipeline: AbstractPipeline;
+    private targetBranch: Branch;
+    private pullRequest: PullRequest;
+    private longRunningValidations: AbstractPipelineTask[];
+    private thresholdTimes: number[];
+    private table: AbstractTable;
 
-        if (pullRequest.mostRecentSourceCommitMatchesCurrent(data.getCurrentSourceCommitIteration())) {
-            let currentPipeline: AbstractPipeline = await azureApi.getCurrentPipeline(data);
-            tl.debug("target branch of pull request: " + pullRequest.getTargetBranchName());            
-            let targetBranch: Branch = new Branch(pullRequest.getTargetBranchName());
-            targetBranch.setPipelines(await azureApi.getMostRecentPipelinesOfCurrentType(data.getProjectName(), currentPipeline, numberPipelinesToConsiderForHealth, targetBranch.getFullName()));
-            let thresholdTimes: number[] = [];
-            let longRunningValidations: AbstractPipelineTask[] = [];
+    constructor(data: PipelineData) {
+        this.data = data;
+    }
+
+    public async invoke(): Promise<void> {
+
+        this.azureApi = await AzureApiFactory.create(this.data);
+        this.pullRequest = await this.azureApi.getPullRequest(this.data.getRepository(), this.data.getPullRequestId(), this.data.getProjectName());
+
+        if (this.taskIsRunningInMostRecentSourceCommit()) {
+            this.currentPipeline = await this.azureApi.getCurrentPipeline(this.data);
+            tl.debug("target branch of pull request: " + this.pullRequest.getTargetBranchName());            
+            this.targetBranch = new Branch(this.pullRequest.getTargetBranchName());
+            this.targetBranch.setPipelines(await this.azureApi.getMostRecentPipelinesOfCurrentType(this.data.getProjectName(), this.currentPipeline, TaskInsights.numberPipelinesToConsiderForHealth, this.targetBranch.getFullName()));
+    
             let tableType: string = TableFactory.FAILURE;
-            tl.debug("pipeline is a failure?: " + currentPipeline.isFailure());
-            tl.debug("host type: " + data.getHostType())
+            tl.debug("pipeline is a failure?: " + this.currentPipeline.isFailure());
+            tl.debug("host type: " + this.data.getHostType())
 
-            if (!currentPipeline.isFailure()) {
+            if (!this.currentPipeline.isFailure()) {
                 tableType = TableFactory.LONG_RUNNING_VALIDATIONS;
-                targetBranch.setPipelines(await azureApi.getMostRecentPipelinesOfCurrentType(data.getProjectName(), currentPipeline, numberPipelinesToConsiderForLongRunningValidations, targetBranch.getFullName()));
-                for (let task of currentPipeline.getTasks()) {
-                    let percentileTime: number = targetBranch.getPercentileTimeForPipelineTask(data.getDurationPercentile(), task);
-                    if (task.isLongRunning(percentileTime, TaskInsights.getMillisecondsFromMinutes(data.getMimimumValidationDurationMinutes()), TaskInsights.getMillisecondsFromMinutes(data.getMimimumValidationRegressionMinutes())) && 
-                    data.getTaskTypesForLongRunningValidations().includes(task.getType())) {
-                        longRunningValidations.push(task);
-                        thresholdTimes.push(percentileTime);
-                    }
-                }
-                tl.debug("Number of longRunningValidations = " + longRunningValidations.length);
+                this.findAllLongRunningValidations();
             }
 
-            if ((currentPipeline.isFailure() || longRunningValidations.length > 0)) {
-                let serviceThreads: azureGitInterfaces.GitPullRequestCommentThread[] = await pullRequest.getCurrentServiceCommentThreads(azureApi);
-                let currentIterationCommentThread: azureGitInterfaces.GitPullRequestCommentThread = pullRequest.getCurrentIterationCommentThread(serviceThreads);
-                let checkStatusLink: string = await this.getStatusLink(currentPipeline, azureApi, data.getProjectName());
-                tl.debug(`Check status link to use: ${checkStatusLink}`);
-                tl.debug("type of table to create: " + tableType);
-                let table: Table = TableFactory.create(tableType, pullRequest.getCurrentIterationCommentContent(currentIterationCommentThread));
-                tl.debug("comment data: " + table.getCurrentCommentData());
-                table.addHeader(targetBranch.getTruncatedName());
-                table.addSection(currentPipeline, checkStatusLink, targetBranch, numberPipelinesToConsiderForHealth, longRunningValidations, thresholdTimes)
-                if (currentIterationCommentThread) {
-                    pullRequest.editCommentInThread(azureApi, currentIterationCommentThread, currentIterationCommentThread.comments[0].id, table.getCurrentCommentData());
-                }
-                else {
-                    let currentIterationCommentThreadId: number = (await pullRequest.addNewComment(azureApi, table.getCurrentCommentData(), azureGitInterfaces.CommentThreadStatus.Closed)).id;
-                    pullRequest.deleteOldComments(azureApi, serviceThreads, currentIterationCommentThreadId);
-                }
-
+            if (this.shouldPRInsightsCommentOccur()) {
+                this.manageComments(tableType);
             }
         }
         else {
-            tl.debug(data.getHostType() + " is not for most recent source commit");
+            tl.debug(this.data.getHostType() + " is not for most recent source commit");
         }
     }
 
-    private async getStatusLink(currentPipeline: AbstractPipeline, apiCaller: AbstractAzureApi, project: string): Promise<string> {
-        let statusLink: string = tl.getInput("checkStatusLink", false);
-        if (!statusLink) {
-            statusLink = await currentPipeline.getDefinitionLink(apiCaller, project);
+    private taskIsRunningInMostRecentSourceCommit(): boolean {
+        return this.pullRequest.getMostRecentSourceCommitId() === this.data.getCurrentSourceCommitIteration();
+    }
+    
+    private async checkStatusLink(currentStatusLink: string, project: string): Promise<string> {
+        if (!currentStatusLink) {
+            currentStatusLink = await this.currentPipeline.getDefinitionLink(this.azureApi, project);
         }
-        return statusLink;
+        tl.debug(`Check status link to use: ${currentStatusLink}`);
+        return currentStatusLink;
     }
 
-    public static getMillisecondsFromMinutes(minutes: number) {
+    private async findAllLongRunningValidations(): Promise<void> {
+        this.longRunningValidations = [];
+        this.thresholdTimes = [];
+        this.targetBranch.setPipelines(await this.azureApi.getMostRecentPipelinesOfCurrentType(this.data.getProjectName(), this.currentPipeline, TaskInsights.numberPipelinesToConsiderForLongRunningValidations, this.targetBranch.getFullName()));
+        for (let task of this.currentPipeline.getTasks()) {
+            let percentileTime: number = this.targetBranch.getPercentileTimeForPipelineTask(this.data.getDurationPercentile(), task);
+            if (this.shouldTaskBeAddedToLongRunningValidations(task)) {
+                this.longRunningValidations.push(task);
+                this.thresholdTimes.push(percentileTime);
+            }
+        }
+        tl.debug("Number of longRunningValidations = " + this.longRunningValidations.length);
+    }
+    
+    private shouldTaskBeAddedToLongRunningValidations(task: AbstractPipelineTask): boolean {
+        return task.isLongRunning(this.data.getDurationPercentile(), TaskInsights.getMillisecondsFromMinutes(this.data.getMimimumValidationDurationMinutes()), TaskInsights.getMillisecondsFromMinutes(this.data.getMimimumValidationRegressionMinutes())) && 
+        this.data.getTaskTypesForLongRunningValidations().includes(task.getType());
+    }
+
+    private makeTable(tableType: string, checkStatusLink: string, currentIterationCommentThread: azureGitInterfaces.GitPullRequestCommentThread) {
+        tl.debug("type of table to create: " + tableType);
+        let table: AbstractTable = TableFactory.create(tableType, this.pullRequest.getCurrentIterationCommentContent(currentIterationCommentThread));
+        tl.debug("comment data: " + table.getCurrentCommentData());
+        table.addHeader(this.targetBranch.getTruncatedName());
+        table.addSection(this.currentPipeline, checkStatusLink, this.targetBranch, TaskInsights.numberPipelinesToConsiderForHealth, this.longRunningValidations, this.thresholdTimes);
+    }
+
+    private async manageComments(tableType: string): Promise<void> {
+        let serviceThreads: azureGitInterfaces.GitPullRequestCommentThread[] = await this.pullRequest.getCurrentServiceCommentThreads(this.azureApi);
+        let currentIterationCommentThread: azureGitInterfaces.GitPullRequestCommentThread = this.pullRequest.getCurrentIterationCommentThread(serviceThreads);
+        this.makeTable(tableType, await this.checkStatusLink(this.data.getStatusLink(), this.data.getProjectName()), currentIterationCommentThread);
+        if (currentIterationCommentThread) {
+            this.pullRequest.editCommentInThread(this.azureApi, currentIterationCommentThread, currentIterationCommentThread.comments[0].id, this.table.getCurrentCommentData());
+        }
+        else {
+            let currentIterationCommentThreadId: number = (await this.pullRequest.addNewComment(this.azureApi, this.table.getCurrentCommentData(), azureGitInterfaces.CommentThreadStatus.Closed)).id;
+            this.pullRequest.deleteOldComments(this.azureApi, serviceThreads, currentIterationCommentThreadId);
+        }
+    }
+
+    private shouldPRInsightsCommentOccur(): boolean {
+      return this.currentPipeline.isFailure() || (this.longRunningValidations.length > 0 && this.data.isLongRunningValidationFeatureEnabled());
+    }
+
+
+    public static getMillisecondsFromMinutes(minutes: number): number {
         return minutes * 60000;
     }
 }
