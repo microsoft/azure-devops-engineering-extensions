@@ -54,15 +54,17 @@ describe("LongRunningValidationTable Tests", () => {
         longRunTable = new LongRunningValidationsTable(messages.longRunningValidationCommentTableHeading.format("master") + " \n|---|---|---|<!--longRunningValidationTable-->");
         let current: AbstractPipeline = makeFakePipeline("pipeline", "pipelineLink", 7, "defName");
         let recent: AbstractPipeline = makeFakePipeline("otherPipeline", "otherPipelineLink", 7, undefined);
-        longRunTable.addSection(current, "link", makeFakeBranch("branch", recent), 2, [makeFakeTask("abc", 100005, 120)], [0]);
-        expect(longRunTable.getCurrentCommentData()).toBe(messages.longRunningValidationCommentTableHeading.format("master") + " \n|---|---|---|\n|[defName](pipelineLink)| abc |1m 40s 5ms [120ms]|<!--longRunningValidationTable-->")
+        longRunTable.addSection(current, "link", makeFakeBranch("branch", recent), 2, [makeFakeTask("abc", 100005, 1000)], [0]);
+        expect(longRunTable.getCurrentCommentData()).toBe(messages.longRunningValidationCommentTableHeading.format("master") + " \n|---|---|---|\n" + 
+        messages.longRunningValidationCommentFirstSectionRow.format("defName", "pipelineLink", "abc", "1m 40s", "1s") + "<!--longRunningValidationTable-->");
     });
 
     test("Multi task section is added to table with existing data",  () => {
         longRunTable = new LongRunningValidationsTable(messages.longRunningValidationCommentTableHeading.format("master") + "\n|---|---|---|<!--longRunningValidationTable-->");
         let current: AbstractPipeline = makeFakePipeline("pipeline", "pipelineLink", 7, "defName");
         let recent: AbstractPipeline = makeFakePipeline("otherPipeline", "otherPipelineLink", 7, undefined);
-        longRunTable.addSection(current, "link", makeFakeBranch("branch", recent), 2, [makeFakeTask("abc", 123, 120), makeFakeTask("xyz", 321, 130)], [0, 0]);
-        expect(longRunTable.getCurrentCommentData()).toBe(messages.longRunningValidationCommentTableHeading.format("master") + "\n|---|---|---|\n|[defName](pipelineLink)| abc |123ms [120ms]|\n| | xyz |321ms [130ms]|<!--longRunningValidationTable-->");
+        longRunTable.addSection(current, "link", makeFakeBranch("branch", recent), 2, [makeFakeTask("abc", 2000, 1000), makeFakeTask("xyz", 3000, 5000)], [0, 0]);
+        expect(longRunTable.getCurrentCommentData()).toBe(messages.longRunningValidationCommentTableHeading.format("master") + "\n|---|---|---|\n" + messages.longRunningValidationCommentFirstSectionRow.format("defName" ,"pipelineLink", "abc", "2s", "1s") +"\n" +
+        messages.longRunningValidationCommentLowerSectionRow.format("defName", "pipelineLink", "xyz", "3s", "5s") + "<!--longRunningValidationTable-->");
     });
 });

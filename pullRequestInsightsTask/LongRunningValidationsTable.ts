@@ -7,7 +7,7 @@ import { AbstractPipelineTask } from './AbstractPipelineTask.js';
 
 export class LongRunningValidationsTable extends AbstractTable {
     
-    private static readonly TIME_LABELS: Map<() => number, string> = new Map([[Date.prototype.getUTCHours, "h"], [Date.prototype.getUTCMinutes, "m"], [Date.prototype.getUTCSeconds, "s"], [Date.prototype.getUTCMilliseconds, "ms"]]);
+    private static readonly TIME_LABELS: Map<() => number, string> = new Map([[Date.prototype.getUTCHours, "h"], [Date.prototype.getUTCMinutes, "m"], [Date.prototype.getUTCSeconds, "s"]]);
 
     constructor(currentCommentData?: string) {
         super(messages.longRunningValidationCommentTableHeading, messages.longRunningValidationTableEndName, currentCommentData);
@@ -32,7 +32,7 @@ export class LongRunningValidationsTable extends AbstractTable {
 
     private formatTime(duration: number): string {
         let formattedTime: string = "";
-        let date: Date = new Date(Math.round(duration));
+        let date: Date = new Date(this.roundMillisecondsToSeconds(duration));
         LongRunningValidationsTable.TIME_LABELS.forEach((value: string, key: () => number) => {
             if (key.call(date) > 0) {
                 formattedTime += key.call(date) + value + " ";

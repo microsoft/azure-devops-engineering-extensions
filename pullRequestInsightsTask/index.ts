@@ -21,8 +21,8 @@ async function run() {
         data.setTeamUri(environmentConfigurations.getValue(EnvironmentConfigurations.TEAM_FOUNDATION_KEY));
         data.setPullRequestId(environmentConfigurations.getPullRequestId());
         data.setDurationPercentile(Number(tl.getInput("longRunningValidationPercentile", false)));
-        data.setMimimumValidationDurationMinutes(Number(tl.getInput("longRunningValidationMinimumDuration", false)));
-        data.setMimimumValidationRegressionMinutes(Number(tl.getInput("longRunningValidationMinimumRegression", false)));
+        data.setMimimumValidationDurationSeconds(Number(tl.getInput("longRunningValidationMinimumDuration", false)));
+        data.setMimimumValidationRegressionSeconds(Number(tl.getInput("longRunningValidationMinimumRegression", false)));
         data.setTaskTypesForLongRunningValidations(tl.getInput("longRunningValidationTaskTypes", true).toLowerCase().split(","));
         data.setStatusLink(tl.getInput("checkStatusLink", false)); 
         tl.debug("pipline data: " + JSON.stringify(data));

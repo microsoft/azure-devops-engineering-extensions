@@ -12,8 +12,9 @@ import { TableFactory } from "./TableFactory";
 
 export class TaskInsights {
 
-    private static readonly numberPipelinesToConsiderForHealth = 3;
-    private static readonly numberPipelinesToConsiderForLongRunningValidations = 50;
+    private static readonly NUMBER_PIPELINES_FOR_HEALTH = 3;
+    private static readonly NUMBER_PIPELINES_FOR_LONG_RUNNING_VALIDATIONS = 50;
+    private static readonly MINIMUM_SECONDS = 1;
 
     private data: PipelineData;
     private azureApi: AbstractAzureApi;
@@ -37,7 +38,7 @@ export class TaskInsights {
             this.currentPipeline = await this.azureApi.getCurrentPipeline(this.data);
             tl.debug("target branch of pull request: " + this.pullRequest.getTargetBranchName());            
             this.targetBranch = new Branch(this.pullRequest.getTargetBranchName());
-            this.targetBranch.setPipelines(await this.azureApi.getMostRecentPipelinesOfCurrentType(this.data.getProjectName(), this.currentPipeline, TaskInsights.numberPipelinesToConsiderForHealth, this.targetBranch.getFullName()));
+            this.targetBranch.setPipelines(await this.azureApi.getMostRecentPipelinesOfCurrentType(this.data.getProjectName(), this.currentPipeline, TaskInsights.NUMBER_PIPELINES_FOR_HEALTH, this.targetBranch.getFullName()));
     
             let tableType: string = TableFactory.FAILURE;
             tl.debug("pipeline is a failure?: " + this.currentPipeline.isFailure());
@@ -72,7 +73,7 @@ export class TaskInsights {
     private async findAllLongRunningValidations(): Promise<void> {
         this.longRunningValidations = [];
         this.thresholdTimes = [];
-        this.targetBranch.setPipelines(await this.azureApi.getMostRecentPipelinesOfCurrentType(this.data.getProjectName(), this.currentPipeline, TaskInsights.numberPipelinesToConsiderForLongRunningValidations, this.targetBranch.getFullName()));
+        this.targetBranch.setPipelines(await this.azureApi.getMostRecentPipelinesOfCurrentType(this.data.getProjectName(), this.currentPipeline, TaskInsights.NUMBER_PIPELINES_FOR_LONG_RUNNING_VALIDATIONS, this.targetBranch.getFullName()));
         for (let task of this.currentPipeline.getTasks()) {
             let percentileTime: number = this.targetBranch.getPercentileTimeForPipelineTask(this.data.getDurationPercentile(), task);
             if (this.shouldTaskBeAddedToLongRunningValidations(task)) {
@@ -84,16 +85,16 @@ export class TaskInsights {
     }
     
     private shouldTaskBeAddedToLongRunningValidations(task: AbstractPipelineTask): boolean {
-        return task.isLongRunning(this.data.getDurationPercentile(), TaskInsights.getMillisecondsFromMinutes(this.data.getMimimumValidationDurationMinutes()), TaskInsights.getMillisecondsFromMinutes(this.data.getMimimumValidationRegressionMinutes())) && 
+        return task.isLongRunning(this.data.getDurationPercentile(), TaskInsights.getMillisecondsFromSeconds(this.data.getMimimumValidationDurationSeconds()), TaskInsights.getMillisecondsFromSeconds(this.data.getMimimumValidationRegressionSeconds())) && 
         this.data.getTaskTypesForLongRunningValidations().includes(task.getType());
     }
 
     private makeTable(tableType: string, checkStatusLink: string, currentIterationCommentThread: azureGitInterfaces.GitPullRequestCommentThread) {
         tl.debug("type of table to create: " + tableType);
-        let table: AbstractTable = TableFactory.create(tableType, this.pullRequest.getCurrentIterationCommentContent(currentIterationCommentThread));
-        tl.debug("comment data: " + table.getCurrentCommentData());
-        table.addHeader(this.targetBranch.getTruncatedName());
-        table.addSection(this.currentPipeline, checkStatusLink, this.targetBranch, TaskInsights.numberPipelinesToConsiderForHealth, this.longRunningValidations, this.thresholdTimes);
+        this.table = TableFactory.create(tableType, this.pullRequest.getCurrentIterationCommentContent(currentIterationCommentThread));
+        tl.debug("comment data: " + this.table.getCurrentCommentData());
+        this.table.addHeader(this.targetBranch.getTruncatedName());
+        this.table.addSection(this.currentPipeline, checkStatusLink, this.targetBranch, TaskInsights.NUMBER_PIPELINES_FOR_HEALTH, this.longRunningValidations, this.thresholdTimes);
     }
 
     private async manageComments(tableType: string): Promise<void> {
@@ -113,8 +114,10 @@ export class TaskInsights {
       return this.currentPipeline.isFailure() || (this.longRunningValidations.length > 0 && this.data.isLongRunningValidationFeatureEnabled());
     }
 
-
-    public static getMillisecondsFromMinutes(minutes: number): number {
-        return minutes * 60000;
+    public static getMillisecondsFromSeconds(seconds: number): number {
+        if (seconds < this.MINIMUM_SECONDS) {
+            seconds = this.MINIMUM_SECONDS;
+        }
+        return seconds * 1000;
     }
 }

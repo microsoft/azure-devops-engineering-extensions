@@ -102,19 +102,19 @@ export class PipelineData {
         this.durationPercentile = durationPercentile;
     }
 
-    public getMimimumValidationDurationMinutes(): number {
+    public getMimimumValidationDurationSeconds(): number {
         return this.mimimumValidationDuration;
     }
 
-    public setMimimumValidationDurationMinutes(mimimumValidationDuration: number): void {
+    public setMimimumValidationDurationSeconds(mimimumValidationDuration: number): void {
         this.mimimumValidationDuration = mimimumValidationDuration;
     }
 
-    public setMimimumValidationRegressionMinutes(mimimumValidationRegression: number): void {
+    public setMimimumValidationRegressionSeconds(mimimumValidationRegression: number): void {
         this.mimimumValidationRegression = mimimumValidationRegression;
     }
 
-    public getMimimumValidationRegressionMinutes(): number {
+    public getMimimumValidationRegressionSeconds(): number {
         return this.mimimumValidationRegression;
     }
 

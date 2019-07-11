@@ -9,7 +9,7 @@
     "version": {
         "Major": 0,
         "Minor": 0,
-        "Patch": 67
+        "Patch": 68
     },
     "instanceNameFormat": "PR Insights",
     "inputs": [
@@ -39,18 +39,16 @@
         {
             "name": "longRunningValidationMinimumDuration",
             "type": "number",
-            "defaultValue": .5,
-            "label": "Long Running Validation Minimum Duration (in minutes)",
-            "required": false,
-            "helpMarkDown": "The minimum duration (in minutes) of a validation for it to be potentially considered long running"
+            "label": "Long Running Validation Minimum Duration (in seconds)",
+            "required": true,
+            "helpMarkDown": "The minimum duration (in seconds) of a validation for it to be potentially considered long running \n Note: Minimum is 1 second"
         },
         {
             "name": "longRunningValidationMinimumRegression",
             "type": "number",
-            "defaultValue": .5,
-            "label": "Long Running Validation Minimum Regression (in minutes)",
-            "required": false,
-            "helpMarkDown": "The minimum regression (in minutes) of a validation from the given duration percentile on the target branch for it to be potentially considered long running"
+            "label": "Long Running Validation Minimum Regression (in seconds)",
+            "required": true,
+            "helpMarkDown": "The minimum regression (in seconds) of a validation from the given duration percentile on the target branch for it to be potentially considered long running \n Note: Minimum is 1 second"
         }, 
         {
             "name": "checkStatusLink",

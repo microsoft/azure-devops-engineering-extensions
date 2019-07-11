@@ -15,8 +15,8 @@ function runInvokeTaskTest() {
     data.setTeamUri("https://vscsepsteam.visualstudio.com/");
     data.setPullRequestId(10);
     data.setDurationPercentile(1);
-    data.setMimimumValidationDurationMinutes(0);
-    data.setMimimumValidationRegressionMinutes(0);
+    data.setMimimumValidationDurationSeconds(0);
+    data.setMimimumValidationRegressionSeconds(0);
     data.setTaskTypesForLongRunningValidations(["powershell"]);
     data.setIsLongRunningValidationFeatureEnabled(true);
     tl.debug(JSON.stringify(data));

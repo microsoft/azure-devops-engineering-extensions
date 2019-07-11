@@ -162,7 +162,7 @@ describe("PullRequest Tests", () => {
         expect(pullRequest.getCurrentIterationCommentThread(threads)).toBeNull();
     });
 
-    test.skip("No comment thread is found when comment thread first comment is not authored by service", () => { // check currently disabled
+    test.skip("No comment thread is found when comment thread first comment is not authored by service", () => { // author check currently disabled
         let threads: azureGitInterfaces.GitPullRequestCommentThread[] = [makeThread([makeComment("", "me")], makeRetrievedProperties("11"), 2, active), makeThread([makeComment("", desiredAuthor)], makeRetrievedProperties("111"), 112, active)];
         expect(pullRequest.getCurrentIterationCommentThread(threads)).toBeNull();
     });

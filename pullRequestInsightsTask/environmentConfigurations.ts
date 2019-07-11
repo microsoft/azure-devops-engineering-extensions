@@ -1,20 +1,20 @@
 import tl = require('azure-pipelines-task-lib/task');
 
 export class EnvironmentConfigurations{
-    public static readonly TEAM_FOUNDATION_KEY = "SYSTEM_TEAMFOUNDATIONCOLLECTIONURI";
-    public static readonly VSS_CONNECTION_KEY = "SYSTEMVSSCONNECTION";
-    public static readonly ACCESS_PARAMETER = "ACCESSTOKEN";
-    public static readonly REPOSITORY_KEY = "BUILD_REPOSITORY_NAME";
-    public static readonly PULL_REQUEST_ID_KEYS = ["SYSTEM_PULLREQUEST_PULLREQUESTID", "BUILD_PULLREQUEST_ID"];
-    public static readonly PROJECT_KEY = "SYSTEM_TEAMPROJECT";
-    public static readonly BUILD_ID_KEY = "BUILD_BUILDID";
-    public static readonly BUILD_NUMBER_KEY = "BUILD_BUILDNUMBER";
-    public static readonly SOURCE_COMMIT_ITERATION_KEY = "BUILD_SOURCEVERSION";
-    public static readonly RELEASE_ID_KEY = "RELEASE_RELEASEID";
-    public static readonly HOST_KEY = "SYSTEM_HOSTTYPE";
-    public static readonly BUILD_SOURCE_BRANCH_KEY = "BUILD_SOURCEBRANCH"; 
-    public static readonly PULL_KEY = "pull";
-    public static readonly SEPERATOR = "/";
+    public static readonly TEAM_FOUNDATION_KEY: string = "SYSTEM_TEAMFOUNDATIONCOLLECTIONURI";
+    public static readonly VSS_CONNECTION_KEY: string = "SYSTEMVSSCONNECTION";
+    public static readonly ACCESS_PARAMETER: string = "ACCESSTOKEN";
+    public static readonly REPOSITORY_KEY: string = "BUILD_REPOSITORY_NAME";
+    public static readonly PULL_REQUEST_ID_KEYS: string[] = ["SYSTEM_PULLREQUEST_PULLREQUESTID", "BUILD_PULLREQUEST_ID"];
+    public static readonly PROJECT_KEY: string = "SYSTEM_TEAMPROJECT";
+    public static readonly BUILD_ID_KEY: string = "BUILD_BUILDID";
+    public static readonly BUILD_NUMBER_KEY: string = "BUILD_BUILDNUMBER";
+    public static readonly SOURCE_COMMIT_ITERATION_KEY: string = "BUILD_SOURCEVERSION";
+    public static readonly RELEASE_ID_KEY: string = "RELEASE_RELEASEID";
+    public static readonly HOST_KEY: string = "SYSTEM_HOSTTYPE";
+    public static readonly BUILD_SOURCE_BRANCH_KEY: string = "BUILD_SOURCEBRANCH"; 
+    public static readonly PULL_KEY: string = "pull";
+    public static readonly SEPERATOR: string = "/";
 
 
     public getValue(key: string) {
