@@ -20,6 +20,7 @@ async function run() {
         data.setRepository(environmentConfigurations.getValue(EnvironmentConfigurations.REPOSITORY_KEY));
         data.setTeamUri(environmentConfigurations.getValue(EnvironmentConfigurations.TEAM_FOUNDATION_KEY));
         data.setPullRequestId(environmentConfigurations.getPullRequestId());
+        data.setIsLongRunningValidationFeatureEnabled(tl.getBoolInput("enableLongRunningValidationAnalysis", false));
         data.setDurationPercentile(Number(tl.getInput("longRunningValidationPercentile", false)));
         data.setMimimumValidationDurationSeconds(Number(tl.getInput("longRunningValidationMinimumDuration", false)));
         data.setMimimumValidationRegressionSeconds(Number(tl.getInput("longRunningValidationMinimumRegression", false)));

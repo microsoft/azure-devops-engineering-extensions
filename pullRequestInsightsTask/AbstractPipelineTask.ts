@@ -40,7 +40,7 @@ export abstract class AbstractPipelineTask {
 
     public isLongRunning(thresholdTime: number, minimumDurationMiliseconds: number, minimumRegressionMilliseconds: number): boolean {
         let taskLength = this.getDuration();
-        tl.debug("For long running calculation for task: " + this.getName() + " : " + this.getId() + " threshold time = " + thresholdTime + " min duration = " + minimumDurationMiliseconds + " min regression = " + minimumRegressionMilliseconds + " duration = " + taskLength + " regression = " + this.calculateRegression(thresholdTime));
+        tl.debug("For long running calculation for task: " + this.getName() + " : " + this.getId() + " threshold time = " + thresholdTime + " minDuration = " + minimumDurationMiliseconds + " minRegression = " + minimumRegressionMilliseconds + " duration = " + taskLength + " regression = " + this.calculateRegression(thresholdTime));
         if (thresholdTime && taskLength && this.getDuration() > minimumDurationMiliseconds && this.hasSignificantRegression(thresholdTime, minimumRegressionMilliseconds)) {
             return true;
         }
@@ -72,7 +72,6 @@ export abstract class AbstractPipelineTask {
     private hasSignificantRegression(thresholdTime: number, minimumRegressionMilliseconds: number): boolean {
         return this.calculateRegression(thresholdTime) > minimumRegressionMilliseconds;
     }
-
 
     private getTimeFromDate(date: Date) {
         if (date) {

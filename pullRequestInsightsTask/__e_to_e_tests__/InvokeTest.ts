@@ -6,11 +6,11 @@ import tl = require('azure-pipelines-task-lib/task');
 function runInvokeTaskTest() {
     let data: PipelineData = new PipelineData();
     data.setAccessKey("**");
-    data.setCurrentSourceCommitIteration("cc5f61a8519633374544e483eaed85aa7f37ae33");
+    data.setCurrentSourceCommitIteration("e18f81f64c08bf4214d596816f5bf47f46ea8c20");
     data.setHostType("build");
     data.setProjectName("myepsteam");
     data.setReleaseId(469);
-    data.setBuildId(848);
+    data.setBuildId(887);
     data.setRepository("myepsteam");
     data.setTeamUri("https://vscsepsteam.visualstudio.com/");
     data.setPullRequestId(10);

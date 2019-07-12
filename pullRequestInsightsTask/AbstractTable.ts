@@ -28,11 +28,11 @@ export abstract class AbstractTable {
 
     public addHeader(target: string): void {
         if (!this.tableHasData()) {
-            this.addTableDataToCurrentComment(this.headerFormat.format(target));
+            this.addTextToTableInComment(this.headerFormat.format(target));
             let numberColumns: number = this.getNumberColumns(this.currentCommentData);
-            this.addTableDataToCurrentComment(AbstractTable.NEW_LINE + AbstractTable.COLUMN_DIVIDER);
+            this.addTextToTableInComment(AbstractTable.NEW_LINE + AbstractTable.COLUMN_DIVIDER);
             for (let i = 0; i < numberColumns; i++) {
-                this.addTableDataToCurrentComment(AbstractTable.HEADER_SYMBOL + AbstractTable.COLUMN_DIVIDER);
+                this.addTextToTableInComment(AbstractTable.HEADER_SYMBOL + AbstractTable.COLUMN_DIVIDER);
             }
         }
     }
@@ -47,7 +47,7 @@ export abstract class AbstractTable {
         return this.currentCommentData.indexOf(this.tableEndLine) >= 0;
     }
 
-    protected addTableDataToCurrentComment(data: string): void {
+    protected addTextToTableInComment(data: string): void {
         if (this.tableHasData()) {
             this.currentCommentData = this.currentCommentData.replace(this.tableEndLine, data + this.tableEndLine);
         }

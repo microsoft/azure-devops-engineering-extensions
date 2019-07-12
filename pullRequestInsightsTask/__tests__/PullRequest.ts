@@ -82,14 +82,14 @@ describe("PullRequest Tests", () => {
 
     test("Calls to create new thread when adding comment", () => {
         let callback: jest.SpyInstance = jest.spyOn(mockApi, "postNewCommentThread");
-        pullRequest.addNewComment(mockApi, "", closed);
+        pullRequest.postNewThread(mockApi, "", closed);
         expect(callback).toBeCalled();
     });
 
     test("Calls to create thread with correct properties when adding comment", async () => {
         let callback: jest.SpyInstance = jest.spyOn(mockApi, "postNewCommentThread");
         let expectedThread: azureGitInterfaces.GitPullRequestCommentThread = makeThread([makeComment("")], makeSentProperties("11"), undefined, closed);
-        pullRequest.addNewComment(mockApi, "", closed);
+        pullRequest.postNewThread(mockApi, "", closed);
         expect(callback).toBeCalledWith(expectedThread, 2, "repo", "project");
 
     });
@@ -120,51 +120,30 @@ describe("PullRequest Tests", () => {
         }
     });
 
-    test("Calls to edit only correct comment in correct thread", async () => {
-        let callback: jest.SpyInstance = jest.spyOn(mockApi, "updateComment");
-        let thread: azureGitInterfaces.GitPullRequestCommentThread = makeThread([makeComment("hello", "", 2), makeComment("hi", "", 1)], undefined, 5);
-        pullRequest.editCommentInThread(mockApi, thread, 2, "hellogoodbye");
-        expect(callback).toHaveBeenCalledTimes(1);
-        expect(callback).toBeCalledWith({ content: "hellogoodbye" }, 2, "repo", "project", 5, 2);
-    });
-
-    test("Does not edit any other comments in thread if thread is empty", async () => {
-        let callback: jest.SpyInstance = jest.spyOn(mockApi, "updateComment");
-        let thread: azureGitInterfaces.GitPullRequestCommentThread = makeThread([], undefined, 5);
-        pullRequest.editCommentInThread(mockApi, thread, 1, "goodbye");
-        expect(callback).toHaveBeenCalledTimes(0);
-    });
-
-
-    test("Correct comment thread is found for iteration", () => {
+    test("Comment thread is found for iteration", () => {
         let expectedThread: azureGitInterfaces.GitPullRequestCommentThread = makeThread([makeComment("", desiredAuthor)], makeRetrievedProperties("11"), 12, closed);
         let threads: azureGitInterfaces.GitPullRequestCommentThread[] = [makeThread([makeComment("", desiredAuthor)], makeRetrievedProperties("1"), 2, active), expectedThread, makeThread([makeComment("", desiredAuthor)], makeRetrievedProperties("111"), 112, active)];
-        expect(pullRequest.getCurrentIterationCommentThread(threads)).toBe(expectedThread);
+        expect(pullRequest.hasServiceThreadForExistingIteration(threads)).toBe(true);
     });
 
     test("No comment thread is found when build iteration is not present", () => {
         let threads: azureGitInterfaces.GitPullRequestCommentThread[] = [makeThread([makeComment("", desiredAuthor)], makeRetrievedProperties("1"), 2, active), makeThread([makeComment("", desiredAuthor)], makeRetrievedProperties("111"), 112, active)];
-        expect(pullRequest.getCurrentIterationCommentThread(threads)).toBeNull();
+        expect(pullRequest.hasServiceThreadForExistingIteration(threads)).toBe(false);
     });
 
     test("No comment thread is found when comment thread is missing properties", () => {
         let threads: azureGitInterfaces.GitPullRequestCommentThread[] = [makeThread([makeComment("", desiredAuthor)], 2, active), makeThread([makeComment("", desiredAuthor)], makeRetrievedProperties("111"), 112, active)];
-        expect(pullRequest.getCurrentIterationCommentThread(threads)).toBeNull();
+        expect(pullRequest.hasServiceThreadForExistingIteration(threads)).toBe(false);
     });
 
     test("No comment thread is found when comment thread has iteration but is missing other properties data", () => {
         let threads: azureGitInterfaces.GitPullRequestCommentThread[] = [makeThread([makeComment("", desiredAuthor)], {iterationPropertyName: "11"}, 2, active), makeThread([makeComment("", desiredAuthor)], makeRetrievedProperties("151"), 112, active)];
-        expect(pullRequest.getCurrentIterationCommentThread(threads)).toBeNull();
+        expect(pullRequest.hasServiceThreadForExistingIteration(threads)).toBe(false);
     });
 
     test("No comment thread is found when comment thread does not have comments", () => {
         let threads: azureGitInterfaces.GitPullRequestCommentThread[] = [makeThread([], makeRetrievedProperties("11"), 2, active), makeThread([makeComment("", desiredAuthor)], makeRetrievedProperties("111"), 112, active)];
-        expect(pullRequest.getCurrentIterationCommentThread(threads)).toBeNull();
-    });
-
-    test.skip("No comment thread is found when comment thread first comment is not authored by service", () => { // author check currently disabled
-        let threads: azureGitInterfaces.GitPullRequestCommentThread[] = [makeThread([makeComment("", "me")], makeRetrievedProperties("11"), 2, active), makeThread([makeComment("", desiredAuthor)], makeRetrievedProperties("111"), 112, active)];
-        expect(pullRequest.getCurrentIterationCommentThread(threads)).toBeNull();
+        expect(pullRequest.hasServiceThreadForExistingIteration(threads)).toBe(false);
     });
 
     test("All comment threads are found as service comments when all match criteria", async () => {

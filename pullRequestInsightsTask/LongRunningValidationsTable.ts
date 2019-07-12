@@ -26,7 +26,7 @@ export class LongRunningValidationsTable extends AbstractTable {
                 tl.debug(task.getName() + " has duration of " + task.getDuration() + " ms and regression is " + task.calculateRegression(thresholdTimes[index]) + " ms based on threshold time of " + thresholdTimes[index] + " ms");
                 section += AbstractTable.NEW_LINE + nextLine.format(current.getDefinitionName(), current.getLink(), task.getName(), this.formatTime(task.getDuration()), this.formatTime(task.calculateRegression(thresholdTimes[index])));
             }
-            this.addTableDataToCurrentComment(section);
+            this.addTextToTableInComment(section);
         }
     }
 

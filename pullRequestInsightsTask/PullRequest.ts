@@ -3,6 +3,7 @@ import messages from "./user_messages.json";
 import { AbstractAzureApi } from "./AbstractAzureApi.js";
 import tl = require('azure-pipelines-task-lib/task');
 import commentProperties from "./service_comment_properties.json";
+import { ServiceComment } from "./ServiceComment.js";
 
 
 export class PullRequest {
@@ -29,11 +30,15 @@ export class PullRequest {
         return this.mostRecentSourceCommitId;
     }
 
-    public async addNewComment(apiCaller: AbstractAzureApi, commentContent: string, postStatus: azureGitInterfaces.CommentThreadStatus): Promise<azureGitInterfaces.GitPullRequestCommentThread> {
-        let thread: azureGitInterfaces.CommentThread = {comments: new Array({content: commentContent}), status: postStatus};
+    public async postNewThread(apiCaller: AbstractAzureApi, commentContent: string, postStatus: azureGitInterfaces.CommentThreadStatus): Promise<azureGitInterfaces.GitPullRequestCommentThread> {
+        let thread: azureGitInterfaces.CommentThread = {comments: [{content: commentContent}], status: postStatus};
         thread.properties = {[commentProperties.taskPropertyName]: commentProperties.taskPropertyValue, [commentProperties.iterationPropertyName]: this.mostRecentSourceCommitId};
         tl.debug(messages.commentCompletedMessage);
         return apiCaller.postNewCommentThread(thread, this.id, this.repository, this.projectName);
+    }
+
+    public async editServiceComment(apiCaller: AbstractAzureApi, serviceComment: ServiceComment): Promise<void> {
+        await apiCaller.updateComment({ content: serviceComment.getContent() }, this.id, this.repository, this.projectName, serviceComment.getParentThreadId(), serviceComment.getId());
     }
 
     public async deactivateOldComments(apiCaller: AbstractAzureApi, serviceComments: azureGitInterfaces.GitPullRequestCommentThread[], currentIterationCommentId: number): Promise<void> {
@@ -53,19 +58,11 @@ export class PullRequest {
         }
     }
 
-    public editCommentInThread(apiCaller: AbstractAzureApi, thread: azureGitInterfaces.GitPullRequestCommentThread, commentId: number, newContent: string): void {
-        for (let comment of thread.comments) {
-            if (comment.id === commentId) {
-                let updatedContent: string = newContent;
-                tl.debug("comment to be updated: thread id = " + thread.id + ", comment id = " + comment.id);
-                tl.debug("updated content: " + updatedContent);
-                apiCaller.updateComment({ content: updatedContent }, this.id, this.repository, this.projectName, thread.id, comment.id);
-                break;
-            }
-        }
+    public hasServiceThreadForExistingIteration(threads: azureGitInterfaces.GitPullRequestCommentThread[]): boolean {
+        return this.getCurrentIterationCommentThread(threads) != null;
     }
 
-    public getCurrentIterationCommentThread(threads: azureGitInterfaces.GitPullRequestCommentThread[]): azureGitInterfaces.GitPullRequestCommentThread | null {
+    private getCurrentIterationCommentThread(threads: azureGitInterfaces.GitPullRequestCommentThread[]): azureGitInterfaces.GitPullRequestCommentThread | null {
         for (let commentThread of threads) {
             if (this.threadIsFromService(commentThread) && this.getIterationFromServiceCommentThread(commentThread) === this.mostRecentSourceCommitId) {
                 tl.debug("comment thread id of thread of current source commit " + this.mostRecentSourceCommitId + ": thread id = " + commentThread.id);
@@ -76,18 +73,19 @@ export class PullRequest {
         return null;
     }
 
-    public getCurrentIterationCommentContent(currentIterationCommentThread: azureGitInterfaces.GitPullRequestCommentThread): string {
+    public makeCurrentIterationComment(threads: azureGitInterfaces.GitPullRequestCommentThread[]): ServiceComment {
+        let currentIterationCommentThread: azureGitInterfaces.GitPullRequestCommentThread = this.getCurrentIterationCommentThread(threads);
         if (currentIterationCommentThread && currentIterationCommentThread.comments && currentIterationCommentThread.comments[0]) {
-            return currentIterationCommentThread.comments[0].content;
+            return new ServiceComment(currentIterationCommentThread.comments[0], currentIterationCommentThread.id);
         }
-        return null;
+        return new ServiceComment();
     }
 
     public async getCurrentServiceCommentThreads(apiCaller: AbstractAzureApi) {
         let commentThreads: azureGitInterfaces.GitPullRequestCommentThread[] = await apiCaller.getCommentThreads(this.id, this.repository, this.projectName);
         let serviceThreads: azureGitInterfaces.GitPullRequestCommentThread[] = [];
         for (let commentThread of commentThreads) {
-            tl.debug(commentThread.id + " has service properties: " + this.threadHasServiceProperties(commentThread) + " has comments: " + this.threadHasComments(commentThread) + " has comment with correct author: " + this.commentWasWrittenByService(commentThread.comments[0]));
+            tl.debug(commentThread.id + " has service properties: " + this.threadHasServiceProperties(commentThread) + " has comments: " + this.threadHasComments(commentThread));
             if (this.threadIsFromService(commentThread)) {
                 serviceThreads.push(commentThread);
                 tl.debug("the thread: thread id = " + commentThread.id + " is from service");
@@ -116,10 +114,6 @@ export class PullRequest {
 
     private threadHasServiceProperties(thread: azureGitInterfaces.GitPullRequestCommentThread): boolean {
         return thread.properties && thread.properties[commentProperties.taskPropertyName] && thread.properties[commentProperties.taskPropertyName].$value === commentProperties.taskPropertyValue && thread.properties[commentProperties.iterationPropertyName];
-    }
-
-    private commentWasWrittenByService(comment: azureGitInterfaces.Comment): boolean {
-        return comment.author.displayName === commentProperties.author;
     }
 
     private threadHasComments(thread: azureGitInterfaces.GitPullRequestCommentThread): boolean {

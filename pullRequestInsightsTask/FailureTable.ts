@@ -18,7 +18,7 @@ export class FailureTable extends AbstractTable {
                 if (target.isHealthy(numberPipelinesToConsiderForHealth)) {
                     messageString = messages.successCommentRow;
                 }
-            this.addTableDataToCurrentComment(AbstractTable.NEW_LINE + messageString.format(current.getDefinitionName(), current.getLink(), target.getTruncatedName(), currentDefinitionLink));
+            this.addTextToTableInComment(AbstractTable.NEW_LINE + messageString.format(current.getDefinitionName(), current.getLink(), target.getTruncatedName(), currentDefinitionLink));
             }
         }
     }

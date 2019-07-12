@@ -2,7 +2,6 @@ import tl = require('azure-pipelines-task-lib/task');
 import * as azureGitInterfaces from "azure-devops-node-api/interfaces/GitInterfaces";
 import { WebApi, getPersonalAccessTokenHandler } from 'azure-devops-node-api/WebApi';
 import { AbstractPipeline } from "./AbstractPipeline";
-import { EnvironmentConfigurations } from './EnvironmentConfigurations';
 import { PullRequest } from './PullRequest';
 import { PipelineData } from './PipelineData';
 

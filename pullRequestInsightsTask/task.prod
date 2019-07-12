@@ -9,7 +9,7 @@
     "version": {
         "Major": 0,
         "Minor": 0,
-        "Patch": 68
+        "Patch": 70
     },
     "instanceNameFormat": "PR Insights",
     "inputs": [
@@ -19,7 +19,7 @@
             "defaultValue": "false",
             "label": "Enable Long Running Validation Analysis",
             "required": false,
-            "helpMarkDown": "Enabling this option allows PR Insights to post concerning pipeline tasks that regress a configurable amount over a configurable percentile on the target branch"
+            "helpMarkDown": "Enabling this option allows PR Insights to post information on pipeline tasks that regress a configurable amount over a configurable percentile on the target branch"
         },
         {
             "name": "longRunningValidationTaskTypes",
