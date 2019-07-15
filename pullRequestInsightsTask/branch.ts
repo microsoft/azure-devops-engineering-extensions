@@ -2,9 +2,6 @@ import { AbstractPipeline } from "./AbstractPipeline";
 import tl = require('azure-pipelines-task-lib/task');
 import stats from "stats-lite";
 import { AbstractPipelineTask } from "./AbstractPipelineTask";
-import { AbstractAzureApi } from "./AbstractAzureApi";
-
- 
 
 export class Branch{
 
@@ -25,11 +22,22 @@ export class Branch{
         tl.debug("Number of retrieved pipelines for "  + this.name + " = " + this.pipelines.length);
     }
 
-    public isHealthy(pastPipelinesToConsider: number): boolean {
+    public isHealthy(numberPipelinesToConsider: number): boolean {
+        let pipelinesToConsider: AbstractPipeline[] = [];
         if (this.pipelines) {
-            pastPipelinesToConsider = Math.min(this.pipelines.length, pastPipelinesToConsider);
-            for (let numberPipeline = 0; numberPipeline < pastPipelinesToConsider; numberPipeline++) {
-                if (this.pipelines[numberPipeline].isFailure()) {
+            for (let pipeline of this.pipelines) {
+                if (pipeline.isComplete()) {
+                    pipelinesToConsider.push(pipeline);
+            }
+            else {
+                tl.debug("not considering the health of " + pipeline.getDisplayName() + " because it is not complete");
+            }
+        }
+            numberPipelinesToConsider = Math.min(pipelinesToConsider.length, numberPipelinesToConsider);
+            for (let numberPipeline = 0; numberPipeline < numberPipelinesToConsider; numberPipeline++) {
+                tl.debug("considering pipeline " + pipelinesToConsider[numberPipeline].getDisplayName());
+                tl.debug(pipelinesToConsider[numberPipeline].getDisplayName() + " is a failure? " + pipelinesToConsider[numberPipeline].isFailure());
+                if (pipelinesToConsider[numberPipeline].isFailure()) {
                     return false;
                 }
             }
@@ -88,8 +96,9 @@ export class Branch{
     private getAllPipelineTimesForTask(task: AbstractPipelineTask): number[] {
         let times: number[] = [];
         for (let pipeline of this.pipelines) {
-            if (pipeline.getTask(task)) {
-                times.push(pipeline.getTask(task).getDuration());
+            let taskOnPipeline = pipeline.getTask(task);
+            if (taskOnPipeline && taskOnPipeline.getDuration()) {
+                times.push(taskOnPipeline.getDuration());
             }
         }
         return times;
