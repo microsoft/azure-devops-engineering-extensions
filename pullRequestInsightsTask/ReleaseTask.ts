@@ -12,17 +12,17 @@ export class ReleaseTask extends AbstractPipelineTask {
     private static readonly FAILED_TASK_STATUSES: azureReleaseInterfaces.TaskStatus[] = [azureReleaseInterfaces.TaskStatus.Failed, azureReleaseInterfaces.TaskStatus.Failure]
 
 
-    constructor(taskReference: ITaskReference, name: string, startTime: Date, finishTime: Date, status: azureReleaseInterfaces.TaskStatus) {
-        super(taskReference, name, startTime, finishTime);
+    constructor(taskReference: ITaskReference, name: string, startTime: Date, finishTime: Date, agentName: string, status: azureReleaseInterfaces.TaskStatus) {
+        super(taskReference, name, startTime, finishTime, agentName);
         this.taskStatus = status;
-    }
-   
-    protected hasCompleteStatus(): boolean {
-        return this.currentStatusIsIncluded(ReleaseTask.COMPLETE_TASK_STATUSES);
     }
 
     public wasFailure(): boolean {
         return this.currentStatusIsIncluded(ReleaseTask.FAILED_TASK_STATUSES);
+    }
+   
+    protected hasCompleteStatus(): boolean {
+        return this.currentStatusIsIncluded(ReleaseTask.COMPLETE_TASK_STATUSES);
     }
 
     private currentStatusIsIncluded(statusesToCheck: azureReleaseInterfaces.TaskStatus[]) {

@@ -5,7 +5,6 @@ import { AbstractAzureApi } from "./AbstractAzureApi";
 import { ReleaseTask } from "./ReleaseTask";
 import tl = require('azure-pipelines-task-lib/task');
 
-
 export class Release extends AbstractPipeline{
 
     private releaseData: azureReleaseInterfaces.Release;
@@ -19,30 +18,6 @@ export class Release extends AbstractPipeline{
         this.environmentData = releaseData.environments[0];
         this.selectedDeployment = this.getSelectedDeployment(this.environmentData.deploySteps);
         this.setTasks(this.parseForTasks());
-    }
-
-    private parseForTasks(): AbstractPipelineTask[] {
-        let tasks: AbstractPipelineTask[] = [];
-        try {
-            for (let phase of this.selectedDeployment.releaseDeployPhases){
-                for (let job of phase.deploymentJobs){
-                    for (let taskInstanceRecord of job.tasks){
-                        tasks.push(new ReleaseTask(taskInstanceRecord.task, taskInstanceRecord.name, taskInstanceRecord.startTime, taskInstanceRecord.finishTime, taskInstanceRecord.status));
-                    }
-                }
-            }
-        }
-        catch (err) {
-            tl.debug("Warning: Release " + this.getDisplayName() + " is missing task data");
-        }
-        return tasks;
-    }
-
-    private getSelectedDeployment(deploymentAttempts: azureReleaseInterfaces.DeploymentAttempt[]): azureReleaseInterfaces.DeploymentAttempt {
-        if (deploymentAttempts && deploymentAttempts.length > 0){
-            return deploymentAttempts[0];
-        }
-        throw(new Error("no deployment attempts available for release with id " + this.getId()));
     }
 
     public getDefinitionId(): number{
@@ -84,7 +59,27 @@ export class Release extends AbstractPipeline{
         return this.releaseData.name;
     }
     
-   
+    private parseForTasks(): AbstractPipelineTask[] {
+        let tasks: AbstractPipelineTask[] = [];
+        try {
+            for (let phase of this.selectedDeployment.releaseDeployPhases){
+                for (let job of phase.deploymentJobs){
+                    for (let taskInstanceRecord of job.tasks){
+                        tasks.push(new ReleaseTask(taskInstanceRecord.task, taskInstanceRecord.name, taskInstanceRecord.startTime, taskInstanceRecord.finishTime, taskInstanceRecord.agentName, taskInstanceRecord.status));
+                    }
+                }
+            }
+        }
+        catch (err) {
+            tl.debug("Warning: Release " + this.getDisplayName() + " is missing task data");
+        }
+        return tasks;
+    }
+
+    private getSelectedDeployment(deploymentAttempts: azureReleaseInterfaces.DeploymentAttempt[]): azureReleaseInterfaces.DeploymentAttempt {
+        if (deploymentAttempts && deploymentAttempts.length > 0){
+            return deploymentAttempts[0];
+        }
+        throw(new Error("no deployment attempts available for release with id " + this.getId()));
+    } 
 }
-
-

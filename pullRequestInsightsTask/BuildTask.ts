@@ -7,9 +7,8 @@ export class BuildTask extends AbstractPipelineTask {
     private state: azureBuildInterfaces.TimelineRecordState;
     private result: azureBuildInterfaces.TaskResult;
 
-
-    constructor(taskReference: ITaskReference, name: string, startTime: Date, finishTime: Date, state: azureBuildInterfaces.TimelineRecordState, result: azureBuildInterfaces.TaskResult) {
-        super(taskReference, name, startTime, finishTime);
+    constructor(taskReference: ITaskReference, name: string, startTime: Date, finishTime: Date, agentName: string, state: azureBuildInterfaces.TimelineRecordState, result: azureBuildInterfaces.TaskResult) {
+        super(taskReference, name, startTime, finishTime, agentName);
         this.state = state;
         this.result = result;
     }

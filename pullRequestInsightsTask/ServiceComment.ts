@@ -11,13 +11,13 @@ import { AbstractPipelineTask } from "./AbstractPipelineTask";
 import { TableFactory } from "./TableFactory";
 import messages from './user_messages.json';
 import { TaskInsights } from "./TaskInsights";
+import { LongRunningValidation } from "./LongRunningValidation";
 
 export class ServiceComment {
 
     private id: number;
     private parentThreadId: number;
     private content: string;
-
 
     constructor(commentData?: azureGitInterfaces.Comment, parentThreadId?: number) {
         if (commentData) {
@@ -42,10 +42,10 @@ export class ServiceComment {
         return this.content;
     }
 
-    public formatNewData(tableType: string, currentPipeline: AbstractPipeline, checkStatusLink: string, target: Branch, longRunningValidations: AbstractPipelineTask[], thresholdTimes: number[]) {
+    public formatNewData(tableType: string, currentPipeline: AbstractPipeline, checkStatusLink: string, target: Branch, longRunningValidations: LongRunningValidation[]) {
         this.removeLastLine();
         tl.debug("type of table to create: " + tableType);
-        this.manageTable(tableType, currentPipeline, checkStatusLink, target, longRunningValidations, thresholdTimes);
+        this.manageTable(tableType, currentPipeline, checkStatusLink, target, longRunningValidations);
         this.addFeedbackLine();
     }
 
@@ -63,11 +63,11 @@ export class ServiceComment {
         this.content = splitMessage.splice(0, splitMessage.length - 1).join(AbstractTable.NEW_LINE);
     }
 
-    private manageTable(tableType: string, currentPipeline: AbstractPipeline, checkStatusLink: string, target: Branch, longRunningValidations: AbstractPipelineTask[], thresholdTimes: number[]): void {
+    private manageTable(tableType: string, currentPipeline: AbstractPipeline, checkStatusLink: string, target: Branch, longRunningValidations: LongRunningValidation[]): void {
         let table: AbstractTable = TableFactory.create(tableType, this.content);
         tl.debug("comment data: " + table.getCurrentCommentData());
         table.addHeader(target.getTruncatedName());
-        table.addSection(currentPipeline, checkStatusLink, target, TaskInsights.NUMBER_PIPELINES_FOR_HEALTH, longRunningValidations, thresholdTimes);
+        table.addSection(currentPipeline, checkStatusLink, target, TaskInsights.NUMBER_PIPELINES_FOR_HEALTH, longRunningValidations);
         this.content = table.getCurrentCommentData();
     }
 

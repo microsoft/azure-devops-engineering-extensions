@@ -1,6 +1,5 @@
 import { AbstractPipeline } from "./AbstractPipeline";
 import * as azureBuildInterfaces from "azure-devops-node-api/interfaces/BuildInterfaces";
-import tl = require('azure-pipelines-task-lib/task');
 import { AbstractPipelineTask } from "./AbstractPipelineTask";
 import { BuildTask } from "./BuildTask";
 import { AbstractAzureApi } from "./AbstractAzureApi";
@@ -15,7 +14,7 @@ export class Build extends AbstractPipeline{
         let tasks: AbstractPipelineTask[] = [];
         if (timelineData) {
             for (let taskRecord of timelineData.records) {
-                tasks.push(new BuildTask(taskRecord.task, taskRecord.name, taskRecord.startTime, taskRecord.finishTime, taskRecord.state, taskRecord.result));
+                tasks.push(new BuildTask(taskRecord.task, taskRecord.name, taskRecord.startTime, taskRecord.finishTime, taskRecord.workerName, taskRecord.state, taskRecord.result));
             }
         }
         this.setTasks(tasks);

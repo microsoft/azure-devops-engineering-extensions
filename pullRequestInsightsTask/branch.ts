@@ -93,12 +93,13 @@ export class Branch{
         }
     }
 
-    private getAllPipelineTimesForTask(task: AbstractPipelineTask): number[] {
+    private getAllPipelineTimesForTask(taskToGetInstances: AbstractPipelineTask): number[] {
         let times: number[] = [];
         for (let pipeline of this.pipelines) {
-            let taskOnPipeline = pipeline.getTask(task);
-            if (taskOnPipeline && taskOnPipeline.getDuration()) {
-                times.push(taskOnPipeline.getDuration());
+            for (let task of pipeline.getAllInstancesOfTask(taskToGetInstances)) {
+                if (task.ran()) {
+                    times.push(task.getDuration());
+                }
             }
         }
         return times;

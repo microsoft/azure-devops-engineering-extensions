@@ -46,19 +46,19 @@ describe("FailureTable Tests", () => {
 
     test("Section is added to table with data", () => {
        failureTable = new FailureTable("|Failed Pipeline|FakeTarget Health|Insights|\n|---|---|---|<!--failureTable-->");
-       failureTable.addSection(makeFakePipeline("thisBuild", "h", true, null), "link", makeFakeBranch("thisBranch", 7, true), 5, null, null);
+       failureTable.addSection(makeFakePipeline("thisBuild", "h", true, null), "link", makeFakeBranch("thisBranch", 7, true), 5, null);
        expect(failureTable.getCurrentCommentData()).toBe("|Failed Pipeline|FakeTarget Health|Insights|\n|---|---|---|\n|[thisBuild](h)| :heavy_check_mark: |thisBranch branch is Healthy <br> Failure in this PR is likely related to change|<!--failureTable-->");
     });
 
     test("Section is not added to empty table without heading", () => {
         failureTable = new FailureTable();
-        failureTable.addSection(makeFakePipeline("thisBuild", "h", true, null), "link", makeFakeBranch("thisBranch", 7, false), 7, null, null);
+        failureTable.addSection(makeFakePipeline("thisBuild", "h", true, null), "link", makeFakeBranch("thisBranch", 7, false), 7, null);
         expect(failureTable.getCurrentCommentData()).toBe("");
      });
 
     test("Failure row added when branch unhealthy",  () => {
         failureTable = new FailureTable("|Failed Pipeline|FakeTarget Health|Insights|\n|---|---|---|<!--failureTable-->");
-        failureTable.addSection(makeFakePipeline("thisBuild", "h", true, null), "link", makeFakeBranch("thisBranch", 7, false), 5, null, null);
+        failureTable.addSection(makeFakePipeline("thisBuild", "h", true, null), "link", makeFakeBranch("thisBranch", 7, false), 5, null);
         expect(failureTable.getCurrentCommentData()).toBe("|Failed Pipeline|FakeTarget Health|Insights|\n|---|---|---|\n|[thisBuild](h)| :x: |thisBranch branch is Unhealthy <br> Please compare thisBranch branch [failures](link) <br> with current and take appropriate action|<!--failureTable-->")
     });
 });

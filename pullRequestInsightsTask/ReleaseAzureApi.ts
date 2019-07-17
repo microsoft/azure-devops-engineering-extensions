@@ -5,7 +5,6 @@ import tl = require('azure-pipelines-task-lib/task');
 import { AbstractPipeline } from "./AbstractPipeline";
 import { PipelineData } from "./PipelineData";
 
-
 export class ReleaseAzureApi extends AbstractAzureApi{
 
     public static readonly DESIRED_RELEASE_ENVIRONMENT_STATUS: number = azureReleaseInterfaces.EnvironmentStatus.Succeeded + azureReleaseInterfaces.EnvironmentStatus.PartiallySucceeded + azureReleaseInterfaces.EnvironmentStatus.Rejected;

@@ -5,7 +5,6 @@ import tl = require('azure-pipelines-task-lib/task');
 import commentProperties from "./service_comment_properties.json";
 import { ServiceComment } from "./ServiceComment.js";
 
-
 export class PullRequest {
 
     private id: number;
@@ -62,17 +61,6 @@ export class PullRequest {
         return this.getCurrentIterationCommentThread(threads) != null;
     }
 
-    private getCurrentIterationCommentThread(threads: azureGitInterfaces.GitPullRequestCommentThread[]): azureGitInterfaces.GitPullRequestCommentThread | null {
-        for (let commentThread of threads) {
-            if (this.threadIsFromService(commentThread) && this.getIterationFromServiceCommentThread(commentThread) === this.mostRecentSourceCommitId) {
-                tl.debug("comment thread id of thread of current source commit " + this.mostRecentSourceCommitId + ": thread id = " + commentThread.id);
-                return commentThread;
-            }
-        }
-        tl.debug("no comment was found for iteration " + this.mostRecentSourceCommitId);
-        return null;
-    }
-
     public makeCurrentIterationComment(threads: azureGitInterfaces.GitPullRequestCommentThread[]): ServiceComment {
         let currentIterationCommentThread: azureGitInterfaces.GitPullRequestCommentThread = this.getCurrentIterationCommentThread(threads);
         if (currentIterationCommentThread && currentIterationCommentThread.comments && currentIterationCommentThread.comments[0]) {
@@ -94,6 +82,17 @@ export class PullRequest {
         return serviceThreads;
     }
 
+    private getCurrentIterationCommentThread(threads: azureGitInterfaces.GitPullRequestCommentThread[]): azureGitInterfaces.GitPullRequestCommentThread | null {
+        for (let commentThread of threads) {
+            if (this.threadIsFromService(commentThread) && this.getIterationFromServiceCommentThread(commentThread) === this.mostRecentSourceCommitId) {
+                tl.debug("comment thread id of thread of current source commit " + this.mostRecentSourceCommitId + ": thread id = " + commentThread.id);
+                return commentThread;
+            }
+        }
+        tl.debug("no comment was found for iteration " + this.mostRecentSourceCommitId);
+        return null;
+    }
+
     private parseDataForMostRecentSourceCommitId(): void {
         this.mostRecentSourceCommitId = null;
         if (this.pullRequestData.lastMergeCommit && this.pullRequestData.lastMergeCommit.commitId) {
@@ -109,7 +108,7 @@ export class PullRequest {
     }
 
     private threadIsFromService(thread: azureGitInterfaces.GitPullRequestCommentThread): boolean {
-        return this.threadHasServiceProperties(thread) && this.threadHasComments(thread)  //&& this.commentWasWrittenByService(thread.comments[0]); Removed until we determine how the author name is selected
+        return this.threadHasServiceProperties(thread) && this.threadHasComments(thread);  
     }
 
     private threadHasServiceProperties(thread: azureGitInterfaces.GitPullRequestCommentThread): boolean {

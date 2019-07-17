@@ -3,7 +3,7 @@ import messages from './user_messages.json';
 import { AbstractTable } from './AbstractTable.js';
 import { AbstractPipeline } from './AbstractPipeline.js';
 import { Branch } from './Branch.js';
-import { AbstractPipelineTask } from './AbstractPipelineTask.js';
+import { LongRunningValidation } from './LongRunningValidation.js';
 
 export class LongRunningValidationsTable extends AbstractTable {
     
@@ -13,7 +13,7 @@ export class LongRunningValidationsTable extends AbstractTable {
         super(messages.longRunningValidationCommentTableHeading, messages.longRunningValidationTableEndName, currentCommentData);
     }
 
-    public addSection(current: AbstractPipeline, currentDefinitionLink: string, target: Branch, numberPipelinesToConsiderForHealth: number, longRunningValidations: AbstractPipelineTask[], thresholdTimes: number[]): void {
+    public addSection(current: AbstractPipeline, currentDefinitionLink: string, target: Branch, numberPipelinesToConsiderForHealth: number, longRunningValidations: LongRunningValidation[]): void {
         if (this.tableHasData()) {
             let section: string = "";
             for (let index = 0; index < longRunningValidations.length; index++) {
@@ -21,16 +21,25 @@ export class LongRunningValidationsTable extends AbstractTable {
                 if (index > 0) {
                     nextLine = messages.longRunningValidationCommentLowerSectionRow;
                 }
-                let task: AbstractPipelineTask = longRunningValidations[index];
-                tl.debug("adding long running task: " + task.getName());
-                tl.debug(task.getName() + " has duration of " + task.getDuration() + " ms and regression is " + task.calculateRegression(thresholdTimes[index]) + " ms based on threshold time of " + thresholdTimes[index] + " ms");
-                section += AbstractTable.NEW_LINE + nextLine.format(current.getDefinitionName(), current.getLink(), task.getName(), this.formatTime(task.getDuration()), this.formatTime(task.calculateRegression(thresholdTimes[index])));
+                let validation: LongRunningValidation = longRunningValidations[index];
+                let nameText: string = validation.getName();
+                let durationWithRegressionText: string = this.formatDurationWithRegression(validation.getLongestTaskInstanceDuration(), validation.getLongestTaskInstanceRegression());
+                if (validation.hasInstancesOnMultipleAgents()) {
+                    nameText += messages.longRunningMultiAgentLine.format(String(validation.getNumberOfAgentsRunOn()));
+                    durationWithRegressionText = messages.durationRangeFormat.format(durationWithRegressionText, this.formatDurationWithRegression(validation.getShortestTaskInstanceDuration(), validation.getShortestTaskInstanceRegression()));
+                }
+                tl.debug("adding long running task: " + validation.getName() + " And task has duration/regression of " + durationWithRegressionText);
+                section += AbstractTable.NEW_LINE + nextLine.format(current.getDefinitionName(), current.getLink(), nameText, durationWithRegressionText);
             }
             this.addTextToTableInComment(section);
         }
     }
 
-    private formatTime(duration: number): string {
+    private formatDurationWithRegression(duration: number, regression: number): string {
+        return messages.durationWithRegressionFormat.format(this.formatMillisecondsAsTime(duration), this.formatMillisecondsAsTime(regression));
+    }
+
+    private formatMillisecondsAsTime(duration: number): string {
         let formattedTime: string = "";
         let date: Date = new Date(this.roundMillisecondsToSeconds(duration));
         LongRunningValidationsTable.TIME_LABELS.forEach((value: string, key: () => number) => {

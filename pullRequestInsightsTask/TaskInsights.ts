@@ -5,11 +5,11 @@ import { AbstractAzureApi } from "./AbstractAzureApi";
 import { PullRequest } from "./PullRequest";
 import tl = require('azure-pipelines-task-lib/task');
 import * as azureGitInterfaces from "azure-devops-node-api/interfaces/GitInterfaces";
-import { AbstractTable } from "./AbstractTable";
 import { AbstractPipeline } from "./AbstractPipeline";
 import { AbstractPipelineTask } from "./AbstractPipelineTask";
 import { TableFactory } from "./TableFactory";
 import { ServiceComment } from "./ServiceComment";
+import { LongRunningValidation } from "./LongRunningValidation";
 
 export class TaskInsights {
 
@@ -22,8 +22,8 @@ export class TaskInsights {
     private currentPipeline: AbstractPipeline;
     private targetBranch: Branch;
     private pullRequest: PullRequest;
-    private longRunningValidations: AbstractPipelineTask[];
-    private thresholdTimes: number[];
+    private longRunningValidations: LongRunningValidation[];
+  //  private thresholdTimes: number[];
 
     constructor(data: PipelineData) {
         this.data = data;
@@ -40,7 +40,6 @@ export class TaskInsights {
             this.targetBranch.setPipelines(await this.azureApi.getMostRecentPipelinesOfCurrentType(this.data.getProjectName(), this.currentPipeline, TaskInsights.NUMBER_PIPELINES_FOR_HEALTH, this.targetBranch.getFullName()));
             let tableType: string = TableFactory.FAILURE;
             tl.debug("pipeline is a failure?: " + this.currentPipeline.isFailure());
-            tl.debug("host type: " + this.data.getHostType())
             if (!this.currentPipeline.isFailure()) {
                 tableType = TableFactory.LONG_RUNNING_VALIDATIONS;
                 await this.findAllLongRunningValidations();
@@ -69,16 +68,30 @@ export class TaskInsights {
 
     private async findAllLongRunningValidations(): Promise<void> {
         this.longRunningValidations = [];
-        this.thresholdTimes = [];
+    //    this.thresholdTimes = [];
         this.targetBranch.setPipelines(await this.azureApi.getMostRecentPipelinesOfCurrentType(this.data.getProjectName(), this.currentPipeline, TaskInsights.NUMBER_PIPELINES_FOR_LONG_RUNNING_VALIDATIONS, this.targetBranch.getFullName()));
         for (let task of this.currentPipeline.getTasks()) {
             let thresholdTime: number = this.targetBranch.getPercentileTimeForPipelineTask(this.data.getDurationPercentile(), task);
             if (this.shouldTaskBeAddedToLongRunningValidations(task, thresholdTime)) {
-                this.longRunningValidations.push(task);
-                this.thresholdTimes.push(thresholdTime);
+                let longRunningValidation: LongRunningValidation;
+                for (let validation of this.longRunningValidations) {
+                    if (task.isInstanceOfTask(validation.getName(), validation.getId())) {
+                        longRunningValidation = validation;
+                    }
+                }
+                if (!longRunningValidation) {
+                    longRunningValidation = new LongRunningValidation(task.getName(), task.getId(), thresholdTime);
+                    this.longRunningValidations.push(longRunningValidation);
+               //     this.thresholdTimes.push(thresholdTime);
+
+                }
+                longRunningValidation.addTaskInstance(task);
             }
         }
         tl.debug("Number of longRunningValidations = " + this.longRunningValidations.length);
+        for (let validation of this.longRunningValidations) {
+            tl.debug("Name = " + validation.getName());
+        }
     }
 
     private shouldTaskBeAddedToLongRunningValidations(task: AbstractPipelineTask, thresholdTime: number): boolean {
@@ -89,7 +102,7 @@ export class TaskInsights {
     private async manageComments(tableType: string): Promise<void> {
         let serviceThreads: azureGitInterfaces.GitPullRequestCommentThread[] = await this.pullRequest.getCurrentServiceCommentThreads(this.azureApi);
         let serviceComment: ServiceComment = this.pullRequest.makeCurrentIterationComment(serviceThreads);
-        serviceComment.formatNewData(tableType, this.currentPipeline, await this.checkStatusLink(this.data.getStatusLink(), this.data.getProjectName()), this.targetBranch, this.longRunningValidations, this.thresholdTimes)
+        serviceComment.formatNewData(tableType, this.currentPipeline, await this.checkStatusLink(this.data.getStatusLink(), this.data.getProjectName()), this.targetBranch, this.longRunningValidations);
         if (this.pullRequest.hasServiceThreadForExistingIteration(serviceThreads)) {
             this.pullRequest.editServiceComment(this.azureApi, serviceComment);
         }

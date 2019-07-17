@@ -1,9 +1,8 @@
 import { AbstractTable } from "./AbstractTable";
 import { AbstractPipeline } from "./AbstractPipeline";
 import { Branch } from "./Branch";
-import { AbstractPipelineTask } from "./AbstractPipelineTask";
-import tl = require('azure-pipelines-task-lib/task');
 import messages from './user_messages.json';
+import { LongRunningValidation } from "./LongRunningValidation";
 
 export class FailureTable extends AbstractTable {
 
@@ -11,7 +10,7 @@ export class FailureTable extends AbstractTable {
         super(messages.failureCommentTableHeading, messages.failureCommentTableEndName, currentCommentData);
     }
 
-    public addSection(current: AbstractPipeline, currentDefinitionLink: string, target: Branch, numberPipelinesToConsiderForHealth: number, longRunningValidations: AbstractPipelineTask[], thresholdTimes: number[]): void {
+    public addSection(current: AbstractPipeline, currentDefinitionLink: string, target: Branch, numberPipelinesToConsiderForHealth: number, longRunningValidations: LongRunningValidation[]): void {
         if (this.tableHasData()) {
             if (current.isFailure()) {
                 let messageString: string = messages.failureCommentRow;

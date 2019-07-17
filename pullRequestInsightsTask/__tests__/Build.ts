@@ -77,7 +77,7 @@ describe('Build Tests', () => {
     test('Tasks are properly retrieved', () => {
         fillMockBuildTimeline([makeTimelineRecord(null, null, null, null, "yellow", "a"), makeTimelineRecord(null, null, null, null, "blue", "b"), makeTimelineRecord(null, null, null, null, "red", "c")]);
         build = new Build(null, mockBuildTimeline);
-        let expectedTasks: AbstractPipelineTask[] = [new BuildTask({id: "a"}, "yellow", null, null, null, null), new BuildTask({id: "b"}, "blue", null, null, null, null), new BuildTask({id: "c"}, "red", null, null, null, null)];
+        let expectedTasks: AbstractPipelineTask[] = [new BuildTask({id: "a"}, "yellow", null, null, undefined, null, null), new BuildTask({id: "b"}, "blue", null, null, undefined, null, null), new BuildTask({id: "c"}, "red", null, null, undefined, null, null)];
         expect(build.getTasks()).toEqual(expectedTasks);
     });
     
@@ -89,17 +89,26 @@ describe('Build Tests', () => {
 
     test('Equivalent task retrieved from build when present', () => {
         let record: azureBuildInterfaces.TimelineRecord = makeTimelineRecord(azureBuildInterfaces.TaskResult.Failed, null, null, null, "name", "abc");
-        let taskToGet: AbstractPipelineTask = new BuildTask({id: "abc"}, "name", null, null, null, azureBuildInterfaces.TaskResult.Failed);
-        expect(taskToGet.equals(makeFakeTaskForComparision("name", "abc"))).toBe(true)
+        let taskToGet: AbstractPipelineTask = new BuildTask({id: "abc"}, "name", null, null, undefined, null, azureBuildInterfaces.TaskResult.Failed);
+        expect(taskToGet.isInstanceOfTask("name", "abc")).toBe(true)
         fillMockBuildTimeline([record, makeTimelineRecord(null, null, null, null, "name1", "efg")]);
         build = new Build(null, mockBuildTimeline);
-        expect(build.getTask(makeFakeTaskForComparision("name", "abc"))).toEqual(taskToGet);
+        expect(build.getAllInstancesOfTask(makeFakeTaskForComparision("name", "abc"))).toEqual([taskToGet]);
+    });
+
+    test('All instances of equivalent task retrieved from build when present', () => {
+        let records: azureBuildInterfaces.TimelineRecord[] = [makeTimelineRecord(azureBuildInterfaces.TaskResult.Failed, null, null, null, "name", "abc"), makeTimelineRecord(azureBuildInterfaces.TaskResult.Abandoned, null, null, null, "name", "abc"), makeTimelineRecord(null, null, null, null, "name1", "efg")];
+        let taskToGet: AbstractPipelineTask = new BuildTask({id: "abc"}, "name", null, null, undefined, null, azureBuildInterfaces.TaskResult.Failed);
+        let secondTaskToGet: AbstractPipelineTask = new BuildTask({id: "abc"}, "name", null, null, undefined, null, azureBuildInterfaces.TaskResult.Abandoned);
+        fillMockBuildTimeline(records);
+        build = new Build(null, mockBuildTimeline);
+        expect(build.getAllInstancesOfTask(makeFakeTaskForComparision("name", "abc"))).toEqual([taskToGet, secondTaskToGet]);
     });
 
     test('Null returned when task cannot be gotten', () => {
         fillMockBuildTimeline([makeTimelineRecord(null, null, null, null, "name1", "efg")]);
         build = new Build(null, mockBuildTimeline);
-        expect(build.getTask(makeFakeTaskForComparision("name", "abc"))).toBeNull();
+        expect(build.getAllInstancesOfTask(makeFakeTaskForComparision("name", "abc"))).toEqual([]);
     });
 
 });

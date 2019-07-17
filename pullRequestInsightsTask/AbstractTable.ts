@@ -3,6 +3,7 @@ import { Branch } from "./Branch";
 import './StringExtensions';
 import { AbstractPipelineTask } from "./AbstractPipelineTask";
 import tl = require('azure-pipelines-task-lib/task');
+import { LongRunningValidation } from "./LongRunningValidation";
 
 export abstract class AbstractTable {
 
@@ -37,7 +38,7 @@ export abstract class AbstractTable {
         }
     }
 
-    public abstract addSection(current: AbstractPipeline, currentDefinitionLink: string, target: Branch, numberPipelinesToConsiderForHealth: number, longRunningValidations: AbstractPipelineTask[], thresholdTimes: number[]): void;
+    public abstract addSection(current: AbstractPipeline, currentDefinitionLink: string, target: Branch, numberPipelinesToConsiderForHealth: number, longRunningValidations: LongRunningValidation[]): void;
 
     public getCurrentCommentData(): string {
         return this.currentCommentData;

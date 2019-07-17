@@ -8,20 +8,21 @@ export abstract class AbstractPipelineTask {
     private type: string
     private startTime: Date
     private finishTime: Date
-
-    constructor(taskReference: ITaskReference, name: string, startTime: Date, finishTime: Date) {
+    private agentName: string;
+   
+    constructor(taskReference: ITaskReference, name: string, startTime: Date, finishTime: Date, agentName: string) {
         this.name = name
         this.id = null;
         this.type = null;
         this.startTime = startTime;
         this.finishTime = finishTime;
+        this.agentName = agentName;
         if (taskReference) {
             this.id = taskReference.id;
             this.type = taskReference.name;
         }
     }
 
-    
     protected abstract hasCompleteStatus(): boolean;
 
     public abstract wasFailure(): boolean;
@@ -34,8 +35,12 @@ export abstract class AbstractPipelineTask {
         return this.id;
     } 
 
-    public equals(other: AbstractPipelineTask): boolean {
-        return this.getName() === other.getName() && this.getId() === other.getId();
+    public getAgentName(): string {
+        return this.agentName;
+    }
+
+    public isInstanceOfTask(nameToCompare: string, idToCompare: string): boolean {
+        return this.getName() === nameToCompare && this.getId() === idToCompare;
     }
 
     public isLongRunning(thresholdTime: number, minimumDurationMiliseconds: number, minimumRegressionMilliseconds: number): boolean {
@@ -67,6 +72,10 @@ export abstract class AbstractPipelineTask {
             return this.type.toLowerCase();
         }
         return null;
+    }
+    
+    public getIdentifier() {
+        return this.name + " " + this.id;
     }
 
     private hasSignificantRegression(thresholdTime: number, minimumRegressionMilliseconds: number): boolean {
