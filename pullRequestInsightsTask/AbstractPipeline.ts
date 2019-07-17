@@ -5,7 +5,6 @@ export abstract class AbstractPipeline{
 
     private tasks: AbstractPipelineTask[];
 
-    
     constructor() {
         
     }
@@ -15,29 +14,37 @@ export abstract class AbstractPipeline{
     }
 
     public abstract getDefinitionId(): number;
-    public abstract getDefinitionName(): string;
-    public abstract getDefinitionLink(apiCaller: AbstractAzureApi, project: string):Promise<string>;
-    public abstract isFailure(): boolean;
-    public abstract isComplete(): boolean;
-    public abstract getLink(): string;
-    public abstract getId(): number;
-    public abstract getDisplayName(): string;
-   
 
-    public getTasks(): AbstractPipelineTask[] { 
+    public abstract getDefinitionName(): string;
+
+    public abstract getDefinitionLink(apiCaller: AbstractAzureApi, project: string):Promise<string>;
+
+    public abstract isFailure(): boolean;
+
+    public abstract isComplete(): boolean;
+
+    public abstract getLink(): string;
+
+    public abstract getId(): number;
+
+    public abstract getDisplayName(): string;
+
+
+    public getTasks(): AbstractPipelineTask[] {
         if (!this.tasks) {
             return [];
         }
         return this.tasks;
     }
 
-    public getTask(taskToGet: AbstractPipelineTask): AbstractPipelineTask { 
-            for (let task of this.getTasks()) {
-                if (task.equals(taskToGet)) {
-                    return task;
-                }
+    public getAllInstancesOfTask(taskToGet: AbstractPipelineTask): AbstractPipelineTask[] {
+        let instancesOfTask: AbstractPipelineTask[] = [];
+        for (let task of this.getTasks()) {
+            if (task.isInstanceOfTask(taskToGet.getName(), taskToGet.getId())) {
+                instancesOfTask.push(task);
             }
-        return null;
+        }
+        return instancesOfTask;
     }
 
     protected taskFailedDuringRun(): boolean {
