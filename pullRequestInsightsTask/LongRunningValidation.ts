@@ -25,7 +25,7 @@ export class LongRunningValidation {
     }
 
     public addTaskInstance(taskInstanceToAdd: AbstractPipelineTask) {
-        if (taskInstanceToAdd.isInstanceOfTask(this.name, this.id)) {
+        if (this.taskShouldBeAdded(taskInstanceToAdd)) {
             this.taskInstances.push(taskInstanceToAdd);
             this.durationsToRegressions.set(taskInstanceToAdd.getDuration(), taskInstanceToAdd.calculateRegression(this.thresholdTime));
         }
@@ -47,10 +47,6 @@ export class LongRunningValidation {
         return this.durationsToRegressions.get(this.getShortestTaskInstanceDuration());
     }
 
-    private getAllInstanceDurations(): number[] {
-        return Array.from(this.durationsToRegressions.keys());
-    }
-
     public getNumberOfAgentsRunOn(): number {
         let agents: Set<string> = new Set();
         for (let task of this.taskInstances) {
@@ -62,5 +58,14 @@ export class LongRunningValidation {
     public hasInstancesOnMultipleAgents(): boolean {
         return this.getNumberOfAgentsRunOn() > 1;
     }
+
+    private getAllInstanceDurations(): number[] {
+        return Array.from(this.durationsToRegressions.keys());
+    }
+
+    private taskShouldBeAdded(taskInstanceToAdd: AbstractPipelineTask): boolean {
+        return taskInstanceToAdd.isInstanceOfTask(this.name, this.id)
+    } 
+
 
 }
