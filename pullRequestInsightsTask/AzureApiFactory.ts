@@ -7,6 +7,7 @@ import { HostTypeError } from './HostTypeError';
 import { PipelineData } from './PipelineData';
 
 export class AzureApiFactory {
+    
     public static readonly BUILD: string = "build";
     public static readonly RELEASE: string = "release";
 

@@ -5,7 +5,6 @@ import { Build } from "./Build";
 import { PipelineData } from "./PipelineData";
 import tl = require('azure-pipelines-task-lib/task');
 
-
 export class BuildAzureApi extends AbstractAzureApi{ 
 
     static readonly DESIRED_BUILD_STATUS: number = azureBuildInterfaces.BuildStatus.Completed;

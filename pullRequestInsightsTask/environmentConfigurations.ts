@@ -16,7 +16,6 @@ export class EnvironmentConfigurations{
     public static readonly PULL_KEY: string = "pull";
     public static readonly SEPERATOR: string = "/";
 
-
     public getValue(key: string) {
         return this.loadFromEnvironment(key);
     }
