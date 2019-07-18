@@ -12,7 +12,7 @@
     "longRunningValidationTableEndName": "longRunningValidationTable",
     "longRunningValidationCommentFirstSectionRow": "|[{0}]({1})| {2} | {3} |",
     "longRunningValidationCommentLowerSectionRow": "| | {2} | {3} |",
-    "longRunningMultiAgentLine": "<br><small>(On {0} agents)</small>",
+    "longRunningMultiAgentLine": "<br><small>(Regressed on {0}/{1} agents)</small>",
     "durationWithRegressionFormat": "{0} [<span style='color:red'>+{1}</span>]",
     "durationRangeFormat": "{0} - {1}",
     "feedbackLine": "<small>*Please send your feedback to [EPS Team Channel](https://teams.microsoft.com/l/channel/19%3ad62e5769369b4f449c9f8ed42704bec6%40thread.skype/EPS?groupId=cd2504a9-b748-4087-b3f9-60c46b6f1782&tenantId=72f988bf-86f1-41af-91ab-2d7cd011db470) if above insights are not helpful</small>"

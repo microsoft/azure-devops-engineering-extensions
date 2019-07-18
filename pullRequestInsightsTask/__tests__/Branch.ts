@@ -2,9 +2,10 @@ import { Build } from '../Build';
 import * as sinon from 'sinon';
 import { Branch } from '../Branch';
 import { AbstractPipeline } from '../AbstractPipeline';
-import { AbstractPipelineTask } from '../AbstractPipelineTask';
-import { BuildTask } from '../BuildTask';
+import { AbstractPipelineTaskRun } from '../AbstractPipelineTaskRun';
+import { BuildTaskRun } from '../BuildTaskRun';
 import { mock } from 'ts-mockito';
+import { PipelineTask } from '../PipelineTask';
 
 describe('Branch Tests', () => {
     
@@ -35,7 +36,7 @@ describe('Branch Tests', () => {
         sinon.stub(incompleteBuild, "isComplete").returns(false);
     });
 
-    function makePipeline(isFailure?: boolean, isComplete?: boolean, tasks?: AbstractPipelineTask[]): AbstractPipeline {
+    function makePipeline(isFailure?: boolean, isComplete?: boolean, tasks?: PipelineTask[]): AbstractPipeline {
         let pipeline: AbstractPipeline = new Build(null, null);
         sinon.stub(pipeline, "isFailure").returns(isFailure);
         sinon.stub(pipeline, "isComplete").returns(isComplete);
@@ -43,11 +44,12 @@ describe('Branch Tests', () => {
         return pipeline;
     }
 
-    function makeTask(name: string, id: string, duration: number): AbstractPipelineTask {
-        let fake: AbstractPipelineTask = mock(BuildTask);
+    function makeTask(name: string, id: string, durations: number[]): PipelineTask {
+        let fake: PipelineTask = new PipelineTask(null, null, null);
         sinon.stub(fake, "getName").returns(name);
         sinon.stub(fake, "getId").returns(id);
-        sinon.stub(fake, "getDuration").returns(duration);
+        sinon.stub(fake, "getAllDurations").returns(durations);
+        sinon.stub(fake, "getType").returns("type");
         return fake;
     }
 
@@ -95,22 +97,27 @@ describe('Branch Tests', () => {
 
     test("Null return when invalid task id is given", () => {
         branch = new Branch("", [makePipeline(undefined, undefined, []), makePipeline(undefined, undefined, []), makePipeline(undefined, undefined, [])]);
-        expect(branch.getPercentileTimeForPipelineTask(70, makeTask("abc", "id", 1))).toBeNull();
+        expect(branch.getPercentileTimeForPipelineTask(70, "abc", "id", "type")).toBeNull();
     });
 
     test("Correct percentile is returned when task only ran on some pipelines", () => {
-        branch = new Branch("", [makePipeline(undefined, undefined, [makeTask("abc", "id", 16)]), makePipeline(undefined, undefined, [makeTask("abc", "id", null)]), makePipeline(undefined, undefined,  [makeTask("abc", "id", 4)]), makePipeline(undefined, undefined,  [makeTask("abc", "id", 20)]), makePipeline(undefined, undefined,  [makeTask("abc", "id", 3)])]);
-        expect(branch.getPercentileTimeForPipelineTask(75, makeTask("abc", "id", null))).toBeCloseTo(18);
+        branch = new Branch("", [makePipeline(undefined, undefined, [makeTask("abc", "id", [16])]), makePipeline(undefined, undefined, [makeTask("abc", "id", null)]), makePipeline(undefined, undefined,  [makeTask("abc", "id", [4])]), makePipeline(undefined, undefined,  [makeTask("abc", "id", [20])]), makePipeline(undefined, undefined,  [makeTask("abc", "id", [3])])]);
+        expect(branch.getPercentileTimeForPipelineTask(75, "abc", "id", "type")).toBeCloseTo(18);
     });
 
     test("Correct percentile is returned for a valid task when percentile falls on exact length", () => {
-        branch = new Branch("", [makePipeline(undefined, undefined, [makeTask("jkl", "id", 4)]), makePipeline(undefined, undefined, [makeTask("jkl", "id", 2)]), makePipeline(undefined, undefined, [makeTask("jkl", "id", 3)]), makePipeline(undefined, undefined, [makeTask("jkl", "id", 1)])]);
-        expect(branch.getPercentileTimeForPipelineTask(62.5, makeTask("jkl", "id", 4))).toBeCloseTo(3);
+        branch = new Branch("", [makePipeline(undefined, undefined, [makeTask("jkl", "id", [4])]), makePipeline(undefined, undefined, [makeTask("jkl", "id", [2])]), makePipeline(undefined, undefined, [makeTask("jkl", "id", [3])]), makePipeline(undefined, undefined, [makeTask("jkl", "id", [1])])]);
+        expect(branch.getPercentileTimeForPipelineTask(62.5,  "jkl", "id", "type")).toBeCloseTo(3);
     });
 
     test("Correct percentile is returned for a valid task when percentile does not fall on exact length", () => {
-        branch = new Branch("", [makePipeline(undefined, undefined, [makeTask("jkl", "id", 4)]), makePipeline(undefined, undefined, [makeTask("jkl", "id", 2)]), makePipeline(undefined, undefined, [makeTask("jkl", "id", 3)]), makePipeline(undefined, undefined, [makeTask("jkl", "id", 1)])]);
-        expect(branch.getPercentileTimeForPipelineTask(40, makeTask("jkl", "id", 4))).toBeCloseTo(2.1);
+        branch = new Branch("", [makePipeline(undefined, undefined, [makeTask("jkl", "id", [4])]), makePipeline(undefined, undefined, [makeTask("jkl", "id", [2])]), makePipeline(undefined, undefined, [makeTask("jkl", "id", [3])]), makePipeline(undefined, undefined, [makeTask("jkl", "id", [1])])]);
+        expect(branch.getPercentileTimeForPipelineTask(40, "jkl", "id", "type")).toBeCloseTo(2.1);
+    });
+
+    test("Correct percentile is returned for a valid task when percentile does not fall on exact length", () => {
+        branch = new Branch("", [makePipeline(undefined, undefined, [makeTask("jkl", "id", [4])]), makePipeline(undefined, undefined, [makeTask("jkl", "id", [2])]), makePipeline(undefined, undefined, [makeTask("jkl", "id", [3])]), makePipeline(undefined, undefined, [makeTask("jkl", "id", [1])])]);
+        expect(branch.getPercentileTimeForPipelineTask(40, "jkl", "id", "type")).toBeCloseTo(2.1);
     });
 
     test("Branch with failed pipelines within number to check is not healthy", () => { 

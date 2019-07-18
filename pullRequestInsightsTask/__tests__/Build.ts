@@ -1,9 +1,10 @@
 import * as azureBuildInterfaces from "azure-devops-node-api/interfaces/BuildInterfaces";
 import { Build } from "../Build";
 import sinon from "sinon";
-import { AbstractPipelineTask } from "../AbstractPipelineTask";
-import { BuildTask } from "../BuildTask";
+import { AbstractPipelineTaskRun } from "../AbstractPipelineTaskRun";
+import { BuildTaskRun } from "../BuildTaskRun";
 import { mock } from "ts-mockito";
+import { PipelineTask } from "../PipelineTask";
 
 
 describe('Build Tests', () => {
@@ -15,22 +16,15 @@ describe('Build Tests', () => {
     const failedTask: azureBuildInterfaces.TimelineRecord = makeTimelineRecord(azureBuildInterfaces.TaskResult.Failed, azureBuildInterfaces.TimelineRecordState.Completed, new Date(), new Date());
     const succeededTask: azureBuildInterfaces.TimelineRecord = makeTimelineRecord(azureBuildInterfaces.TaskResult.Succeeded, azureBuildInterfaces.TimelineRecordState.Completed, new Date(), new Date());
 
-    function makeTimelineRecord(result?: azureBuildInterfaces.TaskResult, state?: azureBuildInterfaces.TimelineRecordState, startTime?: Date, finishTime?: Date, name?: string, id?: string): azureBuildInterfaces.TimelineRecord{
+    function makeTimelineRecord(result?: azureBuildInterfaces.TaskResult, state?: azureBuildInterfaces.TimelineRecordState, startTime?: Date, finishTime?: Date, name?: string, id?: string, type?: string): azureBuildInterfaces.TimelineRecord{
         return {
             result: result,
             state: state,
             startTime: startTime,
             finishTime: finishTime,
             name: name,
-            task: {id: id}
+            task: {id: id, name: type}
         }
-    }
-
-    function makeFakeTaskForComparision(name: string, id: string): AbstractPipelineTask {
-        let fake: AbstractPipelineTask = mock(BuildTask);
-        sinon.stub(fake, "getName").returns(name);
-        sinon.stub(fake, "getId").returns(id);
-        return fake;
     }
 
     function fillMockBuildData(buildStatus: azureBuildInterfaces.BuildStatus, buildResult?: azureBuildInterfaces.BuildResult){
@@ -74,41 +68,16 @@ describe('Build Tests', () => {
         expect(build.isFailure()).toBe(false); 
     });
 
-    test('Tasks are properly retrieved', () => {
-        fillMockBuildTimeline([makeTimelineRecord(null, null, null, null, "yellow", "a"), makeTimelineRecord(null, null, null, null, "blue", "b"), makeTimelineRecord(null, null, null, null, "red", "c")]);
-        build = new Build(null, mockBuildTimeline);
-        let expectedTasks: AbstractPipelineTask[] = [new BuildTask({id: "a"}, "yellow", null, null, undefined, null, null), new BuildTask({id: "b"}, "blue", null, null, undefined, null, null), new BuildTask({id: "c"}, "red", null, null, undefined, null, null)];
-        expect(build.getTasks()).toEqual(expectedTasks);
-    });
-    
     test('Null is returned when there are no tasks to be retrieved', () => {
         fillMockBuildTimeline([]);
         build = new Build(null, mockBuildTimeline);
         expect(build.getTasks()).toEqual([]);
     });
 
-    test('Equivalent task retrieved from build when present', () => {
-        let record: azureBuildInterfaces.TimelineRecord = makeTimelineRecord(azureBuildInterfaces.TaskResult.Failed, null, null, null, "name", "abc");
-        let taskToGet: AbstractPipelineTask = new BuildTask({id: "abc"}, "name", null, null, undefined, null, azureBuildInterfaces.TaskResult.Failed);
-        expect(taskToGet.isInstanceOfTask("name", "abc")).toBe(true)
-        fillMockBuildTimeline([record, makeTimelineRecord(null, null, null, null, "name1", "efg")]);
-        build = new Build(null, mockBuildTimeline);
-        expect(build.getAllInstancesOfTask(makeFakeTaskForComparision("name", "abc"))).toEqual([taskToGet]);
-    });
-
-    test('All instances of equivalent task retrieved from build when present', () => {
-        let records: azureBuildInterfaces.TimelineRecord[] = [makeTimelineRecord(azureBuildInterfaces.TaskResult.Failed, null, null, null, "name", "abc"), makeTimelineRecord(azureBuildInterfaces.TaskResult.Abandoned, null, null, null, "name", "abc"), makeTimelineRecord(null, null, null, null, "name1", "efg")];
-        let taskToGet: AbstractPipelineTask = new BuildTask({id: "abc"}, "name", null, null, undefined, null, azureBuildInterfaces.TaskResult.Failed);
-        let secondTaskToGet: AbstractPipelineTask = new BuildTask({id: "abc"}, "name", null, null, undefined, null, azureBuildInterfaces.TaskResult.Abandoned);
-        fillMockBuildTimeline(records);
-        build = new Build(null, mockBuildTimeline);
-        expect(build.getAllInstancesOfTask(makeFakeTaskForComparision("name", "abc"))).toEqual([taskToGet, secondTaskToGet]);
-    });
-
     test('Null returned when task cannot be gotten', () => {
         fillMockBuildTimeline([makeTimelineRecord(null, null, null, null, "name1", "efg")]);
         build = new Build(null, mockBuildTimeline);
-        expect(build.getAllInstancesOfTask(makeFakeTaskForComparision("name", "abc"))).toEqual([]);
+        expect(build.getTask("name", "abc", "type")).toBeNull();
     });
 
 });

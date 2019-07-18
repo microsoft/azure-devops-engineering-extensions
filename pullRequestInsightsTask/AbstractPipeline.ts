@@ -1,16 +1,25 @@
-import { AbstractPipelineTask } from "./AbstractPipelineTask";
+import { AbstractPipelineTaskRun } from "./AbstractPipelineTaskRun";
 import { AbstractAzureApi } from "./AbstractAzureApi";
+import { PipelineTask } from "./PipelineTask";
+import tl = require('azure-pipelines-task-lib/task');
 
 export abstract class AbstractPipeline{
 
-    private tasks: AbstractPipelineTask[];
+    private tasks: PipelineTask[];
 
     constructor() {
-        
+        this.tasks = [];
     }
 
-    protected setTasks(tasks: AbstractPipelineTask[]): void {
-        this.tasks = tasks;
+    protected addTasks(allTaskRuns: AbstractPipelineTaskRun[]): void {
+        for (let taskRun of allTaskRuns) {
+            let task: PipelineTask = this.getTask(taskRun.getName(), taskRun.getId(), taskRun.getType());
+            if (!task) {
+                task = new PipelineTask(taskRun.getName(), taskRun.getId(), taskRun.getType());
+                this.tasks.push(task);
+            }
+            task.addTaskInstance(taskRun);
+        }
     }
 
     public abstract getDefinitionId(): number;
@@ -30,26 +39,27 @@ export abstract class AbstractPipeline{
     public abstract getDisplayName(): string;
 
 
-    public getTasks(): AbstractPipelineTask[] {
+    public getTasks(): PipelineTask[] {
         if (!this.tasks) {
             return [];
         }
         return this.tasks;
     }
 
-    public getAllInstancesOfTask(taskToGet: AbstractPipelineTask): AbstractPipelineTask[] {
-        let instancesOfTask: AbstractPipelineTask[] = [];
+    public getTask(name: string, id: string, type: string): PipelineTask {
         for (let task of this.getTasks()) {
-            if (task.isInstanceOfTask(taskToGet.getName(), taskToGet.getId())) {
-                instancesOfTask.push(task);
+            tl.debug("feeding in type: " + type)
+            if (task.isMatchingTask(name, id, type)) {
+                return task;
             }
         }
-        return instancesOfTask;
+        return null;
     }
+ 
 
     protected taskFailedDuringRun(): boolean {
         for (let task of this.getTasks()){
-            if (task.ran() && task.wasFailure()){
+            if (task.hasFailedInstance()){
                 return true;
             }
         }

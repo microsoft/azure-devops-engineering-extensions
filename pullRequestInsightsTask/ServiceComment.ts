@@ -7,11 +7,11 @@ import tl = require('azure-pipelines-task-lib/task');
 import * as azureGitInterfaces from "azure-devops-node-api/interfaces/GitInterfaces";
 import { AbstractTable } from "./AbstractTable";
 import { AbstractPipeline } from "./AbstractPipeline";
-import { AbstractPipelineTask } from "./AbstractPipelineTask";
+import { AbstractPipelineTaskRun } from "./AbstractPipelineTaskRun";
 import { TableFactory } from "./TableFactory";
 import messages from './user_messages.json';
 import { TaskInsights } from "./TaskInsights";
-import { LongRunningValidation } from "./LongRunningValidation";
+import { PipelineTask } from "./PipelineTask";
 
 export class ServiceComment {
 
@@ -42,7 +42,7 @@ export class ServiceComment {
         return this.content;
     }
 
-    public formatNewData(tableType: string, currentPipeline: AbstractPipeline, checkStatusLink: string, target: Branch, longRunningValidations: LongRunningValidation[]) {
+    public formatNewData(tableType: string, currentPipeline: AbstractPipeline, checkStatusLink: string, target: Branch, longRunningValidations: PipelineTask[]) {
         this.removeLastLine();
         tl.debug("type of table to create: " + tableType);
         this.manageTable(tableType, currentPipeline, checkStatusLink, target, longRunningValidations);
@@ -63,7 +63,7 @@ export class ServiceComment {
         this.content = splitMessage.splice(0, splitMessage.length - 1).join(AbstractTable.NEW_LINE);
     }
 
-    private manageTable(tableType: string, currentPipeline: AbstractPipeline, checkStatusLink: string, target: Branch, longRunningValidations: LongRunningValidation[]): void {
+    private manageTable(tableType: string, currentPipeline: AbstractPipeline, checkStatusLink: string, target: Branch, longRunningValidations: PipelineTask[]): void {
         let table: AbstractTable = TableFactory.create(tableType, this.content);
         tl.debug("comment data: " + table.getCurrentCommentData());
         table.addHeader(target.getTruncatedName());

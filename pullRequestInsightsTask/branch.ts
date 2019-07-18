@@ -1,7 +1,7 @@
 import { AbstractPipeline } from "./AbstractPipeline";
 import tl = require('azure-pipelines-task-lib/task');
 import stats from "stats-lite";
-import { AbstractPipelineTask } from "./AbstractPipelineTask";
+import { PipelineTask } from "./PipelineTask";
 
 export class Branch{
 
@@ -81,27 +81,26 @@ export class Branch{
         return truncatedName.charAt(0).toUpperCase() + truncatedName.slice(1);
     }
 
-    public getPercentileTimeForPipelineTask(percentileToFind: number, task: AbstractPipelineTask): number {
-        let times: number[] = this.getAllPipelineTimesForTask(task);
-        tl.debug("times on target for " + task.getName() + " = " + times.toString())
+    public getPercentileTimeForPipelineTask(percentileToFind: number, taskName: string, taskId: string, taskType: string): number {
+        let times: number[] = this.getAllPipelineTimesForTask(taskName, taskId, taskType);
+        tl.debug("times on target for " + taskName + " = " + times.toString())
         if (times.length > 0) {
             return stats.percentile(times, percentileToFind / 100)
         }
         else {
-            tl.debug("no tasks with name " + task.getName() + " found on pipelines of branch " + this.name);
+            tl.debug("no tasks with name " + taskName + " found on pipelines of branch " + this.name);
             return null;
         }
     }
 
-    private getAllPipelineTimesForTask(taskToGetInstances: AbstractPipelineTask): number[] {
+    private getAllPipelineTimesForTask(taskName: string, taskId: string, taskType: string): number[] {
         let times: number[] = [];
         for (let pipeline of this.pipelines) {
-            for (let task of pipeline.getAllInstancesOfTask(taskToGetInstances)) {
-                if (task.ran()) {
-                    times.push(task.getDuration());
+            let task: PipelineTask = pipeline.getTask(taskName, taskId, taskType);
+                if (task) {
+                    times = times.concat(task.getAllDurations());
                 }
             }
-        }
         return times;
     }
 

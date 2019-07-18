@@ -1,7 +1,7 @@
 import tl = require('azure-pipelines-task-lib/task');
 import { ITaskReference } from './ITaskReference';
 
-export abstract class AbstractPipelineTask {
+export abstract class AbstractPipelineTaskRun {
 
     private name: string
     private id: string
@@ -10,16 +10,16 @@ export abstract class AbstractPipelineTask {
     private finishTime: Date
     private agentName: string;
    
-    constructor(taskReference: ITaskReference, name: string, startTime: Date, finishTime: Date, agentName: string) {
+    constructor(taskRunReference: ITaskReference, name: string, startTime: Date, finishTime: Date, agentName: string) {
         this.name = name
         this.id = null;
         this.type = null;
         this.startTime = startTime;
         this.finishTime = finishTime;
         this.agentName = agentName;
-        if (taskReference) {
-            this.id = taskReference.id;
-            this.type = taskReference.name;
+        if (taskRunReference) {
+            this.id = taskRunReference.id;
+            this.type = taskRunReference.name;
         }
     }
 
@@ -39,9 +39,9 @@ export abstract class AbstractPipelineTask {
         return this.agentName;
     }
 
-    public isInstanceOfTask(nameToCompare: string, idToCompare: string): boolean {
-        return this.getName() === nameToCompare && this.getId() === idToCompare;
-    }
+    // public isInstanceOfTask(nameToCompare: string, idToCompare: string): boolean {
+    //     return this.getName() === nameToCompare && this.getId() === idToCompare;
+    // }
 
     public isLongRunning(thresholdTime: number, minimumDurationMiliseconds: number, minimumRegressionMilliseconds: number): boolean {
         let taskLength = this.getDuration();
@@ -72,10 +72,6 @@ export abstract class AbstractPipelineTask {
             return this.type.toLowerCase();
         }
         return null;
-    }
-    
-    public getIdentifier() {
-        return this.name + " " + this.id;
     }
 
     private hasSignificantRegression(thresholdTime: number, minimumRegressionMilliseconds: number): boolean {

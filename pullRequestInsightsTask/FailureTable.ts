@@ -2,7 +2,7 @@ import { AbstractTable } from "./AbstractTable";
 import { AbstractPipeline } from "./AbstractPipeline";
 import { Branch } from "./Branch";
 import messages from './user_messages.json';
-import { LongRunningValidation } from "./LongRunningValidation";
+import { PipelineTask } from "./PipelineTask";
 
 export class FailureTable extends AbstractTable {
 
@@ -10,7 +10,7 @@ export class FailureTable extends AbstractTable {
         super(messages.failureCommentTableHeading, messages.failureCommentTableEndName, currentCommentData);
     }
 
-    public addSection(current: AbstractPipeline, currentDefinitionLink: string, target: Branch, numberPipelinesToConsiderForHealth: number, longRunningValidations: LongRunningValidation[]): void {
+    public addSection(current: AbstractPipeline, currentDefinitionLink: string, target: Branch, numberPipelinesToConsiderForHealth: number, longRunningValidations: PipelineTask[]): void {
         if (this.tableHasData()) {
             if (current.isFailure()) {
                 let messageString: string = messages.failureCommentRow;

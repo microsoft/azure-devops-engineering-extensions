@@ -1,8 +1,8 @@
 import * as azureReleaseInterfaces from "azure-devops-node-api/interfaces/ReleaseInterfaces";
 import { AbstractPipeline } from "./AbstractPipeline";
-import { AbstractPipelineTask } from "./AbstractPipelineTask";
+import { AbstractPipelineTaskRun } from "./AbstractPipelineTaskRun";
 import { AbstractAzureApi } from "./AbstractAzureApi";
-import { ReleaseTask } from "./ReleaseTask";
+import { ReleaseTaskRun } from "./ReleaseTaskRun";
 import tl = require('azure-pipelines-task-lib/task');
 
 export class Release extends AbstractPipeline{
@@ -17,7 +17,7 @@ export class Release extends AbstractPipeline{
         this.releaseData = releaseData;
         this.environmentData = releaseData.environments[0];
         this.selectedDeployment = this.getSelectedDeployment(this.environmentData.deploySteps);
-        this.setTasks(this.parseForTasks());
+        this.addTasks(this.parseForTasks());
     }
 
     public getDefinitionId(): number{
@@ -59,13 +59,13 @@ export class Release extends AbstractPipeline{
         return this.releaseData.name;
     }
     
-    private parseForTasks(): AbstractPipelineTask[] {
-        let tasks: AbstractPipelineTask[] = [];
+    private parseForTasks(): AbstractPipelineTaskRun[] {
+        let tasks: AbstractPipelineTaskRun[] = [];
         try {
             for (let phase of this.selectedDeployment.releaseDeployPhases){
                 for (let job of phase.deploymentJobs){
                     for (let taskInstanceRecord of job.tasks){
-                        tasks.push(new ReleaseTask(taskInstanceRecord.task, taskInstanceRecord.name, taskInstanceRecord.startTime, taskInstanceRecord.finishTime, taskInstanceRecord.agentName, taskInstanceRecord.status));
+                        tasks.push(new ReleaseTaskRun(taskInstanceRecord.task, taskInstanceRecord.name, taskInstanceRecord.startTime, taskInstanceRecord.finishTime, taskInstanceRecord.agentName, taskInstanceRecord.status));
                     }
                 }
             }

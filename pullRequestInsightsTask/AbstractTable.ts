@@ -1,9 +1,9 @@
 import { AbstractPipeline } from "./AbstractPipeline";
 import { Branch } from "./Branch";
 import './StringExtensions';
-import { AbstractPipelineTask } from "./AbstractPipelineTask";
+import { AbstractPipelineTaskRun } from "./AbstractPipelineTaskRun";
 import tl = require('azure-pipelines-task-lib/task');
-import { LongRunningValidation } from "./LongRunningValidation";
+import { PipelineTask } from "./PipelineTask";
 
 export abstract class AbstractTable {
 
@@ -38,7 +38,7 @@ export abstract class AbstractTable {
         }
     }
 
-    public abstract addSection(current: AbstractPipeline, currentDefinitionLink: string, target: Branch, numberPipelinesToConsiderForHealth: number, longRunningValidations: LongRunningValidation[]): void;
+    public abstract addSection(current: AbstractPipeline, currentDefinitionLink: string, target: Branch, numberPipelinesToConsiderForHealth: number, longRunningValidations: PipelineTask[]): void;
 
     public getCurrentCommentData(): string {
         return this.currentCommentData;

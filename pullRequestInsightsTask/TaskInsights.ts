@@ -6,10 +6,10 @@ import { PullRequest } from "./PullRequest";
 import tl = require('azure-pipelines-task-lib/task');
 import * as azureGitInterfaces from "azure-devops-node-api/interfaces/GitInterfaces";
 import { AbstractPipeline } from "./AbstractPipeline";
-import { AbstractPipelineTask } from "./AbstractPipelineTask";
+import { AbstractPipelineTaskRun } from "./AbstractPipelineTaskRun";
 import { TableFactory } from "./TableFactory";
 import { ServiceComment } from "./ServiceComment";
-import { LongRunningValidation } from "./LongRunningValidation";
+import { PipelineTask } from "./PipelineTask";
 
 export class TaskInsights {
 
@@ -22,7 +22,7 @@ export class TaskInsights {
     private currentPipeline: AbstractPipeline;
     private targetBranch: Branch;
     private pullRequest: PullRequest;
-    private longRunningValidations: LongRunningValidation[];
+    private longRunningValidations: PipelineTask[];
   //  private thresholdTimes: number[];
 
     constructor(data: PipelineData) {
@@ -68,26 +68,12 @@ export class TaskInsights {
 
     private async findAllLongRunningValidations(): Promise<void> {
         this.longRunningValidations = [];
-    //    this.thresholdTimes = [];
         this.targetBranch.setPipelines(await this.azureApi.getMostRecentPipelinesOfCurrentType(this.data.getProjectName(), this.currentPipeline, TaskInsights.NUMBER_PIPELINES_FOR_LONG_RUNNING_VALIDATIONS, this.targetBranch.getFullName()));
         for (let task of this.currentPipeline.getTasks()) {
-            let thresholdTime: number = this.targetBranch.getPercentileTimeForPipelineTask(this.data.getDurationPercentile(), task);
-            if (this.shouldTaskBeAddedToLongRunningValidations(task, thresholdTime)) {
-                let longRunningValidation: LongRunningValidation;
-                for (let validation of this.longRunningValidations) {
-                    if (task.isInstanceOfTask(validation.getName(), validation.getId())) {
-                        tl.debug("found task that is instance of existing long running validation");
-                        longRunningValidation = validation;
-                    }
-                }
-                if (!longRunningValidation) {
-                    tl.debug("creating new long running validation");
-                    longRunningValidation = new LongRunningValidation(task.getName(), task.getId(), thresholdTime);
-                    this.longRunningValidations.push(longRunningValidation);
-               //     this.thresholdTimes.push(thresholdTime);
-
-                }
-                longRunningValidation.addTaskInstance(task);
+            let thresholdTime: number = this.targetBranch.getPercentileTimeForPipelineTask(this.data.getDurationPercentile(), task.getName(), task.getId(), task.getType());
+            task.setRegressionStandards(thresholdTime, TaskInsights.getMillisecondsFromSeconds(this.data.getMimimumValidationDurationSeconds()), TaskInsights.getMillisecondsFromSeconds(this.data.getMimimumValidationRegressionSeconds()));
+            if (this.shouldTaskBeAddedToLongRunningValidations(task)) {
+                this.longRunningValidations.push(task);
             }
         }
         tl.debug("Number of longRunningValidations = " + this.longRunningValidations.length);
@@ -96,9 +82,8 @@ export class TaskInsights {
         }
     }
 
-    private shouldTaskBeAddedToLongRunningValidations(task: AbstractPipelineTask, thresholdTime: number): boolean {
-        return task.isLongRunning(thresholdTime, TaskInsights.getMillisecondsFromSeconds(this.data.getMimimumValidationDurationSeconds()), TaskInsights.getMillisecondsFromSeconds(this.data.getMimimumValidationRegressionSeconds())) &&
-            this.data.getTaskTypesForLongRunningValidations().includes(task.getType());
+    private shouldTaskBeAddedToLongRunningValidations(task: PipelineTask): boolean {
+        return task.hasRegressiveInstances() && this.data.getTaskTypesForLongRunningValidations().includes(task.getType());
     }
 
     private async manageComments(tableType: string): Promise<void> {

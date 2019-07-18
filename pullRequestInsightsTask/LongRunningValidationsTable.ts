@@ -3,7 +3,7 @@ import messages from './user_messages.json';
 import { AbstractTable } from './AbstractTable.js';
 import { AbstractPipeline } from './AbstractPipeline.js';
 import { Branch } from './Branch.js';
-import { LongRunningValidation } from './LongRunningValidation.js';
+import { PipelineTask } from './PipelineTask.js';
 
 export class LongRunningValidationsTable extends AbstractTable {
 
@@ -13,7 +13,7 @@ export class LongRunningValidationsTable extends AbstractTable {
         super(messages.longRunningValidationCommentTableHeading, messages.longRunningValidationTableEndName, currentCommentData);
     }
 
-    public addSection(current: AbstractPipeline, currentDefinitionLink: string, target: Branch, numberPipelinesToConsiderForHealth: number, longRunningValidations: LongRunningValidation[]): void {
+    public addSection(current: AbstractPipeline, currentDefinitionLink: string, target: Branch, numberPipelinesToConsiderForHealth: number, longRunningValidations: PipelineTask[]): void {
         if (this.tableHasData()) {
             let section: string = "";
             for (let index = 0; index < longRunningValidations.length; index++) {
@@ -21,18 +21,16 @@ export class LongRunningValidationsTable extends AbstractTable {
                 if (index > 0) {
                     nextLine = messages.longRunningValidationCommentLowerSectionRow;
                 }
-                let validation: LongRunningValidation = longRunningValidations[index];
+                let validation: PipelineTask = longRunningValidations[index];
                 let nameText: string = validation.getName();
-                let durationWithRegressionText: string = this.formatDurationWithRegression(validation.getLongestTaskInstanceDuration(), validation.getLongestTaskInstanceRegression());
-                //if (validation.hasInstancesOnMultipleAgents()) {
-                    nameText += messages.longRunningMultiAgentLine.format(String(validation.getNumberOfAgentsRunOn()));
-              //  }
-                if (validation.hasMultipleTaskInstances()) {
-                    durationWithRegressionText = messages.durationRangeFormat.format(this.formatDurationWithRegression(validation.getShortestTaskInstanceDuration(), validation.getShortestTaskInstanceRegression()), durationWithRegressionText);
+                let durationWithRegressionText: string = this.formatDurationWithRegression(validation.getLongestRegressiveDuration(), validation.getLongestRegression());
+                if (validation.getNumberOfAgentsRegressedOn() > 1) {
+                    nameText += messages.longRunningMultiAgentLine.format(String(validation.getNumberOfAgentsRegressedOn()), String(validation.getNumberOfAgentsRunOn()));
+                }
+                if (validation.getShortestRegression() != validation.getLongestRegression()) {
+                    durationWithRegressionText = messages.durationRangeFormat.format(this.formatDurationWithRegression(validation.getShortestRegressiveDuration(), validation.getShortestRegression()), durationWithRegressionText);
                 }
                 tl.debug("adding long running task: " + validation.getName() + " And task has duration/regression of " + durationWithRegressionText);
-                tl.debug("task ran on " + validation.getNumberOfAgentsRunOn() + " agents");
-                tl.debug("task has multiple instances: " + validation.hasMultipleTaskInstances());
                 section += AbstractTable.NEW_LINE + nextLine.format(current.getDefinitionName(), current.getLink(), nameText, durationWithRegressionText);
             }
             this.addTextToTableInComment(section);

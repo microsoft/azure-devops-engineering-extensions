@@ -4,10 +4,10 @@ import { Release } from "../Release";
 import { mock } from "ts-mockito";
 import messages from '../user_messages.json';
 import { Branch } from "../Branch";
-import { AbstractPipelineTask } from "../AbstractPipelineTask";
-import { BuildTask } from "../BuildTask";
+import { AbstractPipelineTaskRun } from "../AbstractPipelineTaskRun";
+import { BuildTaskRun } from "../BuildTaskRun";
 import { LongRunningValidationsTable } from "../LongRunningValidationsTable";
-import { LongRunningValidation } from "../LongRunningValidation";
+import { PipelineTask } from "../PipelineTask";
 
 describe("LongRunningValidationTable Tests", () => {
 
@@ -29,20 +29,20 @@ describe("LongRunningValidationTable Tests", () => {
         return branch;
      }
 
-     function makeFakeTask(name: string, duration: number, regression: number): AbstractPipelineTask {
-        let task: AbstractPipelineTask = mock(BuildTask); 
+     function makeFakeTask(name: string, duration: number, regression: number): AbstractPipelineTaskRun {
+        let task: AbstractPipelineTaskRun = mock(BuildTaskRun); 
         sinon.stub(task, "getName").returns(name);
         sinon.stub(task, "calculateRegression").returns(regression);
         sinon.stub(task, "getDuration").returns(duration);
         return task;
      }
 
-     function makeFakeLongRunningValidation(name: string, numberAgents: number, maxDuration: number, minDuration: number, maxRegression: number, minRegression: number): LongRunningValidation {
-        let validation: LongRunningValidation = new LongRunningValidation(name, null, null);
-        sinon.stub(validation, "getLongestTaskInstanceDuration").returns(maxDuration);
-        sinon.stub(validation, "getShortestTaskInstanceDuration").returns(minDuration);
-        sinon.stub(validation, "getLongestTaskInstanceRegression").returns(maxRegression);
-        sinon.stub(validation, "getShortestTaskInstanceRegression").returns(minRegression);
+     function makeFakeLongRunningValidation(name: string, numberAgents: number, maxDuration: number, minDuration: number, maxRegression: number, minRegression: number): PipelineTask {
+        let validation: PipelineTask = new PipelineTask(name, null, null);
+        sinon.stub(validation, "getLongestRegressiveDuration").returns(maxDuration);
+        sinon.stub(validation, "getShortestRegressiveDuration").returns(minDuration);
+        sinon.stub(validation, "getLongestRegression").returns(maxRegression);
+        sinon.stub(validation, "getShortestRegression").returns(minRegression);
         sinon.stub(validation, "getNumberOfAgentsRunOn").returns(numberAgents);
         return validation;
      }

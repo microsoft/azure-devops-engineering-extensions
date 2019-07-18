@@ -1,7 +1,7 @@
 import { AbstractPipeline } from "./AbstractPipeline";
 import * as azureBuildInterfaces from "azure-devops-node-api/interfaces/BuildInterfaces";
-import { AbstractPipelineTask } from "./AbstractPipelineTask";
-import { BuildTask } from "./BuildTask";
+import { AbstractPipelineTaskRun } from "./AbstractPipelineTaskRun";
+import { BuildTaskRun } from "./BuildTaskRun";
 import { AbstractAzureApi } from "./AbstractAzureApi";
 
 export class Build extends AbstractPipeline{
@@ -11,13 +11,13 @@ export class Build extends AbstractPipeline{
     constructor(buildData: azureBuildInterfaces.Build, timelineData: azureBuildInterfaces.Timeline) {
         super();
         this.buildData = buildData;
-        let tasks: AbstractPipelineTask[] = [];
+        let tasks: AbstractPipelineTaskRun[] = [];
         if (timelineData) {
             for (let taskRecord of timelineData.records) {
-                tasks.push(new BuildTask(taskRecord.task, taskRecord.name, taskRecord.startTime, taskRecord.finishTime, taskRecord.workerName, taskRecord.state, taskRecord.result));
+                tasks.push(new BuildTaskRun(taskRecord.task, taskRecord.name, taskRecord.startTime, taskRecord.finishTime, taskRecord.workerName, taskRecord.state, taskRecord.result));
             }
         }
-        this.setTasks(tasks);
+        this.addTasks(tasks);
     }
 
     public isFailure() : boolean {
