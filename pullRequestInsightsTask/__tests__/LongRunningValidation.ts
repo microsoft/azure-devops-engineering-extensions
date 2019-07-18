@@ -37,7 +37,6 @@ describe("LongRunningValidation Tests", () => {
        expect(validation.getLongestTaskInstanceDuration()).toBe(-Infinity);
     });
 
-
     test("Shortest duration is correct when there is a single instance",  () => {
        validation.addTaskInstance(makeFakeTask("abc", "123", 5));
        expect(validation.getShortestTaskInstanceDuration()).toBe(5);
@@ -73,7 +72,6 @@ describe("LongRunningValidation Tests", () => {
         expect(validation.getShortestTaskInstanceRegression()).toBe(3);
     });
 
-
     test("Has instances on multiple agents is false when there are no tasks added",  () => {
         expect(validation.hasInstancesOnMultipleAgents()).toBe(false);
     });
@@ -95,6 +93,21 @@ describe("LongRunningValidation Tests", () => {
 
     test("Number of agents task ran on is 0 when no instances have been added",  () => {
         expect(validation.getNumberOfAgentsRunOn()).toBe(0);
+    });
+
+    test("Has multiple instances of task when there is more than one instance",  () => {
+        addTasksToValidation([makeFakeTask("abc", "123", null, null, "a"), makeFakeTask("abc", "123", null, null, "b"), makeFakeTask("abc", "123", null, null, "c")]);
+        expect(validation.hasMultipleTaskInstances()).toBe(true);
+    });
+
+    test("Has multiple instances of task when there is more than one instance and all ran on same agent",  () => {
+        addTasksToValidation([makeFakeTask("abc", "123", null, null, "a"), makeFakeTask("abc", "123", null, null, "a"), makeFakeTask("abc", "123", null, null, "a")]);
+        expect(validation.hasMultipleTaskInstances()).toBe(true);
+    });
+
+    test("Does not have multiple instances of task when there is one instance",  () => {
+        addTasksToValidation([makeFakeTask("abc", "123", null, null, "a")]);
+        expect(validation.hasMultipleTaskInstances()).toBe(false);
     });
 
 });

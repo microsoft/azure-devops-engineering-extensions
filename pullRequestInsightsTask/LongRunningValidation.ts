@@ -61,6 +61,10 @@ export class LongRunningValidation {
         return this.getNumberOfAgentsRunOn() > 1;
     }
 
+    public hasMultipleTaskInstances(): boolean {
+        return this.taskInstances.length > 1;
+    }
+
     private getAllInstanceDurations(): number[] {
         return Array.from(this.durationsToRegressions.keys());
     }

@@ -6,7 +6,7 @@ import { Branch } from './Branch.js';
 import { LongRunningValidation } from './LongRunningValidation.js';
 
 export class LongRunningValidationsTable extends AbstractTable {
-    
+
     private static readonly TIME_LABELS: Map<() => number, string> = new Map([[Date.prototype.getUTCHours, "h"], [Date.prototype.getUTCMinutes, "m"], [Date.prototype.getUTCSeconds, "s"]]);
 
     constructor(currentCommentData?: string) {
@@ -26,10 +26,13 @@ export class LongRunningValidationsTable extends AbstractTable {
                 let durationWithRegressionText: string = this.formatDurationWithRegression(validation.getLongestTaskInstanceDuration(), validation.getLongestTaskInstanceRegression());
                 if (validation.hasInstancesOnMultipleAgents()) {
                     nameText += messages.longRunningMultiAgentLine.format(String(validation.getNumberOfAgentsRunOn()));
+                }
+                if (validation.hasMultipleTaskInstances()) {
                     durationWithRegressionText = messages.durationRangeFormat.format(durationWithRegressionText, this.formatDurationWithRegression(validation.getShortestTaskInstanceDuration(), validation.getShortestTaskInstanceRegression()));
                 }
                 tl.debug("adding long running task: " + validation.getName() + " And task has duration/regression of " + durationWithRegressionText);
                 tl.debug("task ran on " + validation.getNumberOfAgentsRunOn() + " agents");
+                tl.debug("task has multiple instances: " + validation.hasMultipleTaskInstances());
                 section += AbstractTable.NEW_LINE + nextLine.format(current.getDefinitionName(), current.getLink(), nameText, durationWithRegressionText);
             }
             this.addTextToTableInComment(section);
