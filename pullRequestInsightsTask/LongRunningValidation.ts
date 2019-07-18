@@ -1,4 +1,5 @@
 import { AbstractPipelineTask } from "./AbstractPipelineTask";
+import tl = require('azure-pipelines-task-lib/task');
 
 export class LongRunningValidation {
 
@@ -26,6 +27,7 @@ export class LongRunningValidation {
 
     public addTaskInstance(taskInstanceToAdd: AbstractPipelineTask) {
         if (this.taskShouldBeAdded(taskInstanceToAdd)) {
+            tl.debug("added task instance from agent " + taskInstanceToAdd.getAgentName() + " to long running validation " + this.name);
             this.taskInstances.push(taskInstanceToAdd);
             this.durationsToRegressions.set(taskInstanceToAdd.getDuration(), taskInstanceToAdd.calculateRegression(this.thresholdTime));
         }

@@ -76,10 +76,12 @@ export class TaskInsights {
                 let longRunningValidation: LongRunningValidation;
                 for (let validation of this.longRunningValidations) {
                     if (task.isInstanceOfTask(validation.getName(), validation.getId())) {
+                        tl.debug("found task that is instance of existing long running validation");
                         longRunningValidation = validation;
                     }
                 }
                 if (!longRunningValidation) {
+                    tl.debug("creating new long running validation");
                     longRunningValidation = new LongRunningValidation(task.getName(), task.getId(), thresholdTime);
                     this.longRunningValidations.push(longRunningValidation);
                //     this.thresholdTimes.push(thresholdTime);

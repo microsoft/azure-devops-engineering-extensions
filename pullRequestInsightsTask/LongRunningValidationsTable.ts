@@ -29,6 +29,7 @@ export class LongRunningValidationsTable extends AbstractTable {
                     durationWithRegressionText = messages.durationRangeFormat.format(durationWithRegressionText, this.formatDurationWithRegression(validation.getShortestTaskInstanceDuration(), validation.getShortestTaskInstanceRegression()));
                 }
                 tl.debug("adding long running task: " + validation.getName() + " And task has duration/regression of " + durationWithRegressionText);
+                tl.debug("task ran on " + validation.getNumberOfAgentsRunOn() + " agents");
                 section += AbstractTable.NEW_LINE + nextLine.format(current.getDefinitionName(), current.getLink(), nameText, durationWithRegressionText);
             }
             this.addTextToTableInComment(section);
