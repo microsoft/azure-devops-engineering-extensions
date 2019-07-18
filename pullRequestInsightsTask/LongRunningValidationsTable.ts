@@ -24,11 +24,11 @@ export class LongRunningValidationsTable extends AbstractTable {
                 let validation: LongRunningValidation = longRunningValidations[index];
                 let nameText: string = validation.getName();
                 let durationWithRegressionText: string = this.formatDurationWithRegression(validation.getLongestTaskInstanceDuration(), validation.getLongestTaskInstanceRegression());
-                if (validation.hasInstancesOnMultipleAgents()) {
+                //if (validation.hasInstancesOnMultipleAgents()) {
                     nameText += messages.longRunningMultiAgentLine.format(String(validation.getNumberOfAgentsRunOn()));
-                }
+              //  }
                 if (validation.hasMultipleTaskInstances()) {
-                    durationWithRegressionText = messages.durationRangeFormat.format(durationWithRegressionText, this.formatDurationWithRegression(validation.getShortestTaskInstanceDuration(), validation.getShortestTaskInstanceRegression()));
+                    durationWithRegressionText = messages.durationRangeFormat.format(this.formatDurationWithRegression(validation.getShortestTaskInstanceDuration(), validation.getShortestTaskInstanceRegression()), durationWithRegressionText);
                 }
                 tl.debug("adding long running task: " + validation.getName() + " And task has duration/regression of " + durationWithRegressionText);
                 tl.debug("task ran on " + validation.getNumberOfAgentsRunOn() + " agents");

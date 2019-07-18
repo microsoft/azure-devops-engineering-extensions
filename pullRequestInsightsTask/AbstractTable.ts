@@ -29,7 +29,7 @@ export abstract class AbstractTable {
 
     public addHeader(target: string): void {
         if (!this.tableHasData()) {
-            this.addTextToTableInComment(this.headerFormat.format(target));
+            this.addTextToTableInComment(AbstractTable.NEW_LINE + this.headerFormat.format(target));
             let numberColumns: number = this.getNumberColumns(this.currentCommentData);
             this.addTextToTableInComment(AbstractTable.NEW_LINE + AbstractTable.COLUMN_DIVIDER);
             for (let i = 0; i < numberColumns; i++) {
