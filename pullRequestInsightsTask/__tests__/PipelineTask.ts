@@ -8,12 +8,14 @@ describe("PipelineTask Tests", () => {
 
     let task: PipelineTask;
 
-    function makeFakeTaskRun(name: string, id: string, type: string, duration?: number, regression?: number, agent?: string, isLongRunning?: boolean): AbstractPipelineTaskRun {
+    function makeFakeTaskRun(name: string, id: string, type: string, duration?: number, regression?: number, agent?: string, isLongRunning?: boolean, failed?: boolean, ran?: boolean): AbstractPipelineTaskRun {
         let run = new BuildTaskRun({id: id}, name, null, null, agent, null, null);
         sinon.stub(run, "getDuration").returns(duration);
         sinon.stub(run, "calculateRegression").returns(regression);
         sinon.stub(run, "getType").returns(type);
         sinon.stub(run, "isLongRunning").returns(isLongRunning);
+        sinon.stub(run, "wasFailure").returns(failed);
+        sinon.stub(run, "ran").returns(ran);
         return run;
     }
 
@@ -105,8 +107,34 @@ describe("PipelineTask Tests", () => {
         expect(task.getNumberOfAgentsRunOn()).toBe(3);
     });
 
-    test("Number of agents task ran on is 0 when no instances have been added",  () => {
+    test("Number of agents task ran on and regressed on is 0 when no instances have been added",  () => {
         expect(task.getNumberOfAgentsRunOn()).toBe(0);
+        expect(task.getNumberOfAgentsRegressedOn()).toBe(0);
+    });
+
+    test("Number of agents task regressed on is properly calculated",  () => {
+        addTasksToValidation([makeFakeTaskRun("abc", "123", "type", null, null, "a", true), makeFakeTaskRun("abc", "123", "type", null, null, "b", true), makeFakeTaskRun("abc", "123", "type", null, null, "c", true)]);
+        expect(task.getNumberOfAgentsRegressedOn()).toBe(3);
+    });
+
+    test("Number of agents task regressed on is 0 when all instances are not long running",  () => {
+        addTasksToValidation([makeFakeTaskRun("abc", "123", "type", null, null, "a", false), makeFakeTaskRun("abc", "123", "type", null, null, "b", false), makeFakeTaskRun("abc", "123", "type", null, null, "c", false)]);
+        expect(task.getNumberOfAgentsRegressedOn()).toBe(0);
+    });
+
+    test("Task has run that failed when it is present",  () => {
+        addTasksToValidation([makeFakeTaskRun("abc", "123", "type", null, null, "a", false, false, false), makeFakeTaskRun("abc", "123", "type", null, null, "b", false, true, true), makeFakeTaskRun("abc", "123", "type", null, null, "c", false, false, true)]);
+        expect(task.hasFailedInstance()).toBe(true);
+    });
+
+    test("Task does not have run that failed when no runs finished",  () => {
+        addTasksToValidation([makeFakeTaskRun("abc", "123", "type", null, null, "a", false, true, false), makeFakeTaskRun("abc", "123", "type", null, null, "b", false, true, false), makeFakeTaskRun("abc", "123", "type", null, null, "c", false, true, false)]);
+        expect(task.hasFailedInstance()).toBe(false);
+    });
+
+    test("Task does not have run that failed when no runs are failures",  () => {
+        addTasksToValidation([makeFakeTaskRun("abc", "123", "type", null, null, "a", false, false, true), makeFakeTaskRun("abc", "123", "type", null, null, "b", false, false, true), makeFakeTaskRun("abc", "123", "type", null, null, "c", false, false, true)]);
+        expect(task.hasFailedInstance()).toBe(false);
     });
 
 });

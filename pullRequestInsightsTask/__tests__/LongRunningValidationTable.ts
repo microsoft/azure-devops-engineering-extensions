@@ -61,7 +61,7 @@ describe("LongRunningValidationTable Tests", () => {
         expect(longRunTable.getCurrentCommentData()).toBe("");
     });
 
-    test.skip("Single validation section is added to table with existing data",  () => {
+    test("Single validation section is added to table with existing data",  () => {
         longRunTable = new LongRunningValidationsTable(messages.longRunningValidationCommentTableHeading.format("master") + " \n|---|---|---|<!--longRunningValidationTable-->");
         let current: AbstractPipeline = makeFakePipeline("pipeline", "pipelineLink", 7, "defName");
         let recent: AbstractPipeline = makeFakePipeline("otherPipeline", "otherPipelineLink", 7, undefined);
@@ -70,7 +70,7 @@ describe("LongRunningValidationTable Tests", () => {
         messages.longRunningValidationCommentFirstSectionRow.format("defName", "pipelineLink", "abc", messages.durationWithRegressionFormat.format("1m 40s", "1s")) + "<!--longRunningValidationTable-->");
     });
 
-    test.skip("Multi validation section is added to table with existing data",  () => {
+    test("Multi validation section is added to table with existing data",  () => {
         longRunTable = new LongRunningValidationsTable(messages.longRunningValidationCommentTableHeading.format("master") + "\n|---|---|---|<!--longRunningValidationTable-->");
         let current: AbstractPipeline = makeFakePipeline("pipeline", "pipelineLink", 7, "defName");
         let recent: AbstractPipeline = makeFakePipeline("otherPipeline", "otherPipelineLink", 7, undefined);
