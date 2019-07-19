@@ -9,7 +9,7 @@
     "version": {
         "Major": 0,
         "Minor": 0,
-        "Patch": 77
+        "Patch": 78
     },
     "instanceNameFormat": "PR Insights",
     "inputs": [

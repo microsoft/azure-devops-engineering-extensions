@@ -1,39 +1,32 @@
 {
-    "manifestVersion": 1,
-    "id": "PullRequestInsightsExtension",
-    "name": "Pull Request Insights Extension",
-    "version": "0.0.77",
-    "publisher": "epsteam",
-    "targets": [
-        {
-            "id": "Microsoft.VisualStudio.Services"
-        }
-    ],    
-    "description": "Extension to look at pull requests and provide insights",
-    "categories": [
-        "Azure Pipelines"
-    ],
-    "icons": {
-    },    
-    "tags": [
-    ],
-    "scopes": [
-    ],
-    "files": [
-        {
-            "path": "pullRequestInsightsTask"
-        }
-    ],
-    "contributions": [
-        {
-            "id": "c4ffd380-3a3b-4fa6-b02a-00ee18afe1f4",
-            "type": "ms.vss-distributed-task.task",
-            "targets": [
-                "ms.vss-distributed-task.tasks"
-            ],
-            "properties": {
-                "name": "pullRequestInsightsTask"
-            }
-        }   
-    ]
+  "manifestVersion": 1,
+  "id": "PullRequestInsightsExtension",
+  "name": "Pull Request Insights Extension",
+  "version": "0.0.78",
+  "publisher": "epsteam",
+  "targets": [
+    {
+      "id": "Microsoft.VisualStudio.Services"
+    }
+  ],
+  "description": "Extension to look at pull requests and provide insights",
+  "categories": ["Azure Pipelines"],
+  "icons": {},
+  "tags": [],
+  "scopes": [],
+  "files": [
+    {
+      "path": "pullRequestInsightsTask"
+    }
+  ],
+  "contributions": [
+    {
+      "id": "c4ffd380-3a3b-4fa6-b02a-00ee18afe1f4",
+      "type": "ms.vss-distributed-task.task",
+      "targets": ["ms.vss-distributed-task.tasks"],
+      "properties": {
+        "name": "pullRequestInsightsTask"
+      }
+    }
+  ]
 }
