@@ -48,7 +48,6 @@ export abstract class AbstractPipeline{
 
     public getTask(name: string, id: string, type: string): PipelineTask {
         for (let task of this.getTasks()) {
-            tl.debug("feeding in type: " + type)
             if (task.isMatchingTask(name, id, type)) {
                 return task;
             }

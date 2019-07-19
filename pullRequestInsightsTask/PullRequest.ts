@@ -73,7 +73,6 @@ export class PullRequest {
         let commentThreads: azureGitInterfaces.GitPullRequestCommentThread[] = await apiCaller.getCommentThreads(this.id, this.repository, this.projectName);
         let serviceThreads: azureGitInterfaces.GitPullRequestCommentThread[] = [];
         for (let commentThread of commentThreads) {
-            tl.debug(commentThread.id + " has service properties: " + this.threadHasServiceProperties(commentThread) + " has comments: " + this.threadHasComments(commentThread));
             if (this.threadIsFromService(commentThread)) {
                 serviceThreads.push(commentThread);
                 tl.debug("the thread: thread id = " + commentThread.id + " is from service");

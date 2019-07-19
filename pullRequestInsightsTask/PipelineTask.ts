@@ -35,7 +35,7 @@ export class PipelineTask {
 
     public addTaskInstance(taskInstanceToAdd: AbstractPipelineTaskRun) {
         if (this.isMatchingTask(taskInstanceToAdd.getName(), taskInstanceToAdd.getId(), taskInstanceToAdd.getType())) {
-            tl.debug("added task instance from agent " + taskInstanceToAdd.getAgentName() + " to long running validation " + this.name);
+            tl.debug("added task instance from agent " + taskInstanceToAdd.getAgentName() + " to task " + this.name);
             this.taskRuns.push(taskInstanceToAdd);
         }
     }

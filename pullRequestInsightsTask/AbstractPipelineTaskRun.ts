@@ -39,13 +39,9 @@ export abstract class AbstractPipelineTaskRun {
         return this.agentName;
     }
 
-    // public isInstanceOfTask(nameToCompare: string, idToCompare: string): boolean {
-    //     return this.getName() === nameToCompare && this.getId() === idToCompare;
-    // }
-
     public isLongRunning(thresholdTime: number, minimumDurationMiliseconds: number, minimumRegressionMilliseconds: number): boolean {
         let taskLength = this.getDuration();
-        tl.debug("For long running calculation for task: " + this.getName() + " : " + this.getId() + " threshold time = " + thresholdTime + " minDuration = " + minimumDurationMiliseconds + " minRegression = " + minimumRegressionMilliseconds + " duration = " + taskLength + " regression = " + this.calculateRegression(thresholdTime));
+        tl.debug("For long running calculation for task instance: " + this.getName() + " : " + this.getId() + " threshold time = " + thresholdTime + " minDuration = " + minimumDurationMiliseconds + " minRegression = " + minimumRegressionMilliseconds + " duration = " + taskLength + " regression = " + this.calculateRegression(thresholdTime));
         if (thresholdTime && taskLength && this.getDuration() > minimumDurationMiliseconds && this.hasSignificantRegression(thresholdTime, minimumRegressionMilliseconds)) {
             return true;
         }
