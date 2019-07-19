@@ -1,5 +1,5 @@
 import tl = require("azure-pipelines-task-lib/task");
-import messages from "../user_messages.json";
+import messages from "../resources/user_messages.json";
 import { AbstractTable } from "./AbstractTable.js";
 import { AbstractPipeline } from "../AbstractPipeline.js";
 import { Branch } from "../Branch.js";

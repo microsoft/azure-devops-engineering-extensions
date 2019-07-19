@@ -1,5 +1,4 @@
 import tl = require("azure-pipelines-task-lib/task");
-import { EnvironmentConfigurations } from "../config/environmentConfigurations";
 import { AbstractAzureApi } from "../dataProviders/AbstractAzureApi";
 import { BuildAzureApi } from "../dataProviders/BuildAzureApi";
 import { ReleaseAzureApi } from "../ReleaseAzureApi";

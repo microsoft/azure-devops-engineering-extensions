@@ -1,7 +1,6 @@
 import { AbstractPipeline } from "../AbstractPipeline";
 import { Branch } from "../Branch";
 import "../StringExtensions";
-import { AbstractPipelineTaskRun } from "../AbstractPipelineTaskRun";
 import tl = require("azure-pipelines-task-lib/task");
 import { PipelineTask } from "../PipelineTask";
 

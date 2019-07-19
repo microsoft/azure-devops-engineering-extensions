@@ -1,7 +1,7 @@
 import { AbstractTable } from "./AbstractTable";
 import { AbstractPipeline } from "../AbstractPipeline";
 import { Branch } from "../Branch";
-import messages from "../user_messages.json";
+import messages from "../resources/user_messages.json";
 import { PipelineTask } from "../PipelineTask";
 
 export class FailureTable extends AbstractTable {

@@ -1,8 +1,7 @@
 import * as azureGitInterfaces from "azure-devops-node-api/interfaces/GitInterfaces";
-import messages from "./user_messages.json";
 import { AbstractAzureApi } from "./dataProviders/AbstractAzureApi.js";
 import tl = require("azure-pipelines-task-lib/task");
-import commentProperties from "./service_comment_properties.json";
+import commentProperties from "./resources/service_comment_properties.json";
 import { ServiceComment } from "./models/ServiceComment.js";
 
 export class PullRequest {
@@ -46,7 +45,6 @@ export class PullRequest {
       [commentProperties.taskPropertyName]: commentProperties.taskPropertyValue,
       [commentProperties.iterationPropertyName]: this.mostRecentSourceCommitId
     };
-    tl.debug(messages.commentCompletedMessage);
     return apiCaller.postNewCommentThread(
       thread,
       this.id,
