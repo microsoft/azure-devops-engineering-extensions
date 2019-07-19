@@ -3,7 +3,7 @@ import sinon from "sinon";
 import { Branch } from "../Branch";
 import { Release } from "../Release";
 import { mock } from "ts-mockito";
-import { FailureTable } from "../FailureTable";
+import { FailureTable } from "../models/FailureTable";
 
 
 describe("FailureTable Tests", () => {

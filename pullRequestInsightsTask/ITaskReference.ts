@@ -1,5 +1,5 @@
 export interface ITaskReference {
-    name?: string,
-    id?: string,
-    version?: string
+  name?: string;
+  id?: string;
+  version?: string;
 }

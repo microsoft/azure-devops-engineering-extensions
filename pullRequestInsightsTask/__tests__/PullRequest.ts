@@ -1,6 +1,6 @@
 import * as azureGitInterfaces from "azure-devops-node-api/interfaces/GitInterfaces";
 import { PullRequest } from "../PullRequest";
-import { AbstractAzureApi } from "../AbstractAzureApi";
+import { AbstractAzureApi } from "../dataProviders/AbstractAzureApi";
 import mockito, { mock } from "ts-mockito";
 import { ReleaseAzureApi } from "../ReleaseAzureApi";
 import sinon, { assert } from "sinon";

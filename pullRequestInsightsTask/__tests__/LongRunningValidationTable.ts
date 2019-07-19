@@ -6,7 +6,7 @@ import messages from '../user_messages.json';
 import { Branch } from "../Branch";
 import { AbstractPipelineTaskRun } from "../AbstractPipelineTaskRun";
 import { BuildTaskRun } from "../BuildTaskRun";
-import { LongRunningValidationsTable } from "../LongRunningValidationsTable";
+import { LongRunningValidationsTable } from "../models/LongRunningValidationsTable";
 import { PipelineTask } from "../PipelineTask";
 
 describe("LongRunningValidationTable Tests", () => {

@@ -1,4 +1,4 @@
-import { EnvironmentConfigurations } from "../EnvironmentConfigurations";
+import { EnvironmentConfigurations } from "../config/environmentConfigurations";
 import * as tl from 'azure-pipelines-task-lib/task';
 import sinon from "sinon";
 
