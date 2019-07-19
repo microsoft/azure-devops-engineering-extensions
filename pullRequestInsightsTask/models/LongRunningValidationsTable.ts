@@ -48,8 +48,8 @@ export class LongRunningValidationsTable extends AbstractTable {
           );
         }
         if (
-          validation.getShortestRegression() !=
-          validation.getLongestRegression()
+          this.formatMillisecondsAsTime(validation.getShortestRegression()) !==
+          this.formatMillisecondsAsTime(validation.getLongestRegression())
         ) {
           durationWithRegressionText = messages.durationRangeFormat.format(
             this.formatDurationWithRegression(
