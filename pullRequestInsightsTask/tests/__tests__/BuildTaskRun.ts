@@ -1,7 +1,7 @@
 import * as azureBuildInterfaces from "azure-devops-node-api/interfaces/BuildInterfaces";
 import sinon from "sinon";
-import { BuildTaskRun } from "../BuildTaskRun";
-import { AbstractPipelineTaskRun } from "../AbstractPipelineTaskRun";
+import { BuildTaskRun } from "../../dataModels/BuildTaskRun";
+import { AbstractPipelineTaskRun } from "../../dataModels/AbstractPipelineTaskRun";
 
 describe("BuildTaskRun Tests", () => {
   let task: AbstractPipelineTaskRun;

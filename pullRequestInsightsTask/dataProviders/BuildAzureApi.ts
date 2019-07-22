@@ -1,9 +1,9 @@
 import { AbstractAzureApi } from "./AbstractAzureApi";
 import * as azureBuildInterfaces from "azure-devops-node-api/interfaces/BuildInterfaces";
-import { AbstractPipeline } from "../AbstractPipeline";
-import { Build } from "../Build";
+import { Build } from "../dataModels/Build";
 import { PipelineData } from "../config/PipelineData";
 import tl = require("azure-pipelines-task-lib/task");
+import { AbstractPipeline } from "../dataModels/AbstractPipeline";
 
 export class BuildAzureApi extends AbstractAzureApi {
   static readonly DESIRED_BUILD_STATUS: number =

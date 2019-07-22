@@ -1,8 +1,8 @@
 import { AbstractTable } from "./AbstractTable";
-import { AbstractPipeline } from "../AbstractPipeline";
-import { Branch } from "../Branch";
 import messages from "../resources/user_messages.json";
-import { PipelineTask } from "../PipelineTask";
+import { Branch } from "../dataModels/Branch";
+import { PipelineTask } from "../dataModels/PipelineTask";
+import { AbstractPipeline } from "../dataModels/AbstractPipeline";
 
 export class FailureTable extends AbstractTable {
   constructor(currentCommentData?: string) {

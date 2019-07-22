@@ -1,7 +1,7 @@
 import tl = require("azure-pipelines-task-lib/task");
 import { EnvironmentConfigurations } from "./config/environmentConfigurations";
 import messages from "./resources/user_messages.json";
-import "./StringExtensions";
+import "./utils/StringExtensions";
 import { PipelineData } from "./config/PipelineData";
 import { TaskInsights } from "./TaskInsights";
 

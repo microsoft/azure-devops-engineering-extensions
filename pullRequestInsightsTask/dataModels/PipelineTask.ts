@@ -110,6 +110,10 @@ export class PipelineTask {
     );
   }
 
+  public getRegressionThreshold(): number {
+    return this.thresholdTime;
+  }
+
   public hasFailedInstance(): boolean {
     for (let run of this.taskRuns) {
       if (run.ran() && run.wasFailure()) {

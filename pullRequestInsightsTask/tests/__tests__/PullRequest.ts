@@ -1,12 +1,12 @@
 import * as azureGitInterfaces from "azure-devops-node-api/interfaces/GitInterfaces";
-import { PullRequest } from "../PullRequest";
-import { AbstractAzureApi } from "../dataProviders/AbstractAzureApi";
+import { AbstractAzureApi } from "../../dataProviders/AbstractAzureApi";
 import { mock } from "ts-mockito";
-import { ReleaseAzureApi } from "../ReleaseAzureApi";
 import sinon from "sinon";
-import "../StringExtensions";
+import "../../utils/StringExtensions";
 import tl = require("azure-pipelines-task-lib/task");
-import commentProperties from "../resources/service_comment_properties.json";
+import commentProperties from "../../resources/service_comment_properties.json";
+import { ReleaseAzureApi } from "../../dataModels/ReleaseAzureApi";
+import { PullRequest } from "../../dataModels/PullRequest";
 
 describe("PullRequest Tests", () => {
   let pullRequest: PullRequest;

@@ -1,7 +1,7 @@
 import * as azureReleaseInterfaces from "azure-devops-node-api/interfaces/ReleaseInterfaces";
 import { AbstractPipeline } from "./AbstractPipeline";
 import { AbstractPipelineTaskRun } from "./AbstractPipelineTaskRun";
-import { AbstractAzureApi } from "./dataProviders/AbstractAzureApi";
+import { AbstractAzureApi } from "../dataProviders/AbstractAzureApi";
 import { ReleaseTaskRun } from "./ReleaseTaskRun";
 import tl = require("azure-pipelines-task-lib/task");
 

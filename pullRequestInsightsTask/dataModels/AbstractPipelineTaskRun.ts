@@ -71,22 +71,6 @@ export abstract class AbstractPipelineTaskRun {
     minimumRegressionMilliseconds: number
   ): boolean {
     let taskLength: number = this.getDuration();
-    tl.debug(
-      "For long running calculation for task instance: " +
-        this.getName() +
-        " : " +
-        this.getId() +
-        " threshold time = " +
-        thresholdTime +
-        " minDuration = " +
-        minimumDurationMiliseconds +
-        " minRegression = " +
-        minimumRegressionMilliseconds +
-        " duration = " +
-        taskLength +
-        " regression = " +
-        this.calculateRegression(thresholdTime)
-    );
     if (
       thresholdTime &&
       taskLength &&

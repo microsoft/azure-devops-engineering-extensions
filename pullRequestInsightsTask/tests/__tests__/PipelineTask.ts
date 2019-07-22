@@ -1,7 +1,7 @@
-import { PipelineTask } from "../PipelineTask";
-import { BuildTaskRun } from "../BuildTaskRun";
-import { AbstractPipelineTaskRun } from "../AbstractPipelineTaskRun";
+import { PipelineTask } from "../../dataModels/PipelineTask";
+import { BuildTaskRun } from "../../dataModels/BuildTaskRun";
 import sinon from "sinon";
+import { AbstractPipelineTaskRun } from "../../dataModels/AbstractPipelineTaskRun";
 
 describe("PipelineTask Tests", () => {
   let task: PipelineTask;

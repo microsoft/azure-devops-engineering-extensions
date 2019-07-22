@@ -1,8 +1,8 @@
-import { Build } from "../Build";
+import { Build } from "../../dataModels/Build";
 import * as sinon from "sinon";
-import { Branch } from "../Branch";
-import { AbstractPipeline } from "../AbstractPipeline";
-import { PipelineTask } from "../PipelineTask";
+import { AbstractPipeline } from "../../dataModels/AbstractPipeline";
+import { PipelineTask } from "../../dataModels/PipelineTask";
+import { Branch } from "../../dataModels/Branch";
 
 describe("Branch Tests", () => {
   let failedBuildOne: AbstractPipeline;

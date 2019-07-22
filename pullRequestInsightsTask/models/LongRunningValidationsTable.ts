@@ -1,11 +1,11 @@
 import tl = require("azure-pipelines-task-lib/task");
 import messages from "../resources/user_messages.json";
-import { AbstractTable } from "./AbstractTable.js";
-import { AbstractPipeline } from "../AbstractPipeline.js";
-import { Branch } from "../Branch.js";
-import { PipelineTask } from "../PipelineTask.js";
+import { AbstractPipeline } from "../dataModels/AbstractPipeline.js";
+import { PipelineTask } from "../dataModels/PipelineTask.js";
+import {;AbstractTable} from "./AbstractTable";
 
 export class LongRunningValidationsTable extends AbstractTable {
+ 
   private static readonly TIME_LABELS: Map<() => number, string> = new Map([
     [Date.prototype.getUTCHours, "h"],
     [Date.prototype.getUTCMinutes, "m"],

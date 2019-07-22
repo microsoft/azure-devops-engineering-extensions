@@ -1,9 +1,10 @@
-import { AbstractPipeline } from "../AbstractPipeline";
 import sinon from "sinon";
-import { Branch } from "../Branch";
-import { Release } from "../Release";
 import { mock } from "ts-mockito";
-import { FailureTable } from "../models/FailureTable";
+import { FailureTable } from "../../models/FailureTable";
+import { Release } from "../../dataModels/Release";
+import { AbstractPipeline } from "../../dataModels/AbstractPipeline";
+import { Branch } from "../../dataModels/Branch";
+
 
 describe("FailureTable Tests", () => {
   let failureTable: FailureTable;

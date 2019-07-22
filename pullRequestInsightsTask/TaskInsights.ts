@@ -1,16 +1,15 @@
 import { PipelineData } from "./config/PipelineData";
 import { AzureApiFactory } from "./factories/AzureApiFactory";
-import { Branch } from "./Branch";
 import { AbstractAzureApi } from "./dataProviders/AbstractAzureApi";
-import { PullRequest } from "./PullRequest";
 import tl = require("azure-pipelines-task-lib/task");
 import * as azureGitInterfaces from "azure-devops-node-api/interfaces/GitInterfaces";
-import { AbstractPipeline } from "./AbstractPipeline";
-import { AbstractPipelineTaskRun } from "./AbstractPipelineTaskRun";
+import { AbstractPipeline } from "./dataModels/AbstractPipeline";
 import { TableFactory } from "./factories/TableFactory";
 import { ServiceComment } from "./models/ServiceComment";
-import { PipelineTask } from "./PipelineTask";
-import { TelemetryInformation } from "./TelemetryInformation";
+import { PipelineTask } from "./dataModels/PipelineTask";
+import { TelemetryInformation } from "./telemetry/TelemetryInformation";
+import { Branch } from "./dataModels/Branch";
+import { PullRequest } from "./dataModels/PullRequest";
 
 export class TaskInsights {
   public static readonly NUMBER_PIPELINES_FOR_HEALTH = 3;
@@ -136,7 +135,19 @@ export class TaskInsights {
       "Number of longRunningValidations = " + this.longRunningValidations.length
     );
     for (let validation of this.longRunningValidations) {
-      tl.debug("Name = " + validation.getName());
+      tl.debug("Name of long running validation = " + validation.getName());
+      tl.debug("Threshold time " + validation.getRegressionThreshold());
+      tl.debug("Durations of all tasks: " + validation.getAllDurations);
+      tl.debug(
+        "Number of agents regressed on: " +
+          validation.getNumberOfAgentsRegressedOn
+      );
+      tl.debug(
+        "Range of regressive durations " +
+          validation.getShortestRegressiveDuration() +
+          " - " +
+          validation.getLongestRegressiveDuration()
+      );
     }
   }
 

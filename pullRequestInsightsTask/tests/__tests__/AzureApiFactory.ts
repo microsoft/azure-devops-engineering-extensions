@@ -1,7 +1,7 @@
-import { AzureApiFactory } from "../factories/AzureApiFactory";
 import sinon from "sinon";
-import { HostTypeError } from "../exceptions/HostTypeError";
-import { PipelineData } from "../config/PipelineData";
+import { HostTypeError } from "../../exceptions/HostTypeError";
+import { PipelineData } from "../../config/PipelineData";
+import { AzureApiFactory } from "../../factories/AzureApiFactory";
 
 describe("AzureApiFactory Tests", () => {
   let data: PipelineData;

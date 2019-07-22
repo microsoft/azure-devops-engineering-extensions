@@ -1,7 +1,7 @@
 import { AbstractPipelineTaskRun } from "./AbstractPipelineTaskRun";
-import { AbstractAzureApi } from "./dataProviders/AbstractAzureApi";
-import { PipelineTask } from "./PipelineTask";
 import tl = require("azure-pipelines-task-lib/task");
+import { PipelineTask } from "./PipelineTask";
+import { AbstractAzureApi } from "../dataProviders/AbstractAzureApi";
 
 export abstract class AbstractPipeline {
   private tasks: PipelineTask[];

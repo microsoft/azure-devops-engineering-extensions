@@ -1,9 +1,9 @@
 import * as azureReleaseInterfaces from "azure-devops-node-api/interfaces/ReleaseInterfaces";
-import { AbstractAzureApi } from "./dataProviders/AbstractAzureApi";
-import { Release } from "./Release";
+import { AbstractAzureApi } from "../dataProviders/AbstractAzureApi";
 import tl = require("azure-pipelines-task-lib/task");
-import { AbstractPipeline } from "./AbstractPipeline";
-import { PipelineData } from "./config/PipelineData";
+import { PipelineData } from "../config/PipelineData";
+import { AbstractPipeline } from "../dataModels/AbstractPipeline";
+import { Release } from "../dataModels/Release";
 
 export class ReleaseAzureApi extends AbstractAzureApi {
   public static readonly DESIRED_RELEASE_ENVIRONMENT_STATUS: number =

@@ -1,13 +1,11 @@
-import { AbstractPipeline } from "../AbstractPipeline";
+import { AbstractPipeline } from "../../dataModels/AbstractPipeline";
 import sinon from "sinon";
-import { Release } from "../Release";
 import { mock } from "ts-mockito";
-import messages from "../resources/user_messages.json";
-import { Branch } from "../Branch";
-import { AbstractPipelineTaskRun } from "../AbstractPipelineTaskRun";
-import { BuildTaskRun } from "../BuildTaskRun";
-import { LongRunningValidationsTable } from "../models/LongRunningValidationsTable";
-import { PipelineTask } from "../PipelineTask";
+import messages from "../../resources/user_messages.json";
+import { LongRunningValidationsTable } from "../../models/LongRunningValidationsTable";
+import { PipelineTask } from "../../dataModels/PipelineTask";
+import { Branch } from "../../dataModels/Branch";
+import { Release } from "../../dataModels/Release";
 
 describe("LongRunningValidationTable Tests", () => {
   let longRunTable: LongRunningValidationsTable;

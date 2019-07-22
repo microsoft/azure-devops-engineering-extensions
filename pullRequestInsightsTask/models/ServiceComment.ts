@@ -1,12 +1,12 @@
-import { Branch } from "../Branch";
 import tl = require("azure-pipelines-task-lib/task");
 import * as azureGitInterfaces from "azure-devops-node-api/interfaces/GitInterfaces";
 import { AbstractTable } from "./AbstractTable";
-import { AbstractPipeline } from "../AbstractPipeline";
+import { AbstractPipeline } from "../dataModels/AbstractPipeline";
 import { TableFactory } from "../factories/TableFactory";
 import messages from "../resources/user_messages.json";
 import { TaskInsights } from "../TaskInsights";
-import { PipelineTask } from "../PipelineTask";
+import { Branch } from "../dataModels/Branch";
+import { PipelineTask } from "../dataModels/PipelineTask";
 
 export class ServiceComment {
   private id: number;

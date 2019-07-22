@@ -1,9 +1,9 @@
 import tl = require("azure-pipelines-task-lib/task");
 import { AbstractAzureApi } from "../dataProviders/AbstractAzureApi";
 import { BuildAzureApi } from "../dataProviders/BuildAzureApi";
-import { ReleaseAzureApi } from "../ReleaseAzureApi";
 import { HostTypeError } from "../exceptions/HostTypeError";
 import { PipelineData } from "../config/PipelineData";
+import { ReleaseAzureApi } from "../dataProviders/ReleaseAzureApi";
 
 export class AzureApiFactory {
   public static readonly BUILD: string = "build";

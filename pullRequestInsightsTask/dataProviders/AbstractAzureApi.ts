@@ -4,9 +4,9 @@ import {
   WebApi,
   getPersonalAccessTokenHandler
 } from "azure-devops-node-api/WebApi";
-import { AbstractPipeline } from "../AbstractPipeline";
-import { PullRequest } from "../PullRequest";
+import { AbstractPipeline } from "../dataModels/AbstractPipeline";
 import { PipelineData } from "../config/PipelineData";
+import { PullRequest } from "../dataModels/PullRequest";
 
 export abstract class AbstractAzureApi {
   private connection: WebApi;

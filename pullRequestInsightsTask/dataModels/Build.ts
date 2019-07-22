@@ -2,7 +2,7 @@ import { AbstractPipeline } from "./AbstractPipeline";
 import * as azureBuildInterfaces from "azure-devops-node-api/interfaces/BuildInterfaces";
 import { AbstractPipelineTaskRun } from "./AbstractPipelineTaskRun";
 import { BuildTaskRun } from "./BuildTaskRun";
-import { AbstractAzureApi } from "./dataProviders/AbstractAzureApi";
+import { AbstractAzureApi } from "../dataProviders/AbstractAzureApi";
 
 export class Build extends AbstractPipeline {
   private buildData: azureBuildInterfaces.Build;

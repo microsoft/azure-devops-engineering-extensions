@@ -1,8 +1,8 @@
-import { AbstractPipeline } from "../AbstractPipeline";
-import { Branch } from "../Branch";
-import "../StringExtensions";
+import { AbstractPipeline } from "../dataModels/AbstractPipeline";
+import "../utils/StringExtensions";
 import tl = require("azure-pipelines-task-lib/task");
-import { PipelineTask } from "../PipelineTask";
+import { PipelineTask } from "../dataModels/PipelineTask";
+import { Branch } from "../dataModels/Branch";
 
 export abstract class AbstractTable {
   private currentCommentData: string;

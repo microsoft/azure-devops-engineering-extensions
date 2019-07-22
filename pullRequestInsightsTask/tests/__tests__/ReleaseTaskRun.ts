@@ -1,5 +1,5 @@
 import * as azureReleaseInterfaces from "azure-devops-node-api/interfaces/ReleaseInterfaces";
-import { ReleaseTaskRun } from "../ReleaseTaskRun";
+import { ReleaseTaskRun } from "../../dataModels/ReleaseTaskRun";
 
 describe("ReleaseTaskRun Tests", () => {
   let task: ReleaseTaskRun;

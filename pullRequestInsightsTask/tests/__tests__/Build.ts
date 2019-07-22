@@ -1,5 +1,5 @@
 import * as azureBuildInterfaces from "azure-devops-node-api/interfaces/BuildInterfaces";
-import { Build } from "../Build";
+import { Build } from "../../dataModels/Build";
 
 describe("Build Tests", () => {
   let build: Build;

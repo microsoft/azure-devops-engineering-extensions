@@ -1,4 +1,4 @@
-import { Release } from "../Release";
+import { Release } from "../../dataModels/Release";
 import * as azureReleaseInterfaces from "azure-devops-node-api/interfaces/ReleaseInterfaces";
 
 describe("Release Tests", () => {
