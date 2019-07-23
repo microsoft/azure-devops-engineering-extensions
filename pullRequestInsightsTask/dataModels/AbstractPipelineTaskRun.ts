@@ -1,5 +1,5 @@
 import tl = require("azure-pipelines-task-lib/task");
-import { ITaskReference } from "./ITaskReference";
+import { ITaskRunReference } from "./ITaskRunReference";
 
 export abstract class AbstractPipelineTaskRun {
   private name: string;
@@ -10,7 +10,7 @@ export abstract class AbstractPipelineTaskRun {
   private agentName: string;
 
   constructor(
-    taskRunReference: ITaskReference,
+    taskRunReference: ITaskRunReference,
     name: string,
     startTime: Date,
     finishTime: Date,

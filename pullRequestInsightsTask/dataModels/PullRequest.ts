@@ -24,14 +24,26 @@ export class PullRequest {
     this.parseDataForMostRecentSourceCommitId();
   }
 
+  /**
+   * Gets name of branch to which pull request is merging
+   */
   public getTargetBranchName(): string {
     return this.pullRequestData.targetRefName;
   }
 
+  /**
+   * Gets id of most recent source commit made
+   */
   public getMostRecentSourceCommitId(): string {
     return this.mostRecentSourceCommitId;
   }
 
+  /**
+   * Post new comment thread on pull request page
+   * @param apiCaller Object to make API calls to AzureDevOps service
+   * @param commentContent Content of comment to post in new thread
+   * @param postStatus Status of thread to post
+   */
   public async postNewThread(
     apiCaller: AbstractAzureApi,
     commentContent: string,
@@ -53,6 +65,11 @@ export class PullRequest {
     );
   }
 
+  /**
+   * Edits comments made by Pull Request Insights task
+   * @param apiCaller Object to make API calls to AzureDevOps service
+   * @param serviceComment Updated Pull Request Insights comment
+   */
   public async editServiceComment(
     apiCaller: AbstractAzureApi,
     serviceComment: ServiceComment
@@ -67,6 +84,12 @@ export class PullRequest {
     );
   }
 
+  /**
+   * Changes status of Pull Request Insights task comment threads to Closed, with exception of current iteration comment thread
+   * @param apiCaller Object to make API calls to AzureDevOps service
+   * @param serviceComments Comments to close
+   * @param currentIterationCommentId Id of current thread that should not be closed
+   */
   public async deactivateOldComments(
     apiCaller: AbstractAzureApi,
     serviceComments: azureGitInterfaces.GitPullRequestCommentThread[],
@@ -91,6 +114,12 @@ export class PullRequest {
     }
   }
 
+  /**
+   * Deletes Pull Request Insights task comment threads, with exception of current iteration comment thread
+   * @param apiCaller Object to make API calls to AzureDevOps service
+   * @param serviceComments Comments to delete
+   * @param currentIterationCommentId Id of current thread that should not be closed
+   */
   public async deleteOldComments(
     apiCaller: AbstractAzureApi,
     serviceComments: azureGitInterfaces.GitPullRequestCommentThread[],
@@ -112,12 +141,21 @@ export class PullRequest {
     }
   }
 
+  /**
+   * Checks to see if this pull request has a comment thread from Pull Request Insights task for the most recent source commit
+   * @param threads Threads on this pull request
+   */
   public hasServiceThreadForExistingIteration(
     threads: azureGitInterfaces.GitPullRequestCommentThread[]
   ): boolean {
     return this.getCurrentIterationCommentThread(threads) != null;
   }
 
+  /**
+   * Creates a ServiceComment object to represent the current iteration by finding current data on this pull request
+   * page or creating a new ServiceComment object
+   * @param threads Threads on this pull request to search for existing comment data
+   */
   public makeCurrentIterationComment(
     threads: azureGitInterfaces.GitPullRequestCommentThread[]
   ): ServiceComment {

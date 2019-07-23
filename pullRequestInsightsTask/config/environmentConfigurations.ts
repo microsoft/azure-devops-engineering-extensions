@@ -21,10 +21,17 @@ export class EnvironmentConfigurations {
   public static readonly PULL_KEY: string = "pull";
   public static readonly SEPERATOR: string = "/";
 
+  /**
+   * Fetches environment variable from system using a key
+   * @param key String with which to fetch value
+   */
   public getValue(key: string) {
-    return this.loadFromEnvironment(key);
+    return tl.getVariable(key);
   }
 
+  /**
+   * Gets access token from system
+   */
   public getAccessKey(): string {
     return tl.getEndpointAuthorizationParameter(
       EnvironmentConfigurations.VSS_CONNECTION_KEY,
@@ -33,6 +40,9 @@ export class EnvironmentConfigurations {
     );
   }
 
+  /**
+   * Gets id of pull request of pipeline task is running within, returns null if pipeline is not within pull request
+   */
   public getPullRequestId(): number {
     let pullRequestId: number = Number(
       this.tryKeys(EnvironmentConfigurations.PULL_REQUEST_ID_KEYS)
@@ -52,18 +62,17 @@ export class EnvironmentConfigurations {
     return pullRequestId;
   }
 
+  /**
+   * Attempts to load several keys from the environment and stops when a valid variable is found
+   */
   private tryKeys(keys: string[]) {
     let result: string;
     for (let key of keys) {
-      result = this.loadFromEnvironment(key);
+      result = this.getValue(key);
       if (result) {
         break;
       }
     }
     return result;
-  }
-
-  private loadFromEnvironment(key: string): string {
-    return tl.getVariable(key);
   }
 }

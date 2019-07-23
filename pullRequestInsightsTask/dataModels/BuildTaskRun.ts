@@ -1,13 +1,13 @@
 import { AbstractPipelineTaskRun } from "./AbstractPipelineTaskRun";
 import * as azureBuildInterfaces from "azure-devops-node-api/interfaces/BuildInterfaces";
-import { ITaskReference } from "./ITaskReference";
+import { ITaskRunReference } from "./ITaskRunReference";
 
 export class BuildTaskRun extends AbstractPipelineTaskRun {
   private state: azureBuildInterfaces.TimelineRecordState;
   private result: azureBuildInterfaces.TaskResult;
 
   constructor(
-    taskRunReference: ITaskReference,
+    taskRunReference: ITaskRunReference,
     name: string,
     startTime: Date,
     finishTime: Date,

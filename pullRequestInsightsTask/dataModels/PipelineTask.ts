@@ -70,6 +70,9 @@ export class PipelineTask {
     this.minimumRegressionMilliseconds = minimumRegressionMilliseconds;
   }
 
+  /**
+   * Gets durations of all completed run instances of this task
+   */
   public getAllDurations(): number[] {
     let durations: number[] = [];
     for (let run of this.taskRuns) {
@@ -80,40 +83,64 @@ export class PipelineTask {
     return durations;
   }
 
+  /**
+   * Gets longest duration of a run that is regressive based on currently set regression standards for this task
+   */
   public getLongestRegressiveDuration(): number {
     return Math.max(...this.getAllRegressiveDurations());
   }
 
+  /**
+   * Gets shortest duration of a run that is regressive based on currently set regression standards for this task
+   */
   public getShortestRegressiveDuration(): number {
     return Math.min(...this.getAllRegressiveDurations());
   }
 
+  /**
+   * Gets longest regression time of a run based on currently set regression standards for this task
+   */
   public getLongestRegression(): number {
     return this.getDurationsToRegression().get(
       this.getLongestRegressiveDuration()
     );
   }
 
+  /**
+   * Gets shortest regression time of a run based on currently set regression standards for this task
+   */
   public getShortestRegression(): number {
     return this.getDurationsToRegression().get(
       this.getShortestRegressiveDuration()
     );
   }
 
+  /**
+   * Gets total number of unique agents task has had instances run on
+   */
   public getNumberOfAgentsRunOn(): number {
     return this.calculateNumberOfAgentsForGivenRuns(this.taskRuns);
   }
 
+  /**
+   * Gets number of unique agents task has had instances that regressed run on based on currently set regression standards
+   */
   public getNumberOfAgentsRegressedOn(): number {
     return this.calculateNumberOfAgentsForGivenRuns(
       this.getRegressiveInstances()
     );
   }
 
+  /**
+   * Gets currently set regression threshold time
+   */
   public getRegressionThreshold(): number {
     return this.thresholdTime;
   }
 
+  /**
+   * Determines if this task has had an instance run that failed
+   */
   public hasFailedInstance(): boolean {
     for (let run of this.taskRuns) {
       if (run.ran() && run.wasFailure()) {
@@ -123,10 +150,19 @@ export class PipelineTask {
     return false;
   }
 
+  /**
+   * Determines if this task has had an instance run that regressed based on currently set regression standards
+   */
   public hasRegressiveInstances(): boolean {
     return this.getRegressiveInstances().length > 0;
   }
 
+  /**
+   * Checks if task matches standards given
+   * @param nameToCompare Name with which to compare this task's name
+   * @param idToCompare Id with which to compare this task's id
+   * @param typeToCompare Type with which to compare this task's type
+   */
   public isMatchingTask(
     nameToCompare: string,
     idToCompare: string,
@@ -139,6 +175,10 @@ export class PipelineTask {
     );
   }
 
+  /**
+   * Determines the number of unique agents for a given set of task runs
+   * @param runs Runs of this task for which to determine unique agents
+   */
   private calculateNumberOfAgentsForGivenRuns(
     runs: AbstractPipelineTaskRun[]
   ): number {
@@ -149,10 +189,16 @@ export class PipelineTask {
     return agents.size;
   }
 
+  /**
+   * Gathers all durations of runs of this task that are regressive based on currently set regression standards
+   */
   private getAllRegressiveDurations(): number[] {
     return Array.from(this.getDurationsToRegression().keys());
   }
 
+  /**
+   * Creates a map of regressive durations of runs of this task to their regression time
+   */
   private getDurationsToRegression(): Map<number, number> {
     let durationsToRegressions: Map<number, number> = new Map<number, number>();
     for (let run of this.getRegressiveInstances()) {
@@ -164,6 +210,9 @@ export class PipelineTask {
     return durationsToRegressions;
   }
 
+  /**
+   * Gathers all regressive runs of this task based on currently set regression standards
+   */
   private getRegressiveInstances(): AbstractPipelineTaskRun[] {
     let regressiveRuns: AbstractPipelineTaskRun[] = [];
     for (let run of this.taskRuns) {

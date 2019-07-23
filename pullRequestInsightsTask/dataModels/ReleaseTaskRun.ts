@@ -1,7 +1,7 @@
 import { AbstractPipelineTaskRun } from "./AbstractPipelineTaskRun";
 import * as azureReleaseInterfaces from "azure-devops-node-api/interfaces/ReleaseInterfaces";
 import tl = require("azure-pipelines-task-lib/task");
-import { ITaskReference } from "./ITaskReference";
+import { ITaskRunReference } from "./ITaskRunReference";
 
 export class ReleaseTaskRun extends AbstractPipelineTaskRun {
   private taskStatus: azureReleaseInterfaces.TaskStatus;
@@ -18,7 +18,7 @@ export class ReleaseTaskRun extends AbstractPipelineTaskRun {
   ];
 
   constructor(
-    taskRunReference: ITaskReference,
+    taskRunReference: ITaskRunReference,
     name: string,
     startTime: Date,
     finishTime: Date,

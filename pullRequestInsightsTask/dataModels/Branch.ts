@@ -16,6 +16,10 @@ export class Branch {
     this.name = name;
   }
 
+  /**
+   * Sets pipelines on this branch
+   * @param pipelines Pipelines to use for this branch
+   */
   public setPipelines(pipelines: AbstractPipeline[]): void {
     this.pipelines = pipelines;
     tl.debug(
@@ -26,6 +30,10 @@ export class Branch {
     );
   }
 
+  /**
+   * Determines if this branch is healthy based on pipelines on its pipelines
+   * @param numberPipelinesToConsider Number of past pipelines to use to determine health
+   */
   public isHealthy(numberPipelinesToConsider: number): boolean {
     let pipelinesToConsider: AbstractPipeline[] = [];
     if (this.pipelines) {
@@ -66,6 +74,9 @@ export class Branch {
     return true;
   }
 
+  /**
+   * Counts how many of most recent pipelines failed on this branch in a row
+   */
   public getPipelineFailStreak(): number {
     let count: number = 0;
     for (
@@ -92,10 +103,16 @@ export class Branch {
     return null;
   }
 
+  /**
+   * Gets name of this pipeline
+   */
   public getFullName(): string {
     return this.name;
   }
 
+  /**
+   * Gets display name of this pipeline
+   */
   public getTruncatedName(): string {
     let truncatedName: string = this.name;
     let seperatedName: string[] = truncatedName.split(Branch.NAME_SEPERATOR);
@@ -137,6 +154,12 @@ export class Branch {
     }
   }
 
+  /**
+   * Gathers times across all pipelines on this branch for task with given details
+   * @param taskName Name of task to find
+   * @param taskId Id of task to find
+   * @param taskType Type of task to find
+   */
   private getAllPipelineTimesForTask(
     taskName: string,
     taskId: string,
