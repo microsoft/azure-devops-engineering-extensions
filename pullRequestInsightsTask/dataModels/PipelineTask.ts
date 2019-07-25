@@ -74,8 +74,8 @@ export class PipelineTask {
    * Gets durations of all completed run instances of this task
    */
   public getAllDurations(): number[] {
-    let durations: number[] = [];
-    for (let run of this.taskRuns) {
+    const durations: number[] = [];
+    for (const run of this.taskRuns) {
       if (run.getDuration()) {
         durations.push(run.getDuration());
       }
@@ -142,7 +142,7 @@ export class PipelineTask {
    * Determines if this task has had an instance run that failed
    */
   public hasFailedInstance(): boolean {
-    for (let run of this.taskRuns) {
+    for (const run of this.taskRuns) {
       if (run.ran() && run.wasFailure()) {
         return true;
       }
@@ -182,8 +182,8 @@ export class PipelineTask {
   private calculateNumberOfAgentsForGivenRuns(
     runs: AbstractPipelineTaskRun[]
   ): number {
-    let agents: Set<string> = new Set();
-    for (let run of runs) {
+    const agents: Set<string> = new Set();
+    for (const run of runs) {
       agents.add(run.getAgentName());
     }
     return agents.size;
@@ -200,8 +200,8 @@ export class PipelineTask {
    * Creates a map of regressive durations of runs of this task to their regression time
    */
   private getDurationsToRegression(): Map<number, number> {
-    let durationsToRegressions: Map<number, number> = new Map<number, number>();
-    for (let run of this.getRegressiveInstances()) {
+    const durationsToRegressions: Map<number, number> = new Map<number, number>();
+    for (const run of this.getRegressiveInstances()) {
       durationsToRegressions.set(
         run.getDuration(),
         run.calculateRegression(this.thresholdTime)
@@ -214,8 +214,8 @@ export class PipelineTask {
    * Gathers all regressive runs of this task based on currently set regression standards
    */
   private getRegressiveInstances(): AbstractPipelineTaskRun[] {
-    let regressiveRuns: AbstractPipelineTaskRun[] = [];
-    for (let run of this.taskRuns) {
+    const regressiveRuns: AbstractPipelineTaskRun[] = [];
+    for (const run of this.taskRuns) {
       if (
         run.isLongRunning(
           this.thresholdTime,

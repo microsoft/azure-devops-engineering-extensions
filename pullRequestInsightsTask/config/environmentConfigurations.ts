@@ -47,7 +47,7 @@ export class EnvironmentConfigurations {
     let pullRequestId: number = Number(
       this.tryKeys(EnvironmentConfigurations.PULL_REQUEST_ID_KEYS)
     );
-    let sourceBranch: string[] = this.getValue(
+    const sourceBranch: string[] = this.getValue(
       EnvironmentConfigurations.BUILD_SOURCE_BRANCH_KEY
     ).split(EnvironmentConfigurations.SEPERATOR);
     if (
@@ -67,7 +67,7 @@ export class EnvironmentConfigurations {
    */
   private tryKeys(keys: string[]) {
     let result: string;
-    for (let key of keys) {
+    for (const key of keys) {
       result = this.getValue(key);
       if (result) {
         break;

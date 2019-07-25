@@ -73,11 +73,11 @@ export class Release extends AbstractPipeline {
   }
 
   private parseForTasks(): AbstractPipelineTaskRun[] {
-    let tasks: AbstractPipelineTaskRun[] = [];
+    const tasks: AbstractPipelineTaskRun[] = [];
     try {
-      for (let phase of this.selectedDeployment.releaseDeployPhases) {
-        for (let job of phase.deploymentJobs) {
-          for (let taskInstanceRecord of job.tasks) {
+      for (const phase of this.selectedDeployment.releaseDeployPhases) {
+        for (const job of phase.deploymentJobs) {
+          for (const taskInstanceRecord of job.tasks) {
             tasks.push(
               new ReleaseTaskRun(
                 taskInstanceRecord.task,

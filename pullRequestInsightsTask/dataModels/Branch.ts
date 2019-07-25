@@ -35,9 +35,9 @@ export class Branch {
    * @param numberPipelinesToConsider Number of past pipelines to use to determine health
    */
   public isHealthy(numberPipelinesToConsider: number): boolean {
-    let pipelinesToConsider: AbstractPipeline[] = [];
+    const pipelinesToConsider: AbstractPipeline[] = [];
     if (this.pipelines) {
-      for (let pipeline of this.pipelines) {
+      for (const pipeline of this.pipelines) {
         if (pipeline.isComplete()) {
           pipelinesToConsider.push(pipeline);
         } else {
@@ -95,7 +95,7 @@ export class Branch {
   }
 
   public getMostRecentCompletePipeline(): AbstractPipeline | null {
-    for (let pipeline of this.pipelines) {
+    for (const pipeline of this.pipelines) {
       if (pipeline.isComplete()) {
         return pipeline;
       }
@@ -115,7 +115,7 @@ export class Branch {
    */
   public getTruncatedName(): string {
     let truncatedName: string = this.name;
-    let seperatedName: string[] = truncatedName.split(Branch.NAME_SEPERATOR);
+    const seperatedName: string[] = truncatedName.split(Branch.NAME_SEPERATOR);
     if (seperatedName.length >= 3) {
       truncatedName = seperatedName.slice(2).join("");
     }
@@ -135,7 +135,7 @@ export class Branch {
     taskId: string,
     taskType: string
   ): number {
-    let times: number[] = this.getAllPipelineTimesForTask(
+    const times: number[] = this.getAllPipelineTimesForTask(
       taskName,
       taskId,
       taskType
@@ -166,8 +166,8 @@ export class Branch {
     taskType: string
   ): number[] {
     let times: number[] = [];
-    for (let pipeline of this.pipelines) {
-      let task: PipelineTask = pipeline.getTask(taskName, taskId, taskType);
+    for (const pipeline of this.pipelines) {
+      const task: PipelineTask = pipeline.getTask(taskName, taskId, taskType);
       if (task) {
         times = times.concat(task.getAllDurations());
       }

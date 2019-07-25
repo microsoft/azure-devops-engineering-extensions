@@ -63,7 +63,7 @@ describe("Release Tests", () => {
   });
 
   test("Incomplete failed release is failure", () => {
-    let deployPhases = [
+    const deployPhases = [
       makeMockDeployPhase([
         makeMockReleaseTask(azureReleaseInterfaces.TaskStatus.Succeeded),
         makeMockReleaseTask(azureReleaseInterfaces.TaskStatus.Skipped),
@@ -82,7 +82,7 @@ describe("Release Tests", () => {
   });
 
   test("Incomplete failed release with multiple deployment phases is failure", () => {
-    let deployPhases = [
+    const deployPhases = [
       makeMockDeployPhase([
         makeMockReleaseTask(azureReleaseInterfaces.TaskStatus.Succeeded)
       ]),
@@ -118,7 +118,7 @@ describe("Release Tests", () => {
   });
 
   test("Incomplete release without current failures is not failure", () => {
-    let deployPhases = [
+    const deployPhases = [
       makeMockDeployPhase([
         makeMockReleaseTask(azureReleaseInterfaces.TaskStatus.Succeeded)
       ]),
@@ -138,7 +138,7 @@ describe("Release Tests", () => {
   });
 
   test("Release with incomplete failed task is not a failure", () => {
-    let deployPhases = [
+    const deployPhases = [
       makeMockDeployPhase([
         makeMockReleaseTask(azureReleaseInterfaces.TaskStatus.InProgress),
         makeMockReleaseTask(azureReleaseInterfaces.TaskStatus.Succeeded),

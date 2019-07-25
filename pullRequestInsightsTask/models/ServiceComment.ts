@@ -68,7 +68,7 @@ export class ServiceComment {
 
   private removeLastLine(): void {
     // feedback line is always last
-    let splitMessage: string[] = this.content.split(AbstractTable.NEW_LINE);
+    const splitMessage: string[] = this.content.split(AbstractTable.NEW_LINE);
     this.content = splitMessage
       .splice(0, splitMessage.length - 1)
       .join(AbstractTable.NEW_LINE);
@@ -81,7 +81,7 @@ export class ServiceComment {
     target: Branch,
     longRunningValidations: PipelineTask[]
   ): void {
-    let table: AbstractTable = TableFactory.create(tableType, this.content);
+    const table: AbstractTable = TableFactory.create(tableType, this.content);
     tl.debug("comment data: " + table.getCurrentCommentData());
     table.addHeader(target.getTruncatedName());
     table.addSection(

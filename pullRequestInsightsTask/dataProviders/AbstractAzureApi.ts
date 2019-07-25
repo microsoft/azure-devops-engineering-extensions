@@ -221,7 +221,7 @@ export abstract class AbstractAzureApi {
    * @param accessToken token to get credentials with access to Api calls
    */
   private createConnection(uri: string, accessToken: string): WebApi {
-    let creds = getPersonalAccessTokenHandler(accessToken);
+    const creds = getPersonalAccessTokenHandler(accessToken);
     return new WebApi(uri, creds);
   }
 }

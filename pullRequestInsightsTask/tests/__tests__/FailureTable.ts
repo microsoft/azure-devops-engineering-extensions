@@ -5,7 +5,6 @@ import { Release } from "../../dataModels/Release";
 import { AbstractPipeline } from "../../dataModels/AbstractPipeline";
 import { Branch } from "../../dataModels/Branch";
 
-
 describe("FailureTable Tests", () => {
   let failureTable: FailureTable;
 
@@ -17,7 +16,7 @@ describe("FailureTable Tests", () => {
     isFailure: boolean,
     definitionId: number
   ): AbstractPipeline {
-    let pipeline: AbstractPipeline = mock(Release);
+    const pipeline: AbstractPipeline = mock(Release);
     sinon.stub(pipeline, "isFailure").returns(isFailure);
     sinon.stub(pipeline, "getDefinitionName").returns(name);
     sinon.stub(pipeline, "getLink").returns(link);
@@ -30,7 +29,7 @@ describe("FailureTable Tests", () => {
     failureStreak: number,
     isHealthy: boolean
   ): Branch {
-    let branch: Branch = new Branch(name, null);
+    const branch: Branch = new Branch(name, null);
     sinon.stub(branch, "getTruncatedName").returns(name);
     sinon.stub(branch, "getPipelineFailStreak").returns(failureStreak);
     sinon.stub(branch, "isHealthy").returns(isHealthy);

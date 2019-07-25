@@ -111,8 +111,8 @@ export class TaskInsights {
         this.targetBranch.getFullName()
       )
     );
-    for (let task of this.currentPipeline.getTasks()) {
-      let thresholdTime: number = this.targetBranch.getPercentileTimeForPipelineTask(
+    for (const task of this.currentPipeline.getTasks()) {
+      const thresholdTime: number = this.targetBranch.getPercentileTimeForPipelineTask(
         this.data.getDurationPercentile(),
         task.getName(),
         task.getId(),
@@ -134,7 +134,7 @@ export class TaskInsights {
     tl.debug(
       "Number of longRunningValidations = " + this.longRunningValidations.length
     );
-    for (let validation of this.longRunningValidations) {
+    for (const validation of this.longRunningValidations) {
       tl.debug("Name of long running validation = " + validation.getName());
       tl.debug("Threshold time " + validation.getRegressionThreshold());
       tl.debug("Durations of all tasks: " + validation.getAllDurations);
@@ -161,10 +161,10 @@ export class TaskInsights {
   }
 
   private async manageComments(tableType: string): Promise<void> {
-    let serviceThreads: azureGitInterfaces.GitPullRequestCommentThread[] = await this.pullRequest.getCurrentServiceCommentThreads(
+    const serviceThreads: azureGitInterfaces.GitPullRequestCommentThread[] = await this.pullRequest.getCurrentServiceCommentThreads(
       this.azureApi
     );
-    let serviceComment: ServiceComment = this.pullRequest.makeCurrentIterationComment(
+    const serviceComment: ServiceComment = this.pullRequest.makeCurrentIterationComment(
       serviceThreads
     );
     serviceComment.formatNewData(
@@ -180,7 +180,7 @@ export class TaskInsights {
     if (this.pullRequest.hasServiceThreadForExistingIteration(serviceThreads)) {
       this.pullRequest.editServiceComment(this.azureApi, serviceComment);
     } else {
-      let currentIterationCommentThreadId: number = (await this.pullRequest.postNewThread(
+      const currentIterationCommentThreadId: number = (await this.pullRequest.postNewThread(
         this.azureApi,
         serviceComment.getContent(),
         azureGitInterfaces.CommentThreadStatus.Closed

@@ -19,7 +19,7 @@ describe("Branch Tests", () => {
     successfulBuildFour = new Build(null, null);
     incompleteBuild = new Build(null, null);
 
-    let builds: AbstractPipeline[] = [
+    const builds: AbstractPipeline[] = [
       failedBuildOne,
       successfulBuildTwo,
       failedBuildThree,
@@ -42,7 +42,7 @@ describe("Branch Tests", () => {
     isComplete?: boolean,
     tasks?: PipelineTask[]
   ): AbstractPipeline {
-    let pipeline: AbstractPipeline = new Build(null, null);
+    const pipeline: AbstractPipeline = new Build(null, null);
     sinon.stub(pipeline, "isFailure").returns(isFailure);
     sinon.stub(pipeline, "isComplete").returns(isComplete);
     sinon.stub(pipeline, "getTasks").returns(tasks);
@@ -54,7 +54,7 @@ describe("Branch Tests", () => {
     id: string,
     durations: number[]
   ): PipelineTask {
-    let fake: PipelineTask = new PipelineTask(null, null, null);
+    const fake: PipelineTask = new PipelineTask(null, null, null);
     sinon.stub(fake, "getName").returns(name);
     sinon.stub(fake, "getId").returns(id);
     sinon.stub(fake, "getAllDurations").returns(durations);

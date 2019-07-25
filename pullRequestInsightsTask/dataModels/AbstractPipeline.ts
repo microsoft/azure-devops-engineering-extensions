@@ -15,7 +15,7 @@ export abstract class AbstractPipeline {
    * @param allTaskRuns task runs to add to pipeline
    */
   protected addTaskRuns(allTaskRuns: AbstractPipelineTaskRun[]): void {
-    for (let taskRun of allTaskRuns) {
+    for (const taskRun of allTaskRuns) {
       let task: PipelineTask = this.getTask(
         taskRun.getName(),
         taskRun.getId(),
@@ -95,7 +95,7 @@ export abstract class AbstractPipeline {
    * @param type Type of task to get
    */
   public getTask(name: string, id: string, type: string): PipelineTask {
-    for (let task of this.getTasks()) {
+    for (const task of this.getTasks()) {
       if (task.isMatchingTask(name, id, type)) {
         return task;
       }
@@ -107,7 +107,7 @@ export abstract class AbstractPipeline {
    * Determines if any task runs have failed on pipeline
    */
   protected taskFailedDuringRun(): boolean {
-    for (let task of this.getTasks()) {
+    for (const task of this.getTasks()) {
       if (task.hasFailedInstance()) {
         return true;
       }

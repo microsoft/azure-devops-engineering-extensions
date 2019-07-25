@@ -16,7 +16,7 @@ describe("LongRunningValidationTable Tests", () => {
     definitionId: number,
     definitionName: string
   ): AbstractPipeline {
-    let pipeline: AbstractPipeline = mock(Release);
+    const pipeline: AbstractPipeline = mock(Release);
     sinon.stub(pipeline, "getDisplayName").returns(name);
     sinon.stub(pipeline, "getDefinitionName").returns(definitionName);
     sinon.stub(pipeline, "getLink").returns(link);
@@ -25,7 +25,7 @@ describe("LongRunningValidationTable Tests", () => {
   }
 
   function makeFakeBranch(name: string, mostRecent: AbstractPipeline): Branch {
-    let branch: Branch = new Branch(name, null);
+    const branch: Branch = new Branch(name, null);
     sinon.stub(branch, "getTruncatedName").returns(name);
     sinon.stub(branch, "getMostRecentCompletePipeline").returns(mostRecent);
     return branch;
@@ -39,7 +39,7 @@ describe("LongRunningValidationTable Tests", () => {
     maxRegression: number,
     minRegression: number
   ): PipelineTask {
-    let validation: PipelineTask = new PipelineTask(name, null, null);
+    const validation: PipelineTask = new PipelineTask(name, null, null);
     sinon.stub(validation, "getLongestRegressiveDuration").returns(maxDuration);
     sinon
       .stub(validation, "getShortestRegressiveDuration")
@@ -62,13 +62,13 @@ describe("LongRunningValidationTable Tests", () => {
 
   test("Section is not added to table without header", () => {
     longRunTable = new LongRunningValidationsTable();
-    let current: AbstractPipeline = makeFakePipeline(
+    const current: AbstractPipeline = makeFakePipeline(
       "pipeline",
       "pipelineLink",
       7,
       "defName"
     );
-    let recent: AbstractPipeline = makeFakePipeline(
+    const recent: AbstractPipeline = makeFakePipeline(
       "otherPipeline",
       "otherPipelineLink",
       7,
@@ -89,13 +89,13 @@ describe("LongRunningValidationTable Tests", () => {
       messages.longRunningValidationCommentTableHeading.format("master") +
         " \n|---|---|---|<!--longRunningValidationTable-->"
     );
-    let current: AbstractPipeline = makeFakePipeline(
+    const current: AbstractPipeline = makeFakePipeline(
       "pipeline",
       "pipelineLink",
       7,
       "defName"
     );
-    let recent: AbstractPipeline = makeFakePipeline(
+    const recent: AbstractPipeline = makeFakePipeline(
       "otherPipeline",
       "otherPipelineLink",
       7,
@@ -126,13 +126,13 @@ describe("LongRunningValidationTable Tests", () => {
       messages.longRunningValidationCommentTableHeading.format("master") +
         "\n|---|---|---|<!--longRunningValidationTable-->"
     );
-    let current: AbstractPipeline = makeFakePipeline(
+    const current: AbstractPipeline = makeFakePipeline(
       "pipeline",
       "pipelineLink",
       7,
       "defName"
     );
-    let recent: AbstractPipeline = makeFakePipeline(
+    const recent: AbstractPipeline = makeFakePipeline(
       "otherPipeline",
       "otherPipelineLink",
       7,

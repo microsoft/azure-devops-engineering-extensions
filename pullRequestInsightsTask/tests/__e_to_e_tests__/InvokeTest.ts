@@ -3,7 +3,7 @@ import { TaskInsights } from "../../TaskInsights";
 import tl = require("azure-pipelines-task-lib/task");
 
 function runInvokeTaskTest(): void {
-  let data: PipelineData = new PipelineData();
+  const data: PipelineData = new PipelineData();
   data.setAccessKey("**");
   data.setCurrentSourceCommitIteration(
     "1919302351f118af5cfa12286c36fc3aa3322b57"
@@ -21,7 +21,7 @@ function runInvokeTaskTest(): void {
   data.setTaskTypesForLongRunningValidations(["powershell"]);
   data.setIsLongRunningValidationFeatureEnabled(true);
   tl.debug(JSON.stringify(data));
-  let insights = new TaskInsights(data);
+  const insights = new TaskInsights(data);
   insights.invoke();
 }
 

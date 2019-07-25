@@ -70,7 +70,7 @@ export abstract class AbstractPipelineTaskRun {
     minimumDurationMiliseconds: number,
     minimumRegressionMilliseconds: number
   ): boolean {
-    let taskLength: number = this.getDuration();
+    const taskLength: number = this.getDuration();
     if (
       thresholdTime &&
       taskLength &&
@@ -104,8 +104,8 @@ export abstract class AbstractPipelineTaskRun {
   public ran(): boolean {
     return (
       this.hasCompleteStatus() &&
-      this.startTime != null &&
-      this.finishTime != null
+      !!this.startTime &&
+      !!this.finishTime
     );
   }
 

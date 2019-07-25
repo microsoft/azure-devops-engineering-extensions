@@ -49,7 +49,7 @@ export class PullRequest {
     commentContent: string,
     postStatus: azureGitInterfaces.CommentThreadStatus
   ): Promise<azureGitInterfaces.GitPullRequestCommentThread> {
-    let thread: azureGitInterfaces.CommentThread = {
+    const thread: azureGitInterfaces.CommentThread = {
       comments: [{ content: commentContent }],
       status: postStatus
     };
@@ -95,7 +95,7 @@ export class PullRequest {
     serviceComments: azureGitInterfaces.GitPullRequestCommentThread[],
     currentIterationCommentId: number
   ): Promise<void> {
-    for (let commentThread of serviceComments) {
+    for (const commentThread of serviceComments) {
       if (
         commentThread.id !== currentIterationCommentId &&
         (commentThread.status ===
@@ -125,7 +125,7 @@ export class PullRequest {
     serviceComments: azureGitInterfaces.GitPullRequestCommentThread[],
     currentIterationCommentId: number
   ): Promise<void> {
-    for (let commentThread of serviceComments) {
+    for (const commentThread of serviceComments) {
       if (
         commentThread.id !== currentIterationCommentId &&
         commentThread.comments.length === 1
@@ -159,7 +159,7 @@ export class PullRequest {
   public makeCurrentIterationComment(
     threads: azureGitInterfaces.GitPullRequestCommentThread[]
   ): ServiceComment {
-    let currentIterationCommentThread: azureGitInterfaces.GitPullRequestCommentThread = this.getCurrentIterationCommentThread(
+    const currentIterationCommentThread: azureGitInterfaces.GitPullRequestCommentThread = this.getCurrentIterationCommentThread(
       threads
     );
     if (
@@ -178,13 +178,13 @@ export class PullRequest {
   public async getCurrentServiceCommentThreads(
     apiCaller: AbstractAzureApi
   ): Promise<azureGitInterfaces.GitPullRequestCommentThread[]> {
-    let commentThreads: azureGitInterfaces.GitPullRequestCommentThread[] = await apiCaller.getCommentThreads(
+    const commentThreads: azureGitInterfaces.GitPullRequestCommentThread[] = await apiCaller.getCommentThreads(
       this.id,
       this.repository,
       this.projectName
     );
-    let serviceThreads: azureGitInterfaces.GitPullRequestCommentThread[] = [];
-    for (let commentThread of commentThreads) {
+    const serviceThreads: azureGitInterfaces.GitPullRequestCommentThread[] = [];
+    for (const commentThread of commentThreads) {
       if (this.threadIsFromService(commentThread)) {
         serviceThreads.push(commentThread);
         tl.debug(
@@ -198,7 +198,7 @@ export class PullRequest {
   private getCurrentIterationCommentThread(
     threads: azureGitInterfaces.GitPullRequestCommentThread[]
   ): azureGitInterfaces.GitPullRequestCommentThread | null {
-    for (let commentThread of threads) {
+    for (const commentThread of threads) {
       if (
         this.threadIsFromService(commentThread) &&
         this.getIterationFromServiceCommentThread(commentThread) ===

@@ -7,7 +7,7 @@ export class TelemetryInformation {
     taskTypesForLongRunningValidations: string[],
     statusLink: string
   ): void {
-    let userConfigurations = {
+    const userConfigurations = {
       isLongRunningValidationsEnabled: String(isLongRunningValidationsEnabled),
       durationPercentile: durationPercentile,
       mimimumValidationDuration: mimimumValidationDuration,

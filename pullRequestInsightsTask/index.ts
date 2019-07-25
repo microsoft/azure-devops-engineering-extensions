@@ -7,8 +7,8 @@ import { TaskInsights } from "./TaskInsights";
 
 async function run(): Promise<void> {
   try {
-    let environmentConfigurations: EnvironmentConfigurations = new EnvironmentConfigurations();
-    let data: PipelineData = new PipelineData();
+    const environmentConfigurations: EnvironmentConfigurations = new EnvironmentConfigurations();
+    const data: PipelineData = new PipelineData();
     data.setAccessKey(environmentConfigurations.getAccessKey());
     data.setCurrentSourceCommitIteration(
       environmentConfigurations.getValue(
@@ -70,7 +70,7 @@ async function run(): Promise<void> {
     if (!data.getPullRequestId()) {
       tl.debug(messages.notInPullRequestMessage);
     } else {
-      let taskInsights: TaskInsights = new TaskInsights(data);
+      const taskInsights: TaskInsights = new TaskInsights(data);
       taskInsights.invoke();
     }
   } catch (err) {

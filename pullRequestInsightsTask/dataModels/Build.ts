@@ -13,9 +13,9 @@ export class Build extends AbstractPipeline {
   ) {
     super();
     this.buildData = buildData;
-    let tasks: AbstractPipelineTaskRun[] = [];
+    const tasks: AbstractPipelineTaskRun[] = [];
     if (timelineData) {
-      for (let taskRecord of timelineData.records) {
+      for (const taskRecord of timelineData.records) {
         tasks.push(
           new BuildTaskRun(
             taskRecord.task,

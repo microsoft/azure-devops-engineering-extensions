@@ -5,8 +5,8 @@ import sinon from "sinon";
 import "../../utils/StringExtensions";
 import tl = require("azure-pipelines-task-lib/task");
 import commentProperties from "../../resources/service_comment_properties.json";
-import { ReleaseAzureApi } from "../../dataModels/ReleaseAzureApi";
 import { PullRequest } from "../../dataModels/PullRequest";
+import { ReleaseAzureApi } from "../../dataProviders/ReleaseAzureApi";
 
 describe("PullRequest Tests", () => {
   let pullRequest: PullRequest;
@@ -26,7 +26,7 @@ describe("PullRequest Tests", () => {
     id?: number,
     status?: azureGitInterfaces.CommentThreadStatus
   ): azureGitInterfaces.GitPullRequestCommentThread {
-    let thread: azureGitInterfaces.GitPullRequestCommentThread = {
+    const thread: azureGitInterfaces.GitPullRequestCommentThread = {
       comments: comments,
       properties: threadProperties
     };
@@ -44,7 +44,7 @@ describe("PullRequest Tests", () => {
     author?: string,
     id?: number
   ): azureGitInterfaces.Comment {
-    let comment: azureGitInterfaces.Comment = { content: content };
+    const comment: azureGitInterfaces.Comment = { content: content };
     if (author) {
       comment.author = { displayName: author };
     }
@@ -92,7 +92,7 @@ describe("PullRequest Tests", () => {
   });
 
   test("Calls to create new thread when adding comment", () => {
-    let callback: jest.SpyInstance = jest.spyOn(
+    const callback: jest.SpyInstance = jest.spyOn(
       mockApi,
       "postNewCommentThread"
     );
@@ -101,11 +101,11 @@ describe("PullRequest Tests", () => {
   });
 
   test("Calls to create thread with correct properties when adding comment", async () => {
-    let callback: jest.SpyInstance = jest.spyOn(
+    const callback: jest.SpyInstance = jest.spyOn(
       mockApi,
       "postNewCommentThread"
     );
-    let expectedThread: azureGitInterfaces.GitPullRequestCommentThread = makeThread(
+    const expectedThread: azureGitInterfaces.GitPullRequestCommentThread = makeThread(
       [makeComment("")],
       makeSentProperties("11"),
       undefined,
@@ -116,7 +116,7 @@ describe("PullRequest Tests", () => {
   });
 
   test("Only calls to deactivate comments that do not match current build iteration", async () => {
-    let threadsToDeactivate: azureGitInterfaces.GitPullRequestCommentThread[] = [
+    const threadsToDeactivate: azureGitInterfaces.GitPullRequestCommentThread[] = [
       makeThread(
         [makeComment("", desiredAuthor)],
         makeRetrievedProperties("900"),
@@ -128,21 +128,21 @@ describe("PullRequest Tests", () => {
         1
       )
     ];
-    let threadNotToDeactivate: azureGitInterfaces.GitPullRequestCommentThread[] = [
+    const threadNotToDeactivate: azureGitInterfaces.GitPullRequestCommentThread[] = [
       makeThread(
         [makeComment("", desiredAuthor)],
         makeRetrievedProperties("500"),
         2
       )
     ];
-    let callback: jest.SpyInstance = jest.spyOn(mockApi, "updateCommentThread");
+    const callback: jest.SpyInstance = jest.spyOn(mockApi, "updateCommentThread");
     setThreads(threadNotToDeactivate.concat(threadsToDeactivate));
     await pullRequest.deactivateOldComments(
       mockApi,
       await pullRequest.getCurrentServiceCommentThreads(mockApi),
       2
     );
-    for (let thread of threadsToDeactivate) {
+    for (const thread of threadsToDeactivate) {
       expect(callback).toBeCalledWith(
         { status: closed },
         2,
@@ -161,7 +161,7 @@ describe("PullRequest Tests", () => {
   });
 
   test("Only calls to deactivate comments that are active or undefined", async () => {
-    let threadsToDeactivate: azureGitInterfaces.GitPullRequestCommentThread[] = [
+    const threadsToDeactivate: azureGitInterfaces.GitPullRequestCommentThread[] = [
       makeThread(
         [makeComment("", desiredAuthor)],
         makeRetrievedProperties("900"),
@@ -175,7 +175,7 @@ describe("PullRequest Tests", () => {
         undefined
       )
     ];
-    let threadsNotToDeactivate: azureGitInterfaces.GitPullRequestCommentThread[] = [
+    const threadsNotToDeactivate: azureGitInterfaces.GitPullRequestCommentThread[] = [
       makeThread(
         [makeComment("", desiredAuthor)],
         makeRetrievedProperties("500"),
@@ -189,14 +189,14 @@ describe("PullRequest Tests", () => {
         azureGitInterfaces.CommentThreadStatus.ByDesign
       )
     ];
-    let callback: jest.SpyInstance = jest.spyOn(mockApi, "updateCommentThread");
+    const callback: jest.SpyInstance = jest.spyOn(mockApi, "updateCommentThread");
     setThreads(threadsNotToDeactivate.concat(threadsToDeactivate));
     await pullRequest.deactivateOldComments(
       mockApi,
       await pullRequest.getCurrentServiceCommentThreads(mockApi),
       2
     );
-    for (let thread of threadsToDeactivate) {
+    for (const thread of threadsToDeactivate) {
       expect(callback).toBeCalledWith(
         { status: closed },
         2,
@@ -205,7 +205,7 @@ describe("PullRequest Tests", () => {
         thread.id
       );
     }
-    for (let thread of threadsNotToDeactivate) {
+    for (const thread of threadsNotToDeactivate) {
       expect(callback).not.toBeCalledWith(
         { status: closed },
         2,
@@ -217,13 +217,13 @@ describe("PullRequest Tests", () => {
   });
 
   test("Comment thread is found for iteration", () => {
-    let expectedThread: azureGitInterfaces.GitPullRequestCommentThread = makeThread(
+    const expectedThread: azureGitInterfaces.GitPullRequestCommentThread = makeThread(
       [makeComment("", desiredAuthor)],
       makeRetrievedProperties("11"),
       12,
       closed
     );
-    let threads: azureGitInterfaces.GitPullRequestCommentThread[] = [
+    const threads: azureGitInterfaces.GitPullRequestCommentThread[] = [
       makeThread(
         [makeComment("", desiredAuthor)],
         makeRetrievedProperties("1"),
@@ -244,7 +244,7 @@ describe("PullRequest Tests", () => {
   });
 
   test("No comment thread is found when build iteration is not present", () => {
-    let threads: azureGitInterfaces.GitPullRequestCommentThread[] = [
+    const threads: azureGitInterfaces.GitPullRequestCommentThread[] = [
       makeThread(
         [makeComment("", desiredAuthor)],
         makeRetrievedProperties("1"),
@@ -264,7 +264,7 @@ describe("PullRequest Tests", () => {
   });
 
   test("No comment thread is found when comment thread is missing properties", () => {
-    let threads: azureGitInterfaces.GitPullRequestCommentThread[] = [
+    const threads: azureGitInterfaces.GitPullRequestCommentThread[] = [
       makeThread([makeComment("", desiredAuthor)], 2, active),
       makeThread(
         [makeComment("", desiredAuthor)],
@@ -279,7 +279,7 @@ describe("PullRequest Tests", () => {
   });
 
   test("No comment thread is found when comment thread has iteration but is missing other properties data", () => {
-    let threads: azureGitInterfaces.GitPullRequestCommentThread[] = [
+    const threads: azureGitInterfaces.GitPullRequestCommentThread[] = [
       makeThread(
         [makeComment("", desiredAuthor)],
         { iterationPropertyName: "11" },
@@ -299,7 +299,7 @@ describe("PullRequest Tests", () => {
   });
 
   test("No comment thread is found when comment thread does not have comments", () => {
-    let threads: azureGitInterfaces.GitPullRequestCommentThread[] = [
+    const threads: azureGitInterfaces.GitPullRequestCommentThread[] = [
       makeThread([], makeRetrievedProperties("11"), 2, active),
       makeThread(
         [makeComment("", desiredAuthor)],

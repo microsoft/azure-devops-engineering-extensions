@@ -17,7 +17,7 @@ describe("PipelineTask Tests", () => {
     failed?: boolean,
     ran?: boolean
   ): AbstractPipelineTaskRun {
-    let run = new BuildTaskRun({ id: id }, name, null, null, agent, null, null);
+    const run = new BuildTaskRun({ id: id }, name, null, null, agent, null, null);
     sinon.stub(run, "getDuration").returns(duration);
     sinon.stub(run, "calculateRegression").returns(regression);
     sinon.stub(run, "getType").returns(type);
@@ -28,7 +28,7 @@ describe("PipelineTask Tests", () => {
   }
 
   function addTasksToValidation(runsToAdd: AbstractPipelineTaskRun[]) {
-    for (let run of runsToAdd) {
+    for (const run of runsToAdd) {
       task.addTaskInstance(run);
     }
   }
@@ -55,7 +55,7 @@ describe("PipelineTask Tests", () => {
 
   test("Task instance is correctly added", () => {
     expect(task.getAllDurations()).toEqual([]);
-    let run = makeFakeTaskRun("abc", "123", "type", 5, null, null, true);
+    const run = makeFakeTaskRun("abc", "123", "type", 5, null, null, true);
     task.addTaskInstance(run);
     expect(task.getAllDurations()).toEqual([5]);
   });
