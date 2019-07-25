@@ -10,6 +10,7 @@ export class PullRequest {
   private projectName: string;
   private pullRequestData: azureGitInterfaces.GitPullRequest;
   private mostRecentSourceCommitId: string;
+  private lastMergeTargetCommitId: string;
 
   constructor(
     id: number,
@@ -21,7 +22,9 @@ export class PullRequest {
     this.repository = repository;
     this.projectName = projectName;
     this.pullRequestData = pullRequestData;
-    this.parseDataForMostRecentSourceCommitId();
+    this.mostRecentSourceCommitId = null;
+    this.lastMergeTargetCommitId = null;
+    this.parseDataForCommitIds();
   }
 
   /**
@@ -36,6 +39,10 @@ export class PullRequest {
    */
   public getMostRecentSourceCommitId(): string {
     return this.mostRecentSourceCommitId;
+  }
+
+  public getLastMergeTargetCommitId(): string {
+    return this.lastMergeTargetCommitId;
   }
 
   /**
@@ -219,14 +226,24 @@ export class PullRequest {
     return null;
   }
 
-  private parseDataForMostRecentSourceCommitId(): void {
-    this.mostRecentSourceCommitId = null;
-    if (
-      this.pullRequestData.lastMergeCommit &&
-      this.pullRequestData.lastMergeCommit.commitId
-    ) {
-      this.mostRecentSourceCommitId = this.pullRequestData.lastMergeCommit.commitId;
+  private parseDataForCommitIds(): void {
+    if (this.pullRequestData.lastMergeCommit) {
+      this.mostRecentSourceCommitId = this.getIdFromCommit(
+        this.pullRequestData.lastMergeCommit
+      );
     }
+    if (this.pullRequestData.lastMergeTargetCommit) {
+      this.lastMergeTargetCommitId = this.getIdFromCommit(
+        this.pullRequestData.lastMergeTargetCommit
+      );
+    }
+  }
+
+  private getIdFromCommit(commit: { commitId?: string }) {
+    if (commit.commitId) {
+      return commit.commitId;
+    }
+    return null;
   }
 
   private getIterationFromServiceCommentThread(

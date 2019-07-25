@@ -22,7 +22,7 @@ describe("PullRequest Tests", () => {
 
   function makeThread(
     comments: azureGitInterfaces.Comment[],
-    threadProperties?: any,
+    threadProperties?: {},
     id?: number,
     status?: azureGitInterfaces.CommentThreadStatus
   ): azureGitInterfaces.GitPullRequestCommentThread {

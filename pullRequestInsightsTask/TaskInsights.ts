@@ -176,7 +176,8 @@ export class TaskInsights {
       ),
       this.targetBranch,
       this.longRunningValidations,
-      String(this.data.getDurationPercentile())
+      String(this.data.getDurationPercentile()),
+      String(TaskInsights.NUMBER_PIPELINES_FOR_HEALTH)
     );
     if (this.pullRequest.hasServiceThreadForExistingIteration(serviceThreads)) {
       this.pullRequest.editServiceComment(this.azureApi, serviceComment);

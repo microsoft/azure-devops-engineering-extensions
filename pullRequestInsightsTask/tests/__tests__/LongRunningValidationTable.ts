@@ -52,7 +52,7 @@ describe("LongRunningValidationTable Tests", () => {
 
   test("Header is added to empty table", () => {
     longRunTable = new LongRunningValidationsTable();
-    longRunTable.addHeader("master", "90");
+    longRunTable.addHeader("master", "90", null);
     expect(longRunTable.getCurrentCommentData()).toBe(
       "\n" +
         messages.longRunningValidationCommentTableHeading.format(

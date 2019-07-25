@@ -28,11 +28,11 @@ export abstract class AbstractTable {
     tl.debug("table already exists in comment? " + this.tableHasData());
   }
 
-  public addHeader(targetName: string, percentile: string): void {
+  public addHeader(targetName: string, percentile: string, numberPipelinesForHealth: string): void {
     if (!this.tableHasData()) {
       this.addTextToTableInComment(
         AbstractTable.NEW_LINE +
-          this.headerFormat.format(targetName, percentile)
+          this.headerFormat.format(targetName, percentile, numberPipelinesForHealth)
       );
       const numberColumns: number = this.getNumberColumns(
         this.currentCommentData

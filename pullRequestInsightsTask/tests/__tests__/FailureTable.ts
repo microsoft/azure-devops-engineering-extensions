@@ -37,9 +37,9 @@ describe("FailureTable Tests", () => {
 
   test("Header is added to comment without table data", () => {
     failureTable = new FailureTable();
-    failureTable.addHeader("FakeTarget", null);
+    failureTable.addHeader("FakeTarget", null, "3");
     expect(failureTable.getCurrentCommentData()).toBe(
-      "\n" + messages.failureCommentTableHeading.format("FakeTarget", null) + "\n|---|---|---|<!--failureTable-->"
+      "\n" + messages.failureCommentTableHeading.format("FakeTarget", null, "3") + "\n|---|---|---|<!--failureTable-->"
     );
   });
 
@@ -47,7 +47,7 @@ describe("FailureTable Tests", () => {
     failureTable = new FailureTable(
       messages.failureCommentTableHeading.format("FakeTarget", null) + "\n|---|---|---|<!--failureTable-->"
     );
-    failureTable.addHeader("fakeTarget", null);
+    failureTable.addHeader("fakeTarget", null, "3");
     expect(failureTable.getCurrentCommentData()).toBe(
       messages.failureCommentTableHeading.format("FakeTarget", null) + "\n|---|---|---|<!--failureTable-->"
     );
