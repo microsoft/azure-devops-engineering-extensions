@@ -155,7 +155,7 @@ export class PullRequest {
   public hasServiceThreadForExistingIteration(
     threads: azureGitInterfaces.GitPullRequestCommentThread[]
   ): boolean {
-    return this.getCurrentIterationCommentThread(threads) != null;
+    return this.getCurrentIterationCommentThread(threads) !== null;
   }
 
   /**
