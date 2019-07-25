@@ -3,7 +3,7 @@
   "noFailureMessage": "Nothing occured because the {0} has not failed any tasks",
   "commentCompletedMessage": "Comment was successfully posted",
   "summaryLine": "Pull Request Validation Insights",
-  "failureCommentTableHeading": "Failed Validations \n |Failed Pipeline|<p title='Status based on last {2} validations before commit'>{0}</p> Status|Insights|",
+  "failureCommentTableHeading": "Failed Validations \n |Failed Pipeline|<p title='Status based on last {2} validations before commit'>{0} Status</p>|Insights|",
   "failureCommentTableEndName": "failureTable",
   "newIterationCommentHeading": "__Source Commit: {0}__",
   "failureCommentRow": "|[{0}]({1})| :x: |{2} branch is Unhealthy <br> Please compare {2} branch [failures]({3}) <br> with current and take appropriate action|",
