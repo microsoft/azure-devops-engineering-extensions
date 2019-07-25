@@ -4,11 +4,10 @@ import { FailureTable } from "../../models/FailureTable";
 import { Release } from "../../dataModels/Release";
 import { AbstractPipeline } from "../../dataModels/AbstractPipeline";
 import { Branch } from "../../dataModels/Branch";
+import messages from "../../resources/user_messages.json";
 
 describe("FailureTable Tests", () => {
   let failureTable: FailureTable;
-
-  beforeEach(() => {});
 
   function makeFakePipeline(
     name: string,
@@ -38,19 +37,19 @@ describe("FailureTable Tests", () => {
 
   test("Header is added to comment without table data", () => {
     failureTable = new FailureTable();
-    failureTable.addHeader("FakeTarget");
+    failureTable.addHeader("FakeTarget", null);
     expect(failureTable.getCurrentCommentData()).toBe(
-      "\n|Failed Pipeline|FakeTarget Health|Insights|\n|---|---|---|<!--failureTable-->"
+      "\n" + messages.failureCommentTableHeading.format("FakeTarget", null) + "\n|---|---|---|<!--failureTable-->"
     );
   });
 
   test("Header is not added to table with existing data", () => {
     failureTable = new FailureTable(
-      "|Failed Pipeline|FakeTarget Health|Insights|\n|---|---|---|<!--failureTable-->"
+      messages.failureCommentTableHeading.format("FakeTarget", null) + "\n|---|---|---|<!--failureTable-->"
     );
-    failureTable.addHeader("fakeTarget");
+    failureTable.addHeader("fakeTarget", null);
     expect(failureTable.getCurrentCommentData()).toBe(
-      "|Failed Pipeline|FakeTarget Health|Insights|\n|---|---|---|<!--failureTable-->"
+      messages.failureCommentTableHeading.format("FakeTarget", null) + "\n|---|---|---|<!--failureTable-->"
     );
   });
 
@@ -66,7 +65,8 @@ describe("FailureTable Tests", () => {
       null
     );
     expect(failureTable.getCurrentCommentData()).toBe(
-      "|Failed Pipeline|FakeTarget Health|Insights|\n|---|---|---|\n|[thisBuild](h)| :heavy_check_mark: |thisBranch branch is Healthy <br> Failure in this PR is likely related to change|<!--failureTable-->"
+      "|Failed Pipeline|FakeTarget Health|Insights|\n|---|---|---|\n|[thisBuild](h)| :heavy_check_mark: |" +
+      "thisBranch branch is Healthy <br> Failure in this PR is likely related to change|<!--failureTable-->"
     );
   });
 
@@ -94,7 +94,8 @@ describe("FailureTable Tests", () => {
       null
     );
     expect(failureTable.getCurrentCommentData()).toBe(
-      "|Failed Pipeline|FakeTarget Health|Insights|\n|---|---|---|\n|[thisBuild](h)| :x: |thisBranch branch is Unhealthy <br> Please compare thisBranch branch [failures](link) <br> with current and take appropriate action|<!--failureTable-->"
+      "|Failed Pipeline|FakeTarget Health|Insights|\n|---|---|---|\n|[thisBuild](h)| :x: |" +
+      "thisBranch branch is Unhealthy <br> Please compare thisBranch branch [failures](link) <br> with current and take appropriate action|<!--failureTable-->"
     );
   });
 });

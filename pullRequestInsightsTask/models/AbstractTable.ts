@@ -28,12 +28,13 @@ export abstract class AbstractTable {
     tl.debug("table already exists in comment? " + this.tableHasData());
   }
 
-  public addHeader(target: string): void {
+  public addHeader(targetName: string, percentile: string): void {
     if (!this.tableHasData()) {
       this.addTextToTableInComment(
-        AbstractTable.NEW_LINE + this.headerFormat.format(target)
+        AbstractTable.NEW_LINE +
+          this.headerFormat.format(targetName, percentile)
       );
-      let numberColumns: number = this.getNumberColumns(
+      const numberColumns: number = this.getNumberColumns(
         this.currentCommentData
       );
       this.addTextToTableInComment(
@@ -84,7 +85,7 @@ export abstract class AbstractTable {
 
   private getNumberColumns(line: string): number {
     let numberColumns: number = -1;
-    for (let char of line) {
+    for (const char of line) {
       if (char === AbstractTable.COLUMN_DIVIDER) {
         numberColumns++;
       }

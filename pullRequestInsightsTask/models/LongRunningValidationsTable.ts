@@ -35,7 +35,7 @@ export class LongRunningValidationsTable extends AbstractTable {
         if (index > 0) {
           nextLine = messages.longRunningValidationCommentLowerSectionRow;
         }
-        let validation: PipelineTask = longRunningValidations[index];
+        const validation: PipelineTask = longRunningValidations[index];
         let nameText: string = validation.getName();
         let durationWithRegressionText: string = this.formatDurationWithRegression(
           validation.getLongestRegressiveDuration(),
@@ -90,7 +90,7 @@ export class LongRunningValidationsTable extends AbstractTable {
 
   private formatMillisecondsAsTime(duration: number): string {
     let formattedTime: string = "";
-    let date: Date = new Date(this.roundMillisecondsToSeconds(duration));
+    const date: Date = new Date(this.roundMillisecondsToSeconds(duration));
     LongRunningValidationsTable.TIME_LABELS.forEach(
       (value: string, key: () => number) => {
         if (key.call(date) > 0) {

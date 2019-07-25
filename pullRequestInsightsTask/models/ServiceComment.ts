@@ -43,7 +43,8 @@ export class ServiceComment {
     currentPipeline: AbstractPipeline,
     checkStatusLink: string,
     target: Branch,
-    longRunningValidations: PipelineTask[]
+    longRunningValidations: PipelineTask[],
+    percentile: string
   ) {
     this.removeLastLine();
     tl.debug("type of table to create: " + tableType);
@@ -52,7 +53,8 @@ export class ServiceComment {
       currentPipeline,
       checkStatusLink,
       target,
-      longRunningValidations
+      longRunningValidations,
+      percentile
     );
     this.addFeedbackLine();
   }
@@ -79,11 +81,12 @@ export class ServiceComment {
     currentPipeline: AbstractPipeline,
     checkStatusLink: string,
     target: Branch,
-    longRunningValidations: PipelineTask[]
+    longRunningValidations: PipelineTask[],
+    percentile: string
   ): void {
     const table: AbstractTable = TableFactory.create(tableType, this.content);
     tl.debug("comment data: " + table.getCurrentCommentData());
-    table.addHeader(target.getTruncatedName());
+    table.addHeader(target.getTruncatedName(), percentile);
     table.addSection(
       currentPipeline,
       checkStatusLink,

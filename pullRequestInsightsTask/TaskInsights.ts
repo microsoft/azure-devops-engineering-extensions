@@ -175,7 +175,8 @@ export class TaskInsights {
         this.data.getProjectName()
       ),
       this.targetBranch,
-      this.longRunningValidations
+      this.longRunningValidations,
+      String(this.data.getDurationPercentile())
     );
     if (this.pullRequest.hasServiceThreadForExistingIteration(serviceThreads)) {
       this.pullRequest.editServiceComment(this.azureApi, serviceComment);
