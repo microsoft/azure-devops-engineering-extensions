@@ -8,6 +8,7 @@ import tl = require("azure-pipelines-task-lib/task");
 export class Release extends AbstractPipeline {
   private releaseData: azureReleaseInterfaces.Release;
   private environmentData: azureReleaseInterfaces.ReleaseEnvironment;
+  private artifactsByAlias: Map<string, azureReleaseInterfaces.Artifact>;
   private selectedDeployment: azureReleaseInterfaces.DeploymentAttempt;
   public static readonly COMPLETE_DEPLOYMENT_STATUSES = [
     azureReleaseInterfaces.DeploymentStatus.PartiallySucceeded,
@@ -22,6 +23,7 @@ export class Release extends AbstractPipeline {
     this.selectedDeployment = this.getSelectedDeployment(
       this.environmentData.deploySteps
     );
+    this.parseForArtifacts(releaseData.artifacts);
     this.addTaskRuns(this.parseForTasks());
   }
 
@@ -73,11 +75,24 @@ export class Release extends AbstractPipeline {
   }
 
   public getTriggeringArtifactAlias(): string {
-    if (this.releaseData.artifacts) {
-      for (const artifact of this.releaseData.artifacts) {
-        if (artifact.isPrimary) {
-          return artifact.alias;
-        }
+    for (const artifactAlias of Array.from(this.artifactsByAlias.keys())) {
+      if (this.artifactsByAlias.get(artifactAlias).isPrimary) {
+        return artifactAlias;
+      }
+    }
+    return null;
+  }
+
+  public getBuildIdFromArtifact(artifactAlias: string): number {
+    if (this.artifactsByAlias.has(artifactAlias)) {
+      const artifact: azureReleaseInterfaces.Artifact = this.artifactsByAlias.get(
+        artifactAlias
+      );
+      if (
+        artifact.definitionReference &&
+        artifact.definitionReference.version
+      ) {
+        return Number(artifact.definitionReference.version.id);
       }
     }
     return null;
@@ -106,6 +121,17 @@ export class Release extends AbstractPipeline {
       tl.debug("Warning: Release " + this.getName() + " is missing task data");
     }
     return tasks;
+  }
+
+  private parseForArtifacts(
+    artifacts: azureReleaseInterfaces.Artifact[]
+  ): void {
+    this.artifactsByAlias = new Map<string, azureReleaseInterfaces.Artifact>();
+    if (artifacts) {
+      for (const artifact of artifacts) {
+        this.artifactsByAlias.set(artifact.alias, artifact);
+      }
+    }
   }
 
   private getSelectedDeployment(

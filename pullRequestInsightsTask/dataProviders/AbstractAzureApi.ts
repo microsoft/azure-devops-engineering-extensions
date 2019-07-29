@@ -8,6 +8,7 @@ import {
 import { AbstractPipeline } from "../dataModels/AbstractPipeline";
 import { PipelineData } from "../config/PipelineData";
 import { PullRequest } from "../dataModels/PullRequest";
+import { pipeline } from "stream";
 
 export abstract class AbstractAzureApi {
   private connection: WebApi;
@@ -38,11 +39,58 @@ export abstract class AbstractAzureApi {
     branchName: string
   ): Promise<AbstractPipeline[]>;
 
-  public abstract async findPipelinesForAndBeforeMergeCommit(
+  public async findPipelinesForAndBeforeMergeCommit(
     project: string,
-    pipelinesToParse: AbstractPipeline[],
     mergeCommit: string,
-  ): Promise<AbstractPipeline[]>;
+    currentPipeline: AbstractPipeline,
+    maxNumber: number,
+    branchName: string
+  ): Promise<AbstractPipeline[]> {
+    let pipelines = await this.getMostRecentPipelinesOfCurrentType(
+      project,
+      currentPipeline,
+      maxNumber,
+      branchName
+    );
+    tl.debug("last merge target commit id: " + mergeCommit);
+    tl.debug(
+      "triggering alias: " + currentPipeline.getTriggeringArtifactAlias()
+    );
+    for (let index = 0; index < pipelines.length; index++) {
+      const artifactId: number = pipelines[index].getBuildIdFromArtifact(
+        currentPipeline.getTriggeringArtifactAlias()
+      );
+      tl.debug(
+        "artifact alias found for pipeline " +
+          pipelines[index].getName() +
+          ", id: " +
+          pipelines[index].getId() +
+          " = " +
+          artifactId
+      );
+      const buildChanges: azureBuildInterfaces.Change[] = await this.getBuildChanges(
+        project,
+        artifactId
+      );
+      tl.debug("commits of pipeline: ");
+      for (const change of buildChanges) {
+        tl.debug(change.id);
+        if (change.id === mergeCommit) {
+          pipelines = pipelines.slice(index);
+          for (const thisPipeline of pipelines) {
+            tl.debug(
+              "using pipeline: " +
+                thisPipeline.getName() +
+                ", id: " +
+                thisPipeline.getId()
+            );
+          }
+        }
+      }
+    }
+    tl.debug("In total, using " + pipelines.length + " pipelines");
+    return pipelines;
+  }
 
   /**
    * Fetches pipeline definition data

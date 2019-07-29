@@ -24,10 +24,7 @@ export class Branch {
   public setPipelines(pipelines: AbstractPipeline[]): void {
     this.pipelines = pipelines;
     tl.debug(
-      "Number of retrieved pipelines for " +
-        this.name +
-        " = " +
-        this.pipelines.length
+      "Number of pipelines set on " + this.name + " = " + this.pipelines.length
     );
   }
 
@@ -51,9 +48,7 @@ export class Branch {
     );
     for (const pipeline of pipelinesToConsider) {
       tl.debug("considering pipeline " + pipeline.getName());
-      tl.debug(
-        pipeline.getName() + " is a failure? " + pipeline.isFailure()
-      );
+      tl.debug(pipeline.getName() + " is a failure? " + pipeline.isFailure());
       if (pipeline.isFailure()) {
         return false;
       }

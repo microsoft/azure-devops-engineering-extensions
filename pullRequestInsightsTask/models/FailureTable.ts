@@ -37,7 +37,10 @@ export class FailureTable extends AbstractTable {
         if (pipelineToConsider.isFailure()) {
           symbolToAdd = messages.failure;
         }
-        statusColumn += symbolToAdd;
+        statusColumn += messages.link.format(
+          symbolToAdd,
+          pipelineToConsider.getLink()
+        );
       }
       const insightsColumn = messages[
         target.getStatus(numberPipelinesToConsiderForHealth)

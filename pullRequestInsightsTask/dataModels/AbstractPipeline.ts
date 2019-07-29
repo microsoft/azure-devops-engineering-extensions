@@ -78,6 +78,10 @@ export abstract class AbstractPipeline {
    */
   public abstract getName(): string;
 
+  public abstract getTriggeringArtifactAlias(): string;
+
+  public abstract getBuildIdFromArtifact(artifactAlias: string): number;
+
   /**
    * Gets all tasks added to this pipeline
    */

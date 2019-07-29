@@ -56,18 +56,8 @@ export class TaskInsights {
           this.pullRequest.getTargetBranchName()
       );
       this.targetBranch = new Branch(this.pullRequest.getTargetBranchName());
-      const mostRecentTargetPipelines = await this.azureApi.getMostRecentPipelinesOfCurrentType(
-        this.data.getProjectName(),
-        this.currentPipeline,
-        TaskInsights.MINIMUM_PIPELINES_TO_FETCH_FOR_HEALTH,
-        this.targetBranch.getFullName()
-      );
-      this.targetBranch.setPipelines(
-        await this.azureApi.findPipelinesForAndBeforeMergeCommit(
-          this.data.getProjectName(),
-          mostRecentTargetPipelines,
-          this.pullRequest.getLastMergeTargetCommitId()
-        )
+      await this.setTargetBranchPipelines(
+        TaskInsights.NUMBER_PIPELINES_FOR_HEALTH
       );
       let tableType: string = TableFactory.FAILURE;
       tl.debug("pipeline is a failure?: " + this.currentPipeline.isFailure());
@@ -76,13 +66,13 @@ export class TaskInsights {
         await this.findAllLongRunningValidations();
       }
       if (this.shouldPRInsightsCommentOccur()) {
-        tl.debug("PR Insights should manage comments = true");
         this.manageComments(tableType);
       }
-    } else {
-      tl.debug(
-        this.data.getHostType() + " is not for most recent source commit"
-      );
+   }
+   else {
+        tl.debug(
+          this.data.getHostType() + " is not for most recent source commit"
+        );
     }
   }
 
@@ -90,6 +80,18 @@ export class TaskInsights {
     return (
       this.pullRequest.getMostRecentSourceCommitId() ===
       this.data.getCurrentSourceCommitIteration()
+    );
+  }
+
+  private async setTargetBranchPipelines(maxNumber: number): Promise<void> {
+    this.targetBranch.setPipelines(
+      await this.azureApi.findPipelinesForAndBeforeMergeCommit(
+        this.data.getProjectName(),
+        this.pullRequest.getLastMergeTargetCommitId(),
+        this.currentPipeline,
+        maxNumber,
+        this.targetBranch.getFullName()
+      )
     );
   }
 
@@ -109,13 +111,8 @@ export class TaskInsights {
 
   private async findAllLongRunningValidations(): Promise<void> {
     this.longRunningValidations = [];
-    this.targetBranch.setPipelines(
-      await this.azureApi.getMostRecentPipelinesOfCurrentType(
-        this.data.getProjectName(),
-        this.currentPipeline,
-        TaskInsights.NUMBER_PIPELINES_FOR_LONG_RUNNING_VALIDATIONS,
-        this.targetBranch.getFullName()
-      )
+    await this.setTargetBranchPipelines(
+      TaskInsights.NUMBER_PIPELINES_FOR_LONG_RUNNING_VALIDATIONS
     );
     for (const task of this.currentPipeline.getTasks()) {
       const thresholdTime: number = this.targetBranch.getPercentileTimeForPipelineTask(
@@ -143,10 +140,10 @@ export class TaskInsights {
     for (const validation of this.longRunningValidations) {
       tl.debug("Name of long running validation = " + validation.getName());
       tl.debug("Threshold time " + validation.getRegressionThreshold());
-      tl.debug("Durations of all tasks: " + validation.getAllDurations);
+      tl.debug("Durations of all tasks: " + validation.getAllDurations());
       tl.debug(
         "Number of agents regressed on: " +
-          validation.getNumberOfAgentsRegressedOn
+          validation.getNumberOfAgentsRegressedOn()
       );
       tl.debug(
         "Range of regressive durations " +
