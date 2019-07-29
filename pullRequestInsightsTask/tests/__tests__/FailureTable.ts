@@ -5,6 +5,7 @@ import { Release } from "../../dataModels/Release";
 import { AbstractPipeline } from "../../dataModels/AbstractPipeline";
 import { Branch } from "../../dataModels/Branch";
 import messages from "../../resources/user_messages.json";
+import { BranchStatus } from "../../dataModels/BranchStatus";
 
 describe("FailureTable Tests", () => {
   let failureTable: FailureTable;
@@ -26,12 +27,12 @@ describe("FailureTable Tests", () => {
   function makeFakeBranch(
     name: string,
     failureStreak: number,
-    isHealthy: boolean
+    status: BranchStatus
   ): Branch {
     const branch: Branch = new Branch(name, null);
     sinon.stub(branch, "getTruncatedName").returns(name);
     sinon.stub(branch, "getPipelineFailStreak").returns(failureStreak);
-    sinon.stub(branch, "isHealthy").returns(isHealthy);
+    sinon.stub(branch, "getStatus").returns(status);
     return branch;
   }
 
@@ -39,17 +40,21 @@ describe("FailureTable Tests", () => {
     failureTable = new FailureTable();
     failureTable.addHeader("FakeTarget", null, "3");
     expect(failureTable.getCurrentCommentData()).toBe(
-      "\n" + messages.failureCommentTableHeading.format("FakeTarget", null, "3") + "\n|---|---|---|<!--failureTable-->"
+      "\n" +
+        messages.failureCommentTableHeading.format("FakeTarget", null, "3") +
+        "\n|---|---|---|<!--failureTable-->"
     );
   });
 
   test("Header is not added to table with existing data", () => {
     failureTable = new FailureTable(
-      messages.failureCommentTableHeading.format("FakeTarget", null) + "\n|---|---|---|<!--failureTable-->"
+      messages.failureCommentTableHeading.format("FakeTarget", null) +
+        "\n|---|---|---|<!--failureTable-->"
     );
     failureTable.addHeader("fakeTarget", null, "3");
     expect(failureTable.getCurrentCommentData()).toBe(
-      messages.failureCommentTableHeading.format("FakeTarget", null) + "\n|---|---|---|<!--failureTable-->"
+      messages.failureCommentTableHeading.format("FakeTarget", undefined) +
+        "\n|---|---|---|<!--failureTable-->"
     );
   });
 
@@ -58,24 +63,30 @@ describe("FailureTable Tests", () => {
       "|Failed Pipeline|FakeTarget Health|Insights|\n|---|---|---|<!--failureTable-->"
     );
     failureTable.addSection(
-      makeFakePipeline("thisBuild", "h", true, null),
+      makeFakePipeline("thisBuild", "h", true, undefined),
       "link",
-      makeFakeBranch("thisBranch", 7, true),
+      makeFakeBranch("thisBranch", 7, BranchStatus.Healthy),
       5,
       null
     );
     expect(failureTable.getCurrentCommentData()).toBe(
-      "|Failed Pipeline|FakeTarget Health|Insights|\n|---|---|---|\n|[thisBuild](h)| :heavy_check_mark: |" +
-      "thisBranch branch is Healthy <br> Failure in this PR is likely related to change|<!--failureTable-->"
+      "|Failed Pipeline|FakeTarget Health|Insights|\n|---|---|---|\n" +
+        messages.failureTableRow.format(
+          "thisBuild",
+          "h",
+          "",
+          messages.healthy.format("thisBranch", "link")
+        ) +
+        "<!--failureTable-->"
     );
   });
 
   test("Section is not added to empty table without heading", () => {
     failureTable = new FailureTable();
     failureTable.addSection(
-      makeFakePipeline("thisBuild", "h", true, null),
+      makeFakePipeline("thisBuild", "h", true, undefined),
       "link",
-      makeFakeBranch("thisBranch", 7, false),
+      makeFakeBranch("thisBranch", 7, BranchStatus.Flakey),
       7,
       null
     );
@@ -87,15 +98,21 @@ describe("FailureTable Tests", () => {
       "|Failed Pipeline|FakeTarget Health|Insights|\n|---|---|---|<!--failureTable-->"
     );
     failureTable.addSection(
-      makeFakePipeline("thisBuild", "h", true, null),
+      makeFakePipeline("thisBuild", "h", true, undefined),
       "link",
-      makeFakeBranch("thisBranch", 7, false),
+      makeFakeBranch("thisBranch", 7, BranchStatus.Unhealthy),
       5,
       null
     );
     expect(failureTable.getCurrentCommentData()).toBe(
-      "|Failed Pipeline|FakeTarget Health|Insights|\n|---|---|---|\n|[thisBuild](h)| :x: |" +
-      "thisBranch branch is Unhealthy <br> Please compare thisBranch branch [failures](link) <br> with current and take appropriate action|<!--failureTable-->"
+      "|Failed Pipeline|FakeTarget Health|Insights|\n|---|---|---|\n" +
+        messages.failureTableRow.format(
+          "thisBuild",
+          "h",
+          "",
+          messages.unhealthy.format("thisBranch", "link")
+        ) +
+        "<!--failureTable-->"
     );
   });
 });

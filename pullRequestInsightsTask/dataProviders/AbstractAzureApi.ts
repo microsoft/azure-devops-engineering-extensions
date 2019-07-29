@@ -1,5 +1,6 @@
 import tl = require("azure-pipelines-task-lib/task");
 import * as azureGitInterfaces from "azure-devops-node-api/interfaces/GitInterfaces";
+import * as azureBuildInterfaces from "azure-devops-node-api/interfaces/BuildInterfaces";
 import {
   WebApi,
   getPersonalAccessTokenHandler
@@ -35,6 +36,12 @@ export abstract class AbstractAzureApi {
     currentPipeline: AbstractPipeline,
     maxNumber: number,
     branchName: string
+  ): Promise<AbstractPipeline[]>;
+
+  public abstract async findPipelinesForAndBeforeMergeCommit(
+    project: string,
+    pipelinesToParse: AbstractPipeline[],
+    mergeCommit: string,
   ): Promise<AbstractPipeline[]>;
 
   /**
@@ -212,6 +219,16 @@ export abstract class AbstractAzureApi {
         pullRequestId,
         projectName
       )
+    );
+  }
+
+  public async getBuildChanges(
+    projectName: string,
+    buildId: number
+  ): Promise<azureBuildInterfaces.Change[]> {
+    return await (await this.getConnection().getBuildApi()).getBuildChanges(
+      projectName,
+      buildId
     );
   }
 

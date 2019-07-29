@@ -9,6 +9,10 @@ export class BuildAzureApi extends AbstractAzureApi {
   static readonly DESIRED_BUILD_STATUS: number =
     azureBuildInterfaces.BuildStatus.Completed;
 
+  static readonly DESIRED_BUILD_REASONS: number =
+    azureBuildInterfaces.BuildReason.BatchedCI +
+    azureBuildInterfaces.BuildReason.IndividualCI;
+
   constructor(uri: string, accessKey: string) {
     super(uri, accessKey);
   }
@@ -28,10 +32,31 @@ export class BuildAzureApi extends AbstractAzureApi {
     return this.getBuilds(
       project,
       currentPipeline.getDefinitionId(),
+      BuildAzureApi.DESIRED_BUILD_REASONS,
       BuildAzureApi.DESIRED_BUILD_STATUS,
       maxNumber,
       branchName
     );
+  }
+
+  public async findPipelinesForAndBeforeMergeCommit(
+    project: string,
+    pipelinesToParse: AbstractPipeline[],
+    mergeCommit: string
+  ): Promise<AbstractPipeline[]> {
+    const pipelinesBeforePullRequest: AbstractPipeline[] = [];
+    for (let index = 0; index < pipelinesToParse.length; index++) {
+      const buildChanges: azureBuildInterfaces.Change[] = await this.getBuildChanges(
+        project,
+        pipelinesToParse[index].getId()
+      );
+      for (const change of buildChanges) {
+        if (change.id === mergeCommit) {
+          pipelinesBeforePullRequest.concat(pipelinesToParse.slice(index));
+        }
+      }
+    }
+    return pipelinesBeforePullRequest;
   }
 
   public async getBuild(
@@ -57,6 +82,7 @@ export class BuildAzureApi extends AbstractAzureApi {
   public async getBuilds(
     project: string,
     definition?: number,
+    reason?: number,
     status?: number,
     maxNumber?: number,
     branchName?: string
@@ -64,8 +90,8 @@ export class BuildAzureApi extends AbstractAzureApi {
     tl.debug(
       `getting builds with: ${project}, ${definition}, ${status}, ${maxNumber}, ${branchName}`
     );
-    let builds: Array<AbstractPipeline> = [];
-    let rawBuildsData: azureBuildInterfaces.Build[] = await (await this.getConnection().getBuildApi()).getBuilds(
+    const builds: Array<AbstractPipeline> = [];
+    const rawBuildsData: azureBuildInterfaces.Build[] = await (await this.getConnection().getBuildApi()).getBuilds(
       project,
       [definition],
       undefined,
@@ -73,7 +99,7 @@ export class BuildAzureApi extends AbstractAzureApi {
       undefined,
       undefined,
       undefined,
-      undefined,
+      reason,
       status,
       undefined,
       undefined,
@@ -85,8 +111,8 @@ export class BuildAzureApi extends AbstractAzureApi {
       undefined,
       branchName
     );
-    let timelinePromiseData: Promise<azureBuildInterfaces.Timeline>[] = [];
-    for (let buildData of rawBuildsData) {
+    const timelinePromiseData: Promise<azureBuildInterfaces.Timeline>[] = [];
+    for (const buildData of rawBuildsData) {
       timelinePromiseData.push(this.getBuildTimeline(project, buildData.id));
     }
     await Promise.all(timelinePromiseData);

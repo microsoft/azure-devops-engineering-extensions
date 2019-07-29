@@ -3,6 +3,7 @@ import messages from "../resources/user_messages.json";
 import { Branch } from "../dataModels/Branch";
 import { PipelineTask } from "../dataModels/PipelineTask";
 import { AbstractPipeline } from "../dataModels/AbstractPipeline";
+import tl = require("azure-pipelines-task-lib/task");
 
 export class FailureTable extends AbstractTable {
   constructor(currentCommentData?: string) {
@@ -21,21 +22,36 @@ export class FailureTable extends AbstractTable {
     longRunningValidations: PipelineTask[]
   ): void {
     if (this.tableHasData()) {
-      if (current.isFailure()) {
-        let messageString: string = messages.failureCommentRow;
-        if (target.isHealthy(numberPipelinesToConsiderForHealth)) {
-          messageString = messages.successCommentRow;
-        }
-        this.addTextToTableInComment(
-          AbstractTable.NEW_LINE +
-            messageString.format(
-              current.getDefinitionName(),
-              current.getLink(),
-              target.getTruncatedName(),
-              currentDefinitionLink
-            )
+      const messageString: string = messages.failureTableRow;
+      let statusColumn: string = "";
+      for (const pipelineToConsider of target.getCompletePipelines(
+        numberPipelinesToConsiderForHealth
+      )) {
+        let symbolToAdd = messages.success;
+        tl.debug(
+          "using pipeline for failure table: " +
+            pipelineToConsider.getName() +
+            " , id: " +
+            pipelineToConsider.getId()
         );
+        if (pipelineToConsider.isFailure()) {
+          symbolToAdd = messages.failure;
+        }
+        statusColumn += symbolToAdd;
       }
+      const insightsColumn = messages[
+        target.getStatus(numberPipelinesToConsiderForHealth)
+      ].format(target.getTruncatedName(), currentDefinitionLink);
+
+      this.addTextToTableInComment(
+        AbstractTable.NEW_LINE +
+          messageString.format(
+            current.getDefinitionName(),
+            current.getLink(),
+            statusColumn,
+            insightsColumn
+          )
+      );
     }
   }
 }

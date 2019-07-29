@@ -17,7 +17,7 @@ describe("LongRunningValidationTable Tests", () => {
     definitionName: string
   ): AbstractPipeline {
     const pipeline: AbstractPipeline = mock(Release);
-    sinon.stub(pipeline, "getDisplayName").returns(name);
+    sinon.stub(pipeline, "getName").returns(name);
     sinon.stub(pipeline, "getDefinitionName").returns(definitionName);
     sinon.stub(pipeline, "getLink").returns(link);
     sinon.stub(pipeline as Release, "getDefinitionId").returns(definitionId);

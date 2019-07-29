@@ -68,8 +68,19 @@ export class Release extends AbstractPipeline {
     return Number(this.releaseData.id);
   }
 
-  public getDisplayName(): string {
+  public getName(): string {
     return this.releaseData.name;
+  }
+
+  public getTriggeringArtifactAlias(): string {
+    if (this.releaseData.artifacts) {
+      for (const artifact of this.releaseData.artifacts) {
+        if (artifact.isPrimary) {
+          return artifact.alias;
+        }
+      }
+    }
+    return null;
   }
 
   private parseForTasks(): AbstractPipelineTaskRun[] {
@@ -92,9 +103,7 @@ export class Release extends AbstractPipeline {
         }
       }
     } catch (err) {
-      tl.debug(
-        "Warning: Release " + this.getDisplayName() + " is missing task data"
-      );
+      tl.debug("Warning: Release " + this.getName() + " is missing task data");
     }
     return tasks;
   }

@@ -76,7 +76,7 @@ export abstract class AbstractPipeline {
   /**
    * Gets pipeline name that is helpful to display to user
    */
-  public abstract getDisplayName(): string;
+  public abstract getName(): string;
 
   /**
    * Gets all tasks added to this pipeline

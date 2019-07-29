@@ -13,6 +13,7 @@ import { PullRequest } from "./dataModels/PullRequest";
 
 export class TaskInsights {
   public static readonly NUMBER_PIPELINES_FOR_HEALTH = 3;
+  public static readonly MINIMUM_PIPELINES_TO_FETCH_FOR_HEALTH = 10;
   public static readonly NUMBER_PIPELINES_FOR_LONG_RUNNING_VALIDATIONS = 50;
   public static readonly MINIMUM_SECONDS = 1;
 
@@ -55,12 +56,17 @@ export class TaskInsights {
           this.pullRequest.getTargetBranchName()
       );
       this.targetBranch = new Branch(this.pullRequest.getTargetBranchName());
+      const mostRecentTargetPipelines = await this.azureApi.getMostRecentPipelinesOfCurrentType(
+        this.data.getProjectName(),
+        this.currentPipeline,
+        TaskInsights.MINIMUM_PIPELINES_TO_FETCH_FOR_HEALTH,
+        this.targetBranch.getFullName()
+      );
       this.targetBranch.setPipelines(
-        await this.azureApi.getMostRecentPipelinesOfCurrentType(
+        await this.azureApi.findPipelinesForAndBeforeMergeCommit(
           this.data.getProjectName(),
-          this.currentPipeline,
-          TaskInsights.NUMBER_PIPELINES_FOR_HEALTH,
-          this.targetBranch.getFullName()
+          mostRecentTargetPipelines,
+          this.pullRequest.getLastMergeTargetCommitId()
         )
       );
       let tableType: string = TableFactory.FAILURE;

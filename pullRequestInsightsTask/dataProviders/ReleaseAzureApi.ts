@@ -6,10 +6,9 @@ import { AbstractPipeline } from "../dataModels/AbstractPipeline";
 import { Release } from "../dataModels/Release";
 
 export class ReleaseAzureApi extends AbstractAzureApi {
-  public static readonly DESIRED_RELEASE_ENVIRONMENT_STATUS: number =
-    azureReleaseInterfaces.EnvironmentStatus.Succeeded +
-    azureReleaseInterfaces.EnvironmentStatus.PartiallySucceeded +
-    azureReleaseInterfaces.EnvironmentStatus.Rejected;
+  public static readonly DESIRED_RELEASE_EXPANDS: number =
+    azureReleaseInterfaces.ReleaseExpands.Environments +
+    azureReleaseInterfaces.ReleaseExpands.Artifacts;
 
   constructor(uri: string, accessKey: string) {
     super(uri, accessKey);
@@ -31,10 +30,17 @@ export class ReleaseAzureApi extends AbstractAzureApi {
       project,
       currentPipeline.getDefinitionId(),
       (currentPipeline as Release).getEnvironmentDefinitionId(),
-      ReleaseAzureApi.DESIRED_RELEASE_ENVIRONMENT_STATUS,
       maxNumber,
       branchName
     );
+  }
+
+  public async findPipelinesForAndBeforeMergeCommit(
+    project: string,
+    pipelinesToParse: AbstractPipeline[],
+    mergeCommit: string
+  ): Promise<AbstractPipeline[]> {
+    return pipelinesToParse; // TODO
   }
 
   public async getRelease(
@@ -48,15 +54,14 @@ export class ReleaseAzureApi extends AbstractAzureApi {
     project: string,
     definition?: number,
     environmentDefinition?: number,
-    environmentStatus?: number,
     maxNumber?: number,
     branchName?: string
   ): Promise<AbstractPipeline[]> {
     tl.debug(
       `getting releases with: ${project}, ${definition}, ${environmentDefinition}, ${branchName}`
     );
-    let releases: Array<AbstractPipeline> = [];
-    let rawTemporaryReleasesData: azureReleaseInterfaces.Release[] = await (await this.getConnection().getReleaseApi()).getReleases(
+    const releases: Array<AbstractPipeline> = [];
+    const rawTemporaryReleasesData: azureReleaseInterfaces.Release[] = await (await this.getConnection().getReleaseApi()).getReleases(
       project,
       definition,
       environmentDefinition,
@@ -69,21 +74,21 @@ export class ReleaseAzureApi extends AbstractAzureApi {
       undefined,
       undefined,
       undefined,
-      azureReleaseInterfaces.ReleaseExpands.Environments,
+      ReleaseAzureApi.DESIRED_RELEASE_EXPANDS,
       undefined,
       undefined,
       undefined,
       branchName
     );
-    let rawIndividualReleaseDataPromises: Promise<
+    const rawIndividualReleaseDataPromises: Promise<
       azureReleaseInterfaces.Release
     >[] = [];
-    for (let rawReleaseData of rawTemporaryReleasesData) {
+    for (const rawReleaseData of rawTemporaryReleasesData) {
       rawIndividualReleaseDataPromises.push(
         this.getReleaseData(project, new Release(rawReleaseData).getId())
       );
     }
-    for (let releaseData of rawIndividualReleaseDataPromises) {
+    for (const releaseData of rawIndividualReleaseDataPromises) {
       releases.push(new Release(await releaseData));
     }
     return releases;

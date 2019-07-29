@@ -67,7 +67,7 @@ export class Build extends AbstractPipeline {
     return Number(this.buildData.id);
   }
 
-  public getDisplayName(): string {
+  public getName(): string {
     return this.buildData.buildNumber;
   }
 }

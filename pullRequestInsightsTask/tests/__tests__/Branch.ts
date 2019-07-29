@@ -28,7 +28,7 @@ describe("Branch Tests", () => {
     for (let buildNumber = 0; buildNumber < builds.length; buildNumber++) {
       sinon.stub(builds[buildNumber], "getId").returns(buildNumber);
       sinon.stub(builds[buildNumber], "isComplete").returns(true);
-      sinon.stub(builds[buildNumber], "getDisplayName").returns("");
+      sinon.stub(builds[buildNumber], "getName").returns("");
     }
     sinon.stub(failedBuildOne, "isFailure").returns(true);
     sinon.stub(failedBuildThree, "isFailure").returns(true);

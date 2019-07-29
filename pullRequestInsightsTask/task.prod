@@ -8,8 +8,8 @@
     "author": "Leah Schwartz",
     "version": {
         "Major": 0,
-        "Minor": 0,
-        "Patch": 122
+        "Minor": 1,
+        "Patch": 0
     },
     "instanceNameFormat": "PR Insights",
     "inputs": [
@@ -55,7 +55,7 @@
             "type": "string",
             "label": "Check Status Link",
             "required": false,
-            "helpMarkDown": "A link that is offered to users when the target branch is unhealthy \n Note: Default link is to definition summary page"
+            "helpMarkDown": "A link that is offered to users to check on the status of the target branch \n Note: Default link is to definition summary page"
         }
     ],
     "execution": {

@@ -2,6 +2,7 @@ import { AbstractPipeline } from "./AbstractPipeline";
 import tl = require("azure-pipelines-task-lib/task");
 import stats from "stats-lite";
 import { PipelineTask } from "./PipelineTask";
+import { BranchStatus } from "./BranchStatus";
 
 export class Branch {
   private pipelines: AbstractPipeline[];
@@ -30,48 +31,68 @@ export class Branch {
     );
   }
 
+  private filterForCompletePipelines(): AbstractPipeline[] {
+    const completePipelines: AbstractPipeline[] = [];
+    for (const pipeline of this.pipelines) {
+      if (pipeline.isComplete()) {
+        completePipelines.push(pipeline);
+      }
+    }
+    return completePipelines;
+  }
+
   /**
    * Determines if this branch is healthy based on pipelines on its pipelines
    * @param numberPipelinesToConsider Number of past pipelines to use to determine health
    */
   public isHealthy(numberPipelinesToConsider: number): boolean {
-    const pipelinesToConsider: AbstractPipeline[] = [];
-    if (this.pipelines) {
-      for (const pipeline of this.pipelines) {
-        if (pipeline.isComplete()) {
-          pipelinesToConsider.push(pipeline);
-        } else {
-          tl.debug(
-            "not considering the health of " +
-              pipeline.getDisplayName() +
-              " because it is not complete"
-          );
-        }
-      }
-      numberPipelinesToConsider = Math.min(
-        pipelinesToConsider.length,
-        numberPipelinesToConsider
+    const pipelinesToConsider: AbstractPipeline[] = this.getCompletePipelines(
+      numberPipelinesToConsider
+    );
+    for (const pipeline of pipelinesToConsider) {
+      tl.debug("considering pipeline " + pipeline.getName());
+      tl.debug(
+        pipeline.getName() + " is a failure? " + pipeline.isFailure()
       );
-      for (
-        let numberPipeline: number = 0;
-        numberPipeline < numberPipelinesToConsider;
-        numberPipeline++
-      ) {
-        tl.debug(
-          "considering pipeline " +
-            pipelinesToConsider[numberPipeline].getDisplayName()
-        );
-        tl.debug(
-          pipelinesToConsider[numberPipeline].getDisplayName() +
-            " is a failure? " +
-            pipelinesToConsider[numberPipeline].isFailure()
-        );
-        if (pipelinesToConsider[numberPipeline].isFailure()) {
-          return false;
-        }
+      if (pipeline.isFailure()) {
+        return false;
       }
     }
     return true;
+  }
+
+  public getStatus(numberPipelinesToConsider: number): BranchStatus {
+    let failureCount = 0;
+    let status: BranchStatus = BranchStatus.Healthy;
+    for (const pipeline of this.getCompletePipelines(
+      numberPipelinesToConsider
+    )) {
+      if (pipeline.isFailure()) {
+        failureCount++;
+        status = BranchStatus.Flakey;
+      }
+    }
+    if (
+      this.getCompletePipelines(numberPipelinesToConsider).length > 0 &&
+      failureCount ===
+        this.getCompletePipelines(numberPipelinesToConsider).length
+    ) {
+      status = BranchStatus.Unhealthy;
+    }
+    return status;
+  }
+
+  public getCompletePipelines(
+    maxNumberPipelinesToReturn: number
+  ): AbstractPipeline[] {
+    const realNumberPipelinesToConsider = Math.min(
+      this.filterForCompletePipelines().length,
+      maxNumberPipelinesToReturn
+    );
+    return this.filterForCompletePipelines().slice(
+      0,
+      realNumberPipelinesToConsider
+    );
   }
 
   /**
