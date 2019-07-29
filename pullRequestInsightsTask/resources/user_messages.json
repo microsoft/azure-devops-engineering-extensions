@@ -1,0 +1,26 @@
+{
+  "notInPullRequestMessage": "Nothing occured because this task is not being run from a pull request",
+  "noFailureMessage": "Nothing occured because the {0} has not failed any tasks",
+  "commentCompletedMessage": "Comment was successfully posted",
+  "summaryLine": "\n #### Pull Request Validation Insights",
+  "link": "[{0}]({1})",
+
+  "failureCommentTableHeading": "**Failed Validations** \n |Failed Pipeline|{0} Status <small title='Last {2} {0} runs before merge commit'>:grey_question:</small>|Insights|",
+  "failureCommentTableEndName": "failureTable",
+  "newIterationCommentHeading": "__Source Commit: {0}__",
+  "success": ":heavy_check_mark:",
+  "failure": ":x:",
+  "failureTableRow": "|[{0}]({1})| {2} | {3} |",
+  "unhealthy": "{0} branch is [Unhealthy]({1}) <br> Please compare {0} branch failures <br> with current and take appropriate action",
+  "healthy": "{0} branch is [Healthy]({1}) <br> Failure in this PR is likely related to change",
+  "flakey": "{0} branch is [Flakey]({1}) <br> Please compare {0} branch flakiness <br> with current failures and take appropriate action",
+
+  "longRunningValidationCommentTableHeading": "**Long Running Validations** \n |Impacted Pipeline|Regressed Task| Duration [Regression] <small title='Regression calculation based on {1}th percentile of recent {0} runs before commit'>:grey_question:</small>|",
+  "longRunningValidationTableEndName": "longRunningValidationTable",
+  "longRunningValidationCommentFirstSectionRow": "|[{0}]({1})| {2} | {3} |",
+  "longRunningValidationCommentLowerSectionRow": "| | {2} | {3} |",
+  "longRunningMultiAgentLine": "<br><small>(Regressed on {0}/{1} agents)</small>",
+  "durationWithRegressionFormat": "&nbsp;&nbsp;&nbsp;&nbsp;{0} [<span style='color:red'>+{1}</span>]",
+  "durationRangeFormat": "{0} - <br>{1}",
+  "feedbackLine": "<small>*Please send your feedback to [EPS Team Channel](https://teams.microsoft.com/l/channel/19%3ad62e5769369b4f449c9f8ed42704bec6%40thread.skype/EPS?groupId=cd2504a9-b748-4087-b3f9-60c46b6f1782&tenantId=72f988bf-86f1-41af-91ab-2d7cd011db470) if above insights are not helpful</small>"
+}

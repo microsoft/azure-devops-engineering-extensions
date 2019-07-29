@@ -15,15 +15,15 @@
     "@types/string-template": "^1.0.2",
     "azure-devops-node-api": "^8.0.0",
     "azure-pipelines-task-lib": "^2.8.0",
-    "jest": "^20.0.4",
     "moment": "^2.24.0",
-    "sinon": "^7.3.2",
     "stats-lite": "^2.0.0",
-    "string-template": "^1.0.0",
-    "ts-mockito": "^2.3.1"
+    "string-template": "^1.0.0"
   },
   "devDependencies": {
     "@types/node": "^12.0.4",
-    "@types/q": "^1.5.2"
+    "@types/q": "^1.5.2",
+    "jest": "^20.0.4",
+    "sinon": "^7.3.2",
+    "ts-mockito": "^2.3.1"
   }
 }
