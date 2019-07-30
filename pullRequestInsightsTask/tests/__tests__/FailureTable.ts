@@ -74,7 +74,7 @@ describe("FailureTable Tests", () => {
         messages.failureTableRow.format(
           "thisBuild",
           "h",
-          "",
+          messages.noPipelines,
           messages.healthy.format("thisBranch", "link")
         ) +
         "<!--failureTable-->"
@@ -109,7 +109,7 @@ describe("FailureTable Tests", () => {
         messages.failureTableRow.format(
           "thisBuild",
           "h",
-          "",
+          messages.noPipelines,
           messages.unhealthy.format("thisBranch", "link")
         ) +
         "<!--failureTable-->"
