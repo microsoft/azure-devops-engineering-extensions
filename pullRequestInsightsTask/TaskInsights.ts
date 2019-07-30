@@ -62,7 +62,7 @@ export class TaskInsights {
       );
       this.targetBranch = new Branch(this.pullRequest.getTargetBranchName());
       await this.setTargetBranchPipelines(
-        TaskInsights.NUMBER_PIPELINES_FOR_HEALTH
+        TaskInsights.MINIMUM_PIPELINES_TO_FETCH_FOR_HEALTH
       );
       let tableType: string = TableFactory.FAILURE;
       this.telemetry.setWasFailureFound(this.currentPipeline.isFailure());
