@@ -56,7 +56,7 @@ export class TaskInsights {
         this.currentPipeline.getId(),
         this.data.getHostType()
       );
-      tl.debug(
+      console.log(
         "target branch of pull request: " +
           this.pullRequest.getTargetBranchName()
       );
@@ -78,7 +78,7 @@ export class TaskInsights {
       }
       this.telemetry.logTaskResults();
     } else {
-      tl.debug(
+      console.log(
         this.data.getHostType() + " is not for most recent source commit"
       );
     }
@@ -88,7 +88,7 @@ export class TaskInsights {
    * Checks to see if current iteration of PR Insights task is running within most recent commit of pull request
    */
   private taskIsRunningInMostRecentSourceCommit(): boolean {
-    tl.debug(
+    console.log(
       "most recent source commit = " +
         this.pullRequest.getMostRecentSourceCommitId()
     );
@@ -130,7 +130,7 @@ export class TaskInsights {
         project
       );
     }
-    tl.debug(`Check status link to use: ${currentStatusLink}`);
+    console.log(`Check status link to use: ${currentStatusLink}`);
     return currentStatusLink;
   }
 
@@ -158,11 +158,11 @@ export class TaskInsights {
         this.longRunningValidations.push(task);
       }
     }
-    tl.debug(
+    console.log(
       "Number of longRunningValidations = " + this.longRunningValidations.length
     );
     for (const validation of this.longRunningValidations) {
-      tl.debug("Name of long running validation = " + validation.getName());
+      console.log("Name of long running validation = " + validation.getName());
       tl.debug("Threshold time " + validation.getRegressionThreshold());
       tl.debug("Durations of all tasks: " + validation.getAllDurations());
       tl.debug(

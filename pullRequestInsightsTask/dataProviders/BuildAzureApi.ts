@@ -67,7 +67,7 @@ export class BuildAzureApi extends AbstractAzureApi {
     maxNumber?: number,
     branchName?: string
   ): Promise<AbstractPipeline[]> {
-    tl.debug(
+    console.log(
       `getting builds with: ${project}, ${definition}, ${status}, ${maxNumber}, ${branchName}`
     );
     const builds: Array<AbstractPipeline> = [];

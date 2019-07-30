@@ -49,7 +49,7 @@ export class ReleaseAzureApi extends AbstractAzureApi {
     maxNumber?: number,
     branchName?: string
   ): Promise<AbstractPipeline[]> {
-    tl.debug(
+    console.log(
       `getting releases with: ${project}, ${definition}, ${environmentDefinition}, ${branchName}`
     );
     const releases: Array<AbstractPipeline> = [];

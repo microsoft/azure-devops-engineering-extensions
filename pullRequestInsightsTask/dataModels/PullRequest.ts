@@ -220,7 +220,7 @@ export class PullRequest {
         this.getIterationFromServiceCommentThread(commentThread) ===
           this.mostRecentSourceCommitId
       ) {
-        tl.debug(
+        console.log(
           "comment thread id of thread of current source commit " +
             this.mostRecentSourceCommitId +
             ": thread id = " +
@@ -229,7 +229,7 @@ export class PullRequest {
         return commentThread;
       }
     }
-    tl.debug(
+    console.log(
       "no comment was found for iteration " + this.mostRecentSourceCommitId
     );
     return null;
@@ -243,13 +243,13 @@ export class PullRequest {
       this.mostRecentSourceCommitId = this.getIdFromCommit(
         this.pullRequestData.lastMergeCommit
       );
-      tl.debug("found source commit: " + this.mostRecentSourceCommitId);
+      console.log("found source commit: " + this.mostRecentSourceCommitId);
     }
     if (this.pullRequestData.lastMergeTargetCommit) {
       this.lastMergeTargetCommitId = this.getIdFromCommit(
         this.pullRequestData.lastMergeTargetCommit
       );
-      tl.debug("found last merge commit: " + this.lastMergeTargetCommitId);
+      console.log("found last merge commit: " + this.lastMergeTargetCommitId);
     }
   }
 

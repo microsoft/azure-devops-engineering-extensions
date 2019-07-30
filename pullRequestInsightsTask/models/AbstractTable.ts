@@ -25,14 +25,22 @@ export abstract class AbstractTable {
     } else {
       this.currentCommentData = "";
     }
-    tl.debug("table already exists in comment? " + this.tableHasData());
+    console.log("table already exists in comment? " + this.tableHasData());
   }
 
-  public addHeader(targetName: string, percentile: string, numberPipelinesForHealth: string): void {
+  public addHeader(
+    targetName: string,
+    percentile: string,
+    numberPipelinesForHealth: string
+  ): void {
     if (!this.tableHasData()) {
       this.addTextToTableInComment(
         AbstractTable.NEW_LINE +
-          this.headerFormat.format(targetName, percentile, numberPipelinesForHealth)
+          this.headerFormat.format(
+            targetName,
+            percentile,
+            numberPipelinesForHealth
+          )
       );
       const numberColumns: number = this.getNumberColumns(
         this.currentCommentData
@@ -66,6 +74,7 @@ export abstract class AbstractTable {
 
   protected addTextToTableInComment(data: string): void {
     if (this.tableHasData()) {
+      console.log("adding data to table: " + data);
       this.currentCommentData = this.currentCommentData.replace(
         this.tableEndLine,
         data + this.tableEndLine

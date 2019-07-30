@@ -28,7 +28,7 @@ export class FailureTable extends AbstractTable {
         numberPipelinesToConsiderForHealth
       )) {
         let symbolToAdd = messages.success;
-        tl.debug(
+        console.log(
           "using pipeline for failure table: " +
             pipelineToConsider.toString()
         );

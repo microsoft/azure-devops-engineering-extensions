@@ -23,7 +23,7 @@ export class Branch {
    */
   public setPipelines(pipelines: AbstractPipeline[]): void {
     this.pipelines = pipelines;
-    tl.debug(
+    console.log(
       "Number of pipelines set on " + this.name + " = " + this.pipelines.length
     );
   }
@@ -38,7 +38,7 @@ export class Branch {
     );
     for (const pipeline of pipelinesToConsider) {
       tl.debug("considering pipeline " + pipeline.getName());
-      tl.debug(pipeline.getName() + " is a failure? " + pipeline.isFailure());
+      console.log(pipeline.getName() + " is a failure? " + pipeline.isFailure());
       if (pipeline.isFailure()) {
         return false;
       }
@@ -106,7 +106,7 @@ export class Branch {
         break;
       }
     }
-    tl.debug(`number pipelines failing on ${this.name} is ${count}`);
+    console.log(`number pipelines failing on ${this.name} is ${count}`);
     return count;
   }
 
@@ -160,7 +160,7 @@ export class Branch {
     if (times.length > 0) {
       return stats.percentile(times, percentileToFind / 100);
     } else {
-      tl.debug(
+      console.log(
         "no tasks with name " +
           taskName +
           " found on pipelines of branch " +

@@ -16,7 +16,7 @@ export class AzureApiFactory {
    */
   public static async create(data: PipelineData): Promise<AbstractAzureApi> {
     const type: string = data.getHostType();
-    tl.debug("host type: " + type);
+    console.log("host type: " + type);
     if (type.toLowerCase() === AzureApiFactory.BUILD) {
       return new BuildAzureApi(data.getTeamUri(), data.getAccessKey());
     }

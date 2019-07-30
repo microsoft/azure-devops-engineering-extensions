@@ -65,10 +65,10 @@ async function run(): Promise<void> {
         .split(",")
     );
     data.setStatusLink(tl.getInput("checkStatusLink", false));
-    tl.debug("pipline data: " + JSON.stringify(data));
+    console.log("pipline data: " + JSON.stringify(data));
 
     if (!data.getPullRequestId()) {
-      tl.debug(messages.notInPullRequestMessage);
+      console.log(messages.notInPullRequestMessage);
     } else {
       const taskInsights: TaskInsights = new TaskInsights(data);
       taskInsights.invoke();

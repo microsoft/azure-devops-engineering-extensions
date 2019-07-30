@@ -118,7 +118,7 @@ export class Release extends AbstractPipeline {
         }
       }
     } catch (err) {
-      tl.debug("Warning: Release " + this.getName() + " is missing task data");
+        console.log("Warning: Release " + this.getName() + " is missing task data");
     }
     return tasks;
   }

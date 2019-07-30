@@ -52,8 +52,8 @@ export abstract class AbstractAzureApi {
       maxNumber,
       branchName
     );
-    tl.debug("last merge target commit id: " + mergeCommit);
-    tl.debug(
+    console.log("last merge target commit id: " + mergeCommit);
+    console.log(
       "triggering alias: " + currentPipeline.getTriggeringArtifactAlias()
     );
     for (let index = 0; index < pipelines.length; index++) {
@@ -75,19 +75,19 @@ export abstract class AbstractAzureApi {
         tl.debug(change.id);
         if (change.id === mergeCommit) {
           for (const thisPipeline of pipelines.slice(index)) {
-            tl.debug(
+            console.log(
               "using pipeline: " +
                 thisPipeline.toString()
             );
           }
-          tl.debug(
+          console.log(
             "found " + pipelines.slice(index).length + " before merge commit"
           );
           return pipelines.slice(index);
         }
       }
     }
-    tl.debug("found no pipelines with merge commit");
+    console.log("found no pipelines with merge commit");
     return [];
   }
 
