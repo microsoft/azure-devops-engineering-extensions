@@ -85,9 +85,16 @@ export abstract class AbstractPipeline {
 
   /**
    * Gets id from pipeline artifact using artifact's alias
-   * @param artifactAlias Alias of artifact from which to get id 
+   * @param artifactAlias Alias of artifact from which to get id
    */
   public abstract getIdFromArtifact(artifactAlias: string): number;
+
+  /**
+   * Creates string representation of this pipeline by giving name and id
+   */
+  public toString(): string {
+    return this.getName() + " " + this.getId();
+  }
 
   /**
    * Gets all tasks added to this pipeline

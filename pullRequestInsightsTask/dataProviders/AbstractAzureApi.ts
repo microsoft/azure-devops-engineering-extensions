@@ -62,9 +62,7 @@ export abstract class AbstractAzureApi {
       );
       tl.debug(
         "artifact alias found for pipeline " +
-          pipelines[index].getName() +
-          ", id: " +
-          pipelines[index].getId() +
+          pipelines[index].toString() +
           " = " +
           artifactId
       );
@@ -79,9 +77,7 @@ export abstract class AbstractAzureApi {
           for (const thisPipeline of pipelines.slice(index)) {
             tl.debug(
               "using pipeline: " +
-                thisPipeline.getName() +
-                ", id: " +
-                thisPipeline.getId()
+                thisPipeline.toString()
             );
           }
           tl.debug(

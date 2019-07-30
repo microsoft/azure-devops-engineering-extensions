@@ -30,9 +30,7 @@ export class FailureTable extends AbstractTable {
         let symbolToAdd = messages.success;
         tl.debug(
           "using pipeline for failure table: " +
-            pipelineToConsider.getName() +
-            " , id: " +
-            pipelineToConsider.getId()
+            pipelineToConsider.toString()
         );
         if (pipelineToConsider.isFailure()) {
           symbolToAdd = messages.failure;
@@ -42,12 +40,13 @@ export class FailureTable extends AbstractTable {
           pipelineToConsider.getLink()
         );
       }
-      if (statusColumn.length === 0) {
-        statusColumn = messages.noPipelines;
-      }
-      const insightsColumn = messages[
+      let insightsColumn = messages[
         target.getStatus(numberPipelinesToConsiderForHealth)
       ].format(target.getTruncatedName(), currentDefinitionLink);
+      if (statusColumn.length === 0) {
+        statusColumn = messages.noPipelines;
+        insightsColumn = "";
+      }
 
       this.addTextToTableInComment(
         AbstractTable.NEW_LINE +
