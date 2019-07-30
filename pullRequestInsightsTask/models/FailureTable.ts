@@ -42,6 +42,9 @@ export class FailureTable extends AbstractTable {
           pipelineToConsider.getLink()
         );
       }
+      if (statusColumn.length === 0) {
+        statusColumn = messages.noPipelines;
+      }
       const insightsColumn = messages[
         target.getStatus(numberPipelinesToConsiderForHealth)
       ].format(target.getTruncatedName(), currentDefinitionLink);
