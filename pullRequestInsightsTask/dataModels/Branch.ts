@@ -28,16 +28,6 @@ export class Branch {
     );
   }
 
-  private filterForCompletePipelines(): AbstractPipeline[] {
-    const completePipelines: AbstractPipeline[] = [];
-    for (const pipeline of this.pipelines) {
-      if (pipeline.isComplete()) {
-        completePipelines.push(pipeline);
-      }
-    }
-    return completePipelines;
-  }
-
   /**
    * Determines if this branch is healthy based on pipelines on its pipelines
    * @param numberPipelinesToConsider Number of past pipelines to use to determine health
@@ -56,6 +46,11 @@ export class Branch {
     return true;
   }
 
+  /**
+   * Gets the status of this branch based on the failures of some number of most recent
+   * complete pipelines on this branch
+   * @param numberPipelinesToConsider Number of complete pipelines to consider for this branch's status
+   */
   public getStatus(numberPipelinesToConsider: number): BranchStatus {
     let failureCount = 0;
     let status: BranchStatus = BranchStatus.Healthy;
@@ -77,6 +72,11 @@ export class Branch {
     return status;
   }
 
+  /**
+   * Gets list of pipelines on this branch that have finished running using a maximum number of pipelines to get
+   * If fewer complete pipelines are present, all complete pipelines are returned
+   * @param maxNumberPipelinesToReturn Maximum number of complete pipelines desired
+   */
   public getCompletePipelines(
     maxNumberPipelinesToReturn: number
   ): AbstractPipeline[] {
@@ -168,6 +168,19 @@ export class Branch {
       );
       return null;
     }
+  }
+
+  /**
+   * Creates a list of pipelines on this branch that have finished running
+   */
+  private filterForCompletePipelines(): AbstractPipeline[] {
+    const completePipelines: AbstractPipeline[] = [];
+    for (const pipeline of this.pipelines) {
+      if (pipeline.isComplete()) {
+        completePipelines.push(pipeline);
+      }
+    }
+    return completePipelines;
   }
 
   /**

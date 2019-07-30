@@ -78,9 +78,16 @@ export abstract class AbstractPipeline {
    */
   public abstract getName(): string;
 
+  /**
+   * Gets alias of the artifact that set off pipeline
+   */
   public abstract getTriggeringArtifactAlias(): string;
 
-  public abstract getBuildIdFromArtifact(artifactAlias: string): number;
+  /**
+   * Gets id from pipeline artifact using artifact's alias
+   * @param artifactAlias Alias of artifact from which to get id 
+   */
+  public abstract getIdFromArtifact(artifactAlias: string): number;
 
   /**
    * Gets all tasks added to this pipeline

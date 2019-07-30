@@ -83,7 +83,7 @@ export class Release extends AbstractPipeline {
     return null;
   }
 
-  public getBuildIdFromArtifact(artifactAlias: string): number {
+  public getIdFromArtifact(artifactAlias: string): number {
     if (this.artifactsByAlias.has(artifactAlias)) {
       const artifact: azureReleaseInterfaces.Artifact = this.artifactsByAlias.get(
         artifactAlias

@@ -9,8 +9,13 @@ export class AzureApiFactory {
   public static readonly BUILD: string = "build";
   public static readonly RELEASE: string = "release";
 
+  /**
+   * Creates the appropriate type of AzureApi depending on current pipeline type
+   * Support build or release, otherwise, HostTypeError is thrown
+   * @param data Object containing variables set by environment and task configurations
+   */
   public static async create(data: PipelineData): Promise<AbstractAzureApi> {
-    let type: string = data.getHostType();
+    const type: string = data.getHostType();
     tl.debug("host type: " + type);
     if (type.toLowerCase() === AzureApiFactory.BUILD) {
       return new BuildAzureApi(data.getTeamUri(), data.getAccessKey());

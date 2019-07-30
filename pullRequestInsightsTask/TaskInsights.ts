@@ -28,6 +28,7 @@ export class TaskInsights {
   constructor(data: PipelineData) {
     this.data = data;
     this.telemetry = new TelemetryInformation();
+    this.longRunningValidations = [];
   }
 
   /**
@@ -51,6 +52,10 @@ export class TaskInsights {
 
     if (this.taskIsRunningInMostRecentSourceCommit()) {
       this.currentPipeline = await this.azureApi.getCurrentPipeline(this.data);
+      this.telemetry.setPipelineData(
+        this.currentPipeline.getId(),
+        this.data.getHostType()
+      );
       tl.debug(
         "target branch of pull request: " +
           this.pullRequest.getTargetBranchName()
@@ -60,29 +65,43 @@ export class TaskInsights {
         TaskInsights.NUMBER_PIPELINES_FOR_HEALTH
       );
       let tableType: string = TableFactory.FAILURE;
-      tl.debug("pipeline is a failure?: " + this.currentPipeline.isFailure());
+      this.telemetry.setWasFailureFound(this.currentPipeline.isFailure());
       if (!this.currentPipeline.isFailure()) {
         tableType = TableFactory.LONG_RUNNING_VALIDATIONS;
         await this.findAllLongRunningValidations();
       }
+      this.telemetry.setWasRegressionFound(
+        this.longRunningValidations.length > 0
+      );
       if (this.shouldPRInsightsCommentOccur()) {
         this.manageComments(tableType);
       }
-   }
-   else {
-        tl.debug(
-          this.data.getHostType() + " is not for most recent source commit"
-        );
+      this.telemetry.logTaskResults();
+    } else {
+      tl.debug(
+        this.data.getHostType() + " is not for most recent source commit"
+      );
     }
   }
 
+  /**
+   * Checks to see if current iteration of PR Insights task is running within most recent commit of pull request
+   */
   private taskIsRunningInMostRecentSourceCommit(): boolean {
+    tl.debug(
+      "most recent source commit = " +
+        this.pullRequest.getMostRecentSourceCommitId()
+    );
     return (
       this.pullRequest.getMostRecentSourceCommitId() ===
       this.data.getCurrentSourceCommitIteration()
     );
   }
 
+  /**
+   * Sets pipelines which ran prior to and for the pull request merge commit on target branch
+   * @param maxNumber Maximum number of pipelines to include
+   */
   private async setTargetBranchPipelines(maxNumber: number): Promise<void> {
     this.targetBranch.setPipelines(
       await this.azureApi.findPipelinesForAndBeforeMergeCommit(
@@ -95,6 +114,12 @@ export class TaskInsights {
     );
   }
 
+  /**
+   * Checks to validation status link input as configuration
+   * If none is present, defaults status link to be definition summary link for current pipelines
+   * @param currentStatusLink String that status link is currently set to
+   * @param project Name of project current pipeline is running within
+   */
   private async checkStatusLink(
     currentStatusLink: string,
     project: string
@@ -110,7 +135,6 @@ export class TaskInsights {
   }
 
   private async findAllLongRunningValidations(): Promise<void> {
-    this.longRunningValidations = [];
     await this.setTargetBranchPipelines(
       TaskInsights.NUMBER_PIPELINES_FOR_LONG_RUNNING_VALIDATIONS
     );
@@ -199,13 +223,18 @@ export class TaskInsights {
   }
 
   private shouldPRInsightsCommentOccur(): boolean {
-    return (
+    const shouldCommentOccur =
       this.currentPipeline.isFailure() ||
       (this.longRunningValidations.length > 0 &&
-        this.data.isLongRunningValidationFeatureEnabled())
-    );
+        this.data.isLongRunningValidationFeatureEnabled());
+    this.telemetry.setWasCommentNeeded(shouldCommentOccur);
+    return shouldCommentOccur;
   }
 
+  /**
+   * Converts seconds into milliseconds
+   * @param seconds Number of seconds to convert
+   */
   public static getMillisecondsFromSeconds(seconds: number): number {
     if (seconds < this.MINIMUM_SECONDS) {
       seconds = this.MINIMUM_SECONDS;

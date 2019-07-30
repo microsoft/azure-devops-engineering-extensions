@@ -6,6 +6,12 @@ export class TableFactory {
   public static readonly LONG_RUNNING_VALIDATIONS: string = "longRunning";
   public static readonly FAILURE: string = "failure";
 
+  /**
+   * Creates table of correct type based on input type
+   * Supports failure and longRunning
+   * @param type Type of table to create
+   * @param currentCommentContent Content table should already include
+   */
   public static create(
     type: string,
     currentCommentContent?: string

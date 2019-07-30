@@ -78,7 +78,7 @@ export class Build extends AbstractPipeline {
   }
 
   // Included to preserve pipeline hierarchy for builds and releases
-  public getBuildIdFromArtifact(artifactAlias: string): number {
+  public getIdFromArtifact(artifactAlias: string): number {
     return this.getId();
   }
 }

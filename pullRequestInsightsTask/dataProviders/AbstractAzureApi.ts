@@ -46,7 +46,7 @@ export abstract class AbstractAzureApi {
     maxNumber: number,
     branchName: string
   ): Promise<AbstractPipeline[]> {
-    let pipelines = await this.getMostRecentPipelinesOfCurrentType(
+    const pipelines = await this.getMostRecentPipelinesOfCurrentType(
       project,
       currentPipeline,
       maxNumber,
@@ -57,7 +57,7 @@ export abstract class AbstractAzureApi {
       "triggering alias: " + currentPipeline.getTriggeringArtifactAlias()
     );
     for (let index = 0; index < pipelines.length; index++) {
-      const artifactId: number = pipelines[index].getBuildIdFromArtifact(
+      const artifactId: number = pipelines[index].getIdFromArtifact(
         currentPipeline.getTriggeringArtifactAlias()
       );
       tl.debug(
@@ -76,8 +76,7 @@ export abstract class AbstractAzureApi {
       for (const change of buildChanges) {
         tl.debug(change.id);
         if (change.id === mergeCommit) {
-          pipelines = pipelines.slice(index);
-          for (const thisPipeline of pipelines) {
+          for (const thisPipeline of pipelines.slice(index)) {
             tl.debug(
               "using pipeline: " +
                 thisPipeline.getName() +
@@ -85,11 +84,15 @@ export abstract class AbstractAzureApi {
                 thisPipeline.getId()
             );
           }
+          tl.debug(
+            "found " + pipelines.slice(index).length + " before merge commit"
+          );
+          return pipelines.slice(index);
         }
       }
     }
-    tl.debug("In total, using " + pipelines.length + " pipelines");
-    return pipelines;
+    tl.debug("found no pipelines with merge commit");
+    return [];
   }
 
   /**
@@ -270,6 +273,11 @@ export abstract class AbstractAzureApi {
     );
   }
 
+  /**
+   * Gets all changes for a specific build, shows commits included in build
+   * @param projectName Name of project build is in
+   * @param buildId Id of build for which to get changes
+   */
   public async getBuildChanges(
     projectName: string,
     buildId: number

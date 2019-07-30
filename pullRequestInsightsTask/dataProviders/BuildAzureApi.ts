@@ -39,27 +39,6 @@ export class BuildAzureApi extends AbstractAzureApi {
     );
   }
 
-  // public async findPipelinesForAndBeforeMergeCommit(
-  //   project: string,
-  //   pipelinesToParse: AbstractPipeline[],
-  //   mergeCommit: string,
-  //   currentPipeline: AbstractPipeline
-  // ): Promise<AbstractPipeline[]> {
-  //   const pipelinesBeforePullRequest: AbstractPipeline[] = [];
-  //   for (let index = 0; index < pipelinesToParse.length; index++) {
-  //     const buildChanges: azureBuildInterfaces.Change[] = await this.getBuildChanges(
-  //       project,
-  //       pipelinesToParse[index].getId()
-  //     );
-  //     for (const change of buildChanges) {
-  //       if (change.id === mergeCommit) {
-  //         pipelinesBeforePullRequest.concat(pipelinesToParse.slice(index));
-  //       }
-  //     }
-  //   }
-  //   return pipelinesBeforePullRequest;
-  // }
-
   public async getBuild(
     project: string,
     buildId: number

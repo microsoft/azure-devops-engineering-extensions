@@ -44,12 +44,6 @@ export class PipelineTask {
         taskInstanceToAdd.getType()
       )
     ) {
-      tl.debug(
-        "added task instance from agent " +
-          taskInstanceToAdd.getAgentName() +
-          " to task " +
-          this.name
-      );
       this.taskRuns.push(taskInstanceToAdd);
     }
   }

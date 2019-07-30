@@ -4,7 +4,6 @@ import tl = require("azure-pipelines-task-lib/task");
 import { PipelineData } from "../config/PipelineData";
 import { AbstractPipeline } from "../dataModels/AbstractPipeline";
 import { Release } from "../dataModels/Release";
-import * as azureBuildInterfaces from "azure-devops-node-api/interfaces/BuildInterfaces";
 
 export class ReleaseAzureApi extends AbstractAzureApi {
   public static readonly DESIRED_RELEASE_EXPANDS: number =
@@ -35,26 +34,6 @@ export class ReleaseAzureApi extends AbstractAzureApi {
       branchName
     );
   }
-
-  // public async findPipelinesForAndBeforeMergeCommit(
-  //   project: string,
-  //   pipelinesToParse: AbstractPipeline[],
-  //   mergeCommit: string,
-  //   currentPipeline: AbstractPipeline
-  // ): Promise<AbstractPipeline[]> {
-  //   const pipelinesBeforePullRequest: AbstractPipeline[] = [];
-  //   const aliasOfTriggeringArtifact: string = currentPipeline.getTriggeringArtifactAlias();
-  //   for (let index = 0; index < pipelinesToParse.length; index++) {
-  //     const artifactId: number = pipelinesToParse[index].getBuildIdFromArtifact(aliasOfTriggeringArtifact);
-  //     const buildChanges: azureBuildInterfaces.Change[] = await this.getBuildChanges(project, artifactId);
-  //     for (const change of buildChanges) {
-  //       if (change.id === mergeCommit) {
-  //         pipelinesBeforePullRequest.concat(pipelinesToParse.slice(index));
-  //       }
-  //     }
-  //   }
-  //   return pipelinesBeforePullRequest;
-  // }
 
   public async getRelease(
     project: string,

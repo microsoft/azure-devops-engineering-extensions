@@ -6,15 +6,15 @@ function runInvokeTaskTest(): void {
   const data: PipelineData = new PipelineData();
   data.setAccessKey("**");
   data.setCurrentSourceCommitIteration(
-    "1919302351f118af5cfa12286c36fc3aa3322b57"
+    "92990b22587c45413ae049b320fa1a6711496cca"
   );
-  data.setHostType("build");
+  data.setHostType("release");
   data.setProjectName("AzureDevOps");
-  data.setReleaseId(11156565);
-  data.setBuildId(9947228);
+  data.setReleaseId(11433455);
+  data.setBuildId(null);
   data.setRepository("AzureDevOps");
   data.setTeamUri("https://dev.azure.com/mseng/");
-  data.setPullRequestId(486147);
+  data.setPullRequestId(490741);
   data.setDurationPercentile(1);
   data.setMimimumValidationDurationSeconds(0);
   data.setMimimumValidationRegressionSeconds(0);
