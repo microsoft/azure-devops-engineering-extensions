@@ -27,12 +27,14 @@ describe("FailureTable Tests", () => {
   function makeFakeBranch(
     name: string,
     failureStreak: number,
-    status: BranchStatus
+    status: BranchStatus,
+    pipelines: AbstractPipeline[]
   ): Branch {
     const branch: Branch = new Branch(name, null);
     sinon.stub(branch, "getTruncatedName").returns(name);
     sinon.stub(branch, "getPipelineFailStreak").returns(failureStreak);
     sinon.stub(branch, "getStatus").returns(status);
+    sinon.stub(branch, "getCompletePipelines").returns(pipelines);
     return branch;
   }
 
@@ -65,7 +67,7 @@ describe("FailureTable Tests", () => {
     failureTable.addSection(
       makeFakePipeline("thisBuild", "h", true, undefined),
       "link",
-      makeFakeBranch("thisBranch", 7, BranchStatus.Healthy),
+      makeFakeBranch("thisBranch", 7, BranchStatus.Healthy, []),
       5,
       null
     );
@@ -75,7 +77,7 @@ describe("FailureTable Tests", () => {
           "thisBuild",
           "h",
           messages.noPipelines,
-          messages.healthy.format("thisBranch", "link")
+          ""
         ) +
         "<!--failureTable-->"
     );
@@ -86,7 +88,7 @@ describe("FailureTable Tests", () => {
     failureTable.addSection(
       makeFakePipeline("thisBuild", "h", true, undefined),
       "link",
-      makeFakeBranch("thisBranch", 7, BranchStatus.Flakey),
+      makeFakeBranch("thisBranch", 7, BranchStatus.Flakey, []),
       7,
       null
     );
@@ -100,7 +102,9 @@ describe("FailureTable Tests", () => {
     failureTable.addSection(
       makeFakePipeline("thisBuild", "h", true, undefined),
       "link",
-      makeFakeBranch("thisBranch", 7, BranchStatus.Unhealthy),
+      makeFakeBranch("thisBranch", 7, BranchStatus.Unhealthy, [
+        makeFakePipeline("", "pipelineLink", true, 0)
+      ]),
       5,
       null
     );
@@ -109,7 +113,7 @@ describe("FailureTable Tests", () => {
         messages.failureTableRow.format(
           "thisBuild",
           "h",
-          messages.noPipelines,
+          messages.link.format(messages.failure, "pipelineLink"),
           messages.unhealthy.format("thisBranch", "link")
         ) +
         "<!--failureTable-->"
