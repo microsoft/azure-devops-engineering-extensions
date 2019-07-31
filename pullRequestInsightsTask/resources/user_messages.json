@@ -14,7 +14,7 @@
   "unhealthy": "{0} branch is [Unhealthy]({1}) <br> Please compare {0} branch failures <br> with current and take appropriate action",
   "healthy": "{0} branch is [Healthy]({1}) <br> Failure in this PR is likely related to change",
   "flakey": "{0} branch is [Flakey]({1}) <br> Please compare {0} branch flakiness <br> with current failures and take appropriate action",
-  "noPipelines": "No data found",
+  "noPipelines": "No pipelines found",
 
   "longRunningValidationCommentTableHeading": "**Long Running Validations** \n |Impacted Pipeline|Regressed Task| Duration [Regression] <small title='Regression calculation based on {1}th percentile of recent {0} runs before commit'>:grey_question:</small>|",
   "longRunningValidationTableEndName": "longRunningValidationTable",

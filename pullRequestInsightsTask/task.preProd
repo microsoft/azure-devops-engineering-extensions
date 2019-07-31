@@ -25,8 +25,8 @@
             "name": "longRunningValidationTaskTypes",
             "type": "string",
             "label": "Long Running Validation Task Types",
-            "required": true,
-            "helpMarkDown": "Types of tasks to be potentially considered as long running \n Note: Seperate each type with a comma"
+            "required": false,
+            "helpMarkDown": "Types of tasks to be potentially considered as long running, if no types are given, all types will be analyzed \n Note: Seperate each type with a comma"
         },
         {
             "name": "longRunningValidationPercentile",

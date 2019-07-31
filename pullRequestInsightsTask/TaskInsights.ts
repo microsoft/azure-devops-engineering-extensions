@@ -183,7 +183,7 @@ export class TaskInsights {
   ): boolean {
     return (
       task.hasRegressiveInstances() &&
-      this.data.getTaskTypesForLongRunningValidations().includes(task.getType())
+      (this.data.getTaskTypesForLongRunningValidations().includes(task.getType()) || !this.data.getTaskTypesForLongRunningValidations())
     );
   }
 
