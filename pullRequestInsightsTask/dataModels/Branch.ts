@@ -38,7 +38,9 @@ export class Branch {
     );
     for (const pipeline of pipelinesToConsider) {
       tl.debug("considering pipeline " + pipeline.getName());
-      console.log(pipeline.getName() + " is a failure? " + pipeline.isFailure());
+      console.log(
+        pipeline.getName() + " is a failure? " + pipeline.isFailure()
+      );
       if (pipeline.isFailure()) {
         return false;
       }
@@ -158,6 +160,7 @@ export class Branch {
     );
     tl.debug("times on target for " + taskName + " = " + times.toString());
     if (times.length > 0) {
+      console.log("found " + times.length + " on target for task" + taskName);
       return stats.percentile(times, percentileToFind / 100);
     } else {
       console.log(

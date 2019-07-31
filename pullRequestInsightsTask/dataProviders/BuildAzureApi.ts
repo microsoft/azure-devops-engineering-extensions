@@ -80,7 +80,8 @@ export class BuildAzureApi extends AbstractAzureApi {
       undefined,
       undefined,
       reason,
-      status,
+      // status,
+      undefined, // if we only get complete builds, might miss the one with merge commit
       undefined,
       undefined,
       undefined,

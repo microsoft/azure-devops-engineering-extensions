@@ -52,6 +52,7 @@ export abstract class AbstractAzureApi {
       maxNumber,
       branchName
     );
+    console.log("in call to getMostRecentPipelinesOfCurrentType, found " + pipelines.length + " pipelines");
     console.log("last merge target commit id: " + mergeCommit);
     console.log(
       "triggering alias: " + currentPipeline.getTriggeringArtifactAlias()
