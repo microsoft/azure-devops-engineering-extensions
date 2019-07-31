@@ -1,11 +1,17 @@
 export class TelemetryInformation {
+  private isLongRunningValidationsEnabled: string;
+  private durationPercentile: string;
+  private mimimumValidationDuration: string;
+  private mimimumValidationRegression: string;
+  private taskTypesForLongRunningValidations: string[];
+  private statusLink: string;
   private wasCommentNeeded: string;
   private wasRegressionFound: string;
   private wasFailureFound: string;
   private pipelineId: string;
   private pipelineType: string;
 
-  public postUserConfigurations(
+  public addUserConfigurations(
     isLongRunningValidationsEnabled: boolean,
     durationPercentile: number,
     mimimumValidationDuration: number,
@@ -13,14 +19,14 @@ export class TelemetryInformation {
     taskTypesForLongRunningValidations: string[],
     statusLink: string
   ): void {
-    this.logTelemetry({
-      isLongRunningValidationsEnabled: String(isLongRunningValidationsEnabled),
-      durationPercentile: durationPercentile,
-      mimimumValidationDuration: mimimumValidationDuration,
-      mimimumValidationRegression: mimimumValidationRegression,
-      taskTypesForLongRunningValidations: taskTypesForLongRunningValidations,
-      statusLink: statusLink
-    });
+    (this.isLongRunningValidationsEnabled = String(
+      isLongRunningValidationsEnabled
+    )),
+      (this.durationPercentile = String(durationPercentile));
+    this.mimimumValidationDuration = String(mimimumValidationDuration);
+    this.mimimumValidationRegression = String(mimimumValidationRegression);
+    this.taskTypesForLongRunningValidations = taskTypesForLongRunningValidations;
+    this.statusLink = statusLink;
   }
 
   public setPipelineData(pipelineId: number, pipelineType: string): void {
@@ -28,9 +34,7 @@ export class TelemetryInformation {
     this.pipelineType = pipelineType;
   }
 
-  public setWasCommentNeeded(
-    wasCommentNeeded: boolean
-  ) {
+  public setWasCommentNeeded(wasCommentNeeded: boolean) {
     this.wasCommentNeeded = String(wasCommentNeeded);
   }
 
@@ -46,9 +50,20 @@ export class TelemetryInformation {
     this.logTelemetry({
       pipelineId: this.pipelineId,
       pipelineType: this.pipelineType,
-      wasCommentNeeded: this.wasCommentNeeded,
-      wasRegressionFound: this.wasRegressionFound,
-      wasFailureFound: this.wasFailureFound
+      userConfigurations: {
+        isLongRunningValidationsEnabled: this.isLongRunningValidationsEnabled,
+        durationPercentile: this.durationPercentile,
+        mimimumValidationDuration: this.mimimumValidationDuration,
+        mimimumValidationRegression: this.mimimumValidationRegression,
+        taskTypesForLongRunningValidations: this
+          .taskTypesForLongRunningValidations,
+        statusLink: this.statusLink
+      },
+      results: {
+        wasCommentNeeded: this.wasCommentNeeded,
+        wasRegressionFound: this.wasRegressionFound,
+        wasFailureFound: this.wasFailureFound
+      }
     });
   }
 

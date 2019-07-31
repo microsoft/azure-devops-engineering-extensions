@@ -35,7 +35,7 @@ export class TaskInsights {
    * Uses configurations to find failing and long running validations and take appropriate commenting action
    */
   public async invoke(): Promise<void> {
-    this.telemetry.postUserConfigurations(
+    this.telemetry.addUserConfigurations(
       this.data.isLongRunningValidationFeatureEnabled(),
       this.data.getDurationPercentile(),
       this.data.getMimimumValidationDurationSeconds(),
