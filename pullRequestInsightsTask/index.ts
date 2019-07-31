@@ -5,6 +5,11 @@ import "./utils/StringExtensions";
 import { PipelineData } from "./config/PipelineData";
 import { TaskInsights } from "./TaskInsights";
 
+/**
+ * Entry point of task
+ * Sets all necessary variables from environment and user configurations
+ * Invokes task logic as long as task is running within pull request pipeline
+ */
 async function run(): Promise<void> {
   try {
     const environmentConfigurations: EnvironmentConfigurations = new EnvironmentConfigurations();

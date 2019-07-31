@@ -134,6 +134,9 @@ export class TaskInsights {
     return currentStatusLink;
   }
 
+  /**
+   * Finds all long running validations in current pipeline
+   */
   private async findAllLongRunningValidations(): Promise<void> {
     await this.setTargetBranchPipelines(
       TaskInsights.NUMBER_PIPELINES_FOR_LONG_RUNNING_VALIDATIONS
@@ -178,6 +181,10 @@ export class TaskInsights {
     }
   }
 
+  /**
+   * Determines if a single task should be added to long running validations based on task regression and user configurations
+   * @param task Task to consider for long running validations
+   */
   private shouldTaskBeAddedToLongRunningValidations(
     task: PipelineTask
   ): boolean {
@@ -187,6 +194,11 @@ export class TaskInsights {
     );
   }
 
+  /**
+   * Performs commenting actions by posting a new comment or editing an existing one with failure or long running validation table data
+   * Upon posting new comment, calls for old PR Insights comments to be deleted
+   * @param tableType Type of information table to create/add to
+   */
   private async manageComments(tableType: string): Promise<void> {
     const serviceThreads: azureGitInterfaces.GitPullRequestCommentThread[] = await this.pullRequest.getCurrentServiceCommentThreads(
       this.azureApi
@@ -222,6 +234,10 @@ export class TaskInsights {
     }
   }
 
+  /**
+   * Determines if commenting is needed for either validation failures or
+   * long running validations
+   */
   private shouldPRInsightsCommentOccur(): boolean {
     const shouldCommentOccur =
       this.currentPipeline.isFailure() ||

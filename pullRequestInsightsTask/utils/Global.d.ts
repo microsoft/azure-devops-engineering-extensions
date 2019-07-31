@@ -1,3 +1,6 @@
+/**
+ * Declares additional format function for String
+ */
 export {};
 declare global {
   interface String {

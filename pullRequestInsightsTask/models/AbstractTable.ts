@@ -28,6 +28,12 @@ export abstract class AbstractTable {
     console.log("table already exists in comment? " + this.tableHasData());
   }
 
+  /**
+   * Adds header text and markdown header symbols to empty table
+   * @param targetName Name of target branch
+   * @param percentile Percentile set for regression calculation
+   * @param numberPipelinesForHealth Number of pipelines being used for failure table target branch status
+   */
   public addHeader(
     targetName: string,
     percentile: string,
@@ -56,6 +62,14 @@ export abstract class AbstractTable {
     }
   }
 
+  /**
+   * Adds section of row or rows to table to represent data from pipeline run
+   * @param current Current pipeline which task is running within
+   * @param currentDefinitionLink Link for failure status check
+   * @param target Target branch of pull request
+   * @param numberPipelinesToConsiderForHealth Number of pipelines being used for failure table target branch status
+   * @param longRunningValidations Regressive tasks
+   */
   public abstract addSection(
     current: AbstractPipeline,
     currentDefinitionLink: string,
@@ -64,14 +78,25 @@ export abstract class AbstractTable {
     longRunningValidations: PipelineTask[]
   ): void;
 
+  /**
+   * Returns all data currently in comment
+   */
   public getCurrentCommentData(): string {
     return this.currentCommentData;
   }
 
+  /**
+   * Determines if table of this type exists in comment
+   */
   protected tableHasData(): boolean {
     return this.currentCommentData.indexOf(this.tableEndLine) >= 0;
   }
 
+  /**
+   * Adds text to table within existing comment, either by creating new table or 
+   * by editing table by locating end tag of this table
+   * @param data Text to add to this table
+   */
   protected addTextToTableInComment(data: string): void {
     if (this.tableHasData()) {
       console.log("adding data to table: " + data);
