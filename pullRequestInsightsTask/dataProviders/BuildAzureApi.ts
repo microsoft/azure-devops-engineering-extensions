@@ -39,26 +39,6 @@ export class BuildAzureApi extends AbstractAzureApi {
     );
   }
 
-  public async findPipelinesForAndBeforeMergeCommit(
-    project: string,
-    pipelinesToParse: AbstractPipeline[],
-    mergeCommit: string
-  ): Promise<AbstractPipeline[]> {
-    const pipelinesBeforePullRequest: AbstractPipeline[] = [];
-    for (let index = 0; index < pipelinesToParse.length; index++) {
-      const buildChanges: azureBuildInterfaces.Change[] = await this.getBuildChanges(
-        project,
-        pipelinesToParse[index].getId()
-      );
-      for (const change of buildChanges) {
-        if (change.id === mergeCommit) {
-          pipelinesBeforePullRequest.concat(pipelinesToParse.slice(index));
-        }
-      }
-    }
-    return pipelinesBeforePullRequest;
-  }
-
   public async getBuild(
     project: string,
     buildId: number
@@ -87,7 +67,7 @@ export class BuildAzureApi extends AbstractAzureApi {
     maxNumber?: number,
     branchName?: string
   ): Promise<AbstractPipeline[]> {
-    tl.debug(
+    console.log(
       `getting builds with: ${project}, ${definition}, ${status}, ${maxNumber}, ${branchName}`
     );
     const builds: Array<AbstractPipeline> = [];
@@ -100,7 +80,8 @@ export class BuildAzureApi extends AbstractAzureApi {
       undefined,
       undefined,
       reason,
-      status,
+      // status,
+      undefined, // if we only get complete builds, might miss the one with merge commit
       undefined,
       undefined,
       undefined,

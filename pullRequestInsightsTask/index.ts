@@ -47,28 +47,30 @@ async function run(): Promise<void> {
     );
     data.setPullRequestId(environmentConfigurations.getPullRequestId());
     data.setIsLongRunningValidationFeatureEnabled(
-      tl.getBoolInput("enableLongRunningValidationAnalysis", false)
+      tl.getBoolInput("enableLongRunningValidationAnalysis")
     );
     data.setDurationPercentile(
-      Number(tl.getInput("longRunningValidationPercentile", false))
+      Number(tl.getInput("longRunningValidationPercentile"))
     );
     data.setMimimumValidationDurationSeconds(
-      Number(tl.getInput("longRunningValidationMinimumDuration", false))
+      Number(tl.getInput("longRunningValidationMinimumDuration"))
     );
     data.setMimimumValidationRegressionSeconds(
-      Number(tl.getInput("longRunningValidationMinimumRegression", false))
+      Number(tl.getInput("longRunningValidationMinimumRegression"))
     );
-    data.setTaskTypesForLongRunningValidations(
-      tl
-        .getInput("longRunningValidationTaskTypes", true)
-        .toLowerCase()
-        .split(",")
-    );
-    data.setStatusLink(tl.getInput("checkStatusLink", false));
-    tl.debug("pipline data: " + JSON.stringify(data));
+    if (tl.getInput("longRunningValidationTaskTypes")) {
+      data.setTaskTypesForLongRunningValidations(
+        tl
+          .getInput("longRunningValidationTaskTypes", true)
+          .toLowerCase()
+          .split(",")
+      );
+    }
+    data.setStatusLink(tl.getInput("checkStatusLink"));
+    console.log("pipline data: " + JSON.stringify(data));
 
     if (!data.getPullRequestId()) {
-      tl.debug(messages.notInPullRequestMessage);
+      console.log(messages.notInPullRequestMessage);
     } else {
       const taskInsights: TaskInsights = new TaskInsights(data);
       taskInsights.invoke();

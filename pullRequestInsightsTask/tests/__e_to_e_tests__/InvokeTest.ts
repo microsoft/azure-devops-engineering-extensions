@@ -6,21 +6,21 @@ function runInvokeTaskTest(): void {
   const data: PipelineData = new PipelineData();
   data.setAccessKey("**");
   data.setCurrentSourceCommitIteration(
-    "1919302351f118af5cfa12286c36fc3aa3322b57"
+    "055c238e56621240498a601d8b7bcb213d6ef201"
   );
   data.setHostType("build");
   data.setProjectName("AzureDevOps");
-  data.setReleaseId(11156565);
-  data.setBuildId(9947228);
+  data.setReleaseId(null);
+  data.setBuildId(10068354);
   data.setRepository("AzureDevOps");
-  data.setTeamUri("https://dev.azure.com/mseng/");
-  data.setPullRequestId(486147);
+  data.setTeamUri("https://mseng.visualstudio.com/");
+  data.setPullRequestId(490584);
   data.setDurationPercentile(1);
   data.setMimimumValidationDurationSeconds(0);
   data.setMimimumValidationRegressionSeconds(0);
   data.setTaskTypesForLongRunningValidations(["powershell"]);
   data.setIsLongRunningValidationFeatureEnabled(true);
-  tl.debug(JSON.stringify(data));
+  console.log(JSON.stringify(data));
   const insights = new TaskInsights(data);
   insights.invoke();
 }

@@ -35,14 +35,6 @@ export class ReleaseAzureApi extends AbstractAzureApi {
     );
   }
 
-  public async findPipelinesForAndBeforeMergeCommit(
-    project: string,
-    pipelinesToParse: AbstractPipeline[],
-    mergeCommit: string
-  ): Promise<AbstractPipeline[]> {
-    return pipelinesToParse; // TODO
-  }
-
   public async getRelease(
     project: string,
     releaseId: number
@@ -57,7 +49,7 @@ export class ReleaseAzureApi extends AbstractAzureApi {
     maxNumber?: number,
     branchName?: string
   ): Promise<AbstractPipeline[]> {
-    tl.debug(
+    console.log(
       `getting releases with: ${project}, ${definition}, ${environmentDefinition}, ${branchName}`
     );
     const releases: Array<AbstractPipeline> = [];

@@ -5,6 +5,7 @@ import { BuildTaskRun } from "./BuildTaskRun";
 import { AbstractAzureApi } from "../dataProviders/AbstractAzureApi";
 
 export class Build extends AbstractPipeline {
+
   private buildData: azureBuildInterfaces.Build;
 
   constructor(
@@ -69,5 +70,15 @@ export class Build extends AbstractPipeline {
 
   public getName(): string {
     return this.buildData.buildNumber;
+  }
+
+  // Included to preserve pipeline hierarchy for builds and releases
+  public getTriggeringArtifactAlias(): string {
+    return this.getDefinitionName();
+  }
+
+  // Included to preserve pipeline hierarchy for builds and releases
+  public getIdFromArtifact(artifactAlias: string): number {
+    return this.getId();
   }
 }

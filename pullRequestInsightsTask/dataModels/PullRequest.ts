@@ -182,6 +182,10 @@ export class PullRequest {
     return new ServiceComment();
   }
 
+  /**
+   * Gets all comment threads posted on pull request page by PR Insights task
+   * @param apiCaller Object to make API calls to AzureDevOps service
+   */
   public async getCurrentServiceCommentThreads(
     apiCaller: AbstractAzureApi
   ): Promise<azureGitInterfaces.GitPullRequestCommentThread[]> {
@@ -202,6 +206,11 @@ export class PullRequest {
     return serviceThreads;
   }
 
+  /**
+   * Gets comment thread on pull request page that aligns with the current commit iteration
+   * If none exists, returns null
+   * @param threads All comment threads to parse for current thread
+   */
   private getCurrentIterationCommentThread(
     threads: azureGitInterfaces.GitPullRequestCommentThread[]
   ): azureGitInterfaces.GitPullRequestCommentThread | null {
@@ -211,7 +220,7 @@ export class PullRequest {
         this.getIterationFromServiceCommentThread(commentThread) ===
           this.mostRecentSourceCommitId
       ) {
-        tl.debug(
+        console.log(
           "comment thread id of thread of current source commit " +
             this.mostRecentSourceCommitId +
             ": thread id = " +
@@ -220,25 +229,34 @@ export class PullRequest {
         return commentThread;
       }
     }
-    tl.debug(
+    console.log(
       "no comment was found for iteration " + this.mostRecentSourceCommitId
     );
     return null;
   }
 
+  /**
+   * Parses this pull request's data to find last merge commit id and source commit id
+   */
   private parseDataForCommitIds(): void {
     if (this.pullRequestData.lastMergeCommit) {
       this.mostRecentSourceCommitId = this.getIdFromCommit(
         this.pullRequestData.lastMergeCommit
       );
+      console.log("found source commit: " + this.mostRecentSourceCommitId);
     }
     if (this.pullRequestData.lastMergeTargetCommit) {
       this.lastMergeTargetCommitId = this.getIdFromCommit(
         this.pullRequestData.lastMergeTargetCommit
       );
+      console.log("found last merge commit: " + this.lastMergeTargetCommitId);
     }
   }
 
+  /**
+   * Parses AzureDevOps commit data for an id
+   * @param commit Commit to parse
+   */
   private getIdFromCommit(commit: { commitId?: string }) {
     if (commit.commitId) {
       return commit.commitId;
@@ -246,6 +264,10 @@ export class PullRequest {
     return null;
   }
 
+  /**
+   * Gets the iteration for which a service comment was made
+   * @param thread Comment thread from which to get the iteration
+   */
   private getIterationFromServiceCommentThread(
     thread: azureGitInterfaces.GitPullRequestCommentThread
   ): string {
@@ -255,6 +277,10 @@ export class PullRequest {
     return null;
   }
 
+  /**
+   * Determines if a pull request comment thread came from PR Insights task based on its properties and comments
+   * @param thread Comment thread to determine if it came from PR Insights
+   */
   private threadIsFromService(
     thread: azureGitInterfaces.GitPullRequestCommentThread
   ): boolean {
@@ -263,6 +289,10 @@ export class PullRequest {
     );
   }
 
+  /**
+   * Checks if pull request comment thread has PR Insights comment properties
+   * @param thread Comment thread of which to examine properties
+   */
   private threadHasServiceProperties(
     thread: azureGitInterfaces.GitPullRequestCommentThread
   ): boolean {
@@ -275,6 +305,10 @@ export class PullRequest {
     );
   }
 
+  /**
+   * Checks if pull request comment thread has any comments
+   * @param thread Comment thread to check for comments
+   */
   private threadHasComments(
     thread: azureGitInterfaces.GitPullRequestCommentThread
   ): boolean {

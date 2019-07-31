@@ -23,22 +23,9 @@ export class Branch {
    */
   public setPipelines(pipelines: AbstractPipeline[]): void {
     this.pipelines = pipelines;
-    tl.debug(
-      "Number of retrieved pipelines for " +
-        this.name +
-        " = " +
-        this.pipelines.length
+    console.log(
+      "Number of pipelines set on " + this.name + " = " + this.pipelines.length
     );
-  }
-
-  private filterForCompletePipelines(): AbstractPipeline[] {
-    const completePipelines: AbstractPipeline[] = [];
-    for (const pipeline of this.pipelines) {
-      if (pipeline.isComplete()) {
-        completePipelines.push(pipeline);
-      }
-    }
-    return completePipelines;
   }
 
   /**
@@ -51,7 +38,7 @@ export class Branch {
     );
     for (const pipeline of pipelinesToConsider) {
       tl.debug("considering pipeline " + pipeline.getName());
-      tl.debug(
+      console.log(
         pipeline.getName() + " is a failure? " + pipeline.isFailure()
       );
       if (pipeline.isFailure()) {
@@ -61,6 +48,11 @@ export class Branch {
     return true;
   }
 
+  /**
+   * Gets the status of this branch based on the failures of some number of most recent
+   * complete pipelines on this branch
+   * @param numberPipelinesToConsider Number of complete pipelines to consider for this branch's status
+   */
   public getStatus(numberPipelinesToConsider: number): BranchStatus {
     let failureCount = 0;
     let status: BranchStatus = BranchStatus.Healthy;
@@ -82,6 +74,11 @@ export class Branch {
     return status;
   }
 
+  /**
+   * Gets list of pipelines on this branch that have finished running using a maximum number of pipelines to get
+   * If fewer complete pipelines are present, all complete pipelines are returned
+   * @param maxNumberPipelinesToReturn Maximum number of complete pipelines desired
+   */
   public getCompletePipelines(
     maxNumberPipelinesToReturn: number
   ): AbstractPipeline[] {
@@ -111,7 +108,7 @@ export class Branch {
         break;
       }
     }
-    tl.debug(`number pipelines failing on ${this.name} is ${count}`);
+    console.log(`number pipelines failing on ${this.name} is ${count}`);
     return count;
   }
 
@@ -163,9 +160,12 @@ export class Branch {
     );
     tl.debug("times on target for " + taskName + " = " + times.toString());
     if (times.length > 0) {
+      console.log(
+        "found " + times.length + " times on target for task" + taskName
+      );
       return stats.percentile(times, percentileToFind / 100);
     } else {
-      tl.debug(
+      console.log(
         "no tasks with name " +
           taskName +
           " found on pipelines of branch " +
@@ -173,6 +173,19 @@ export class Branch {
       );
       return null;
     }
+  }
+
+  /**
+   * Creates a list of pipelines on this branch that have finished running
+   */
+  private filterForCompletePipelines(): AbstractPipeline[] {
+    const completePipelines: AbstractPipeline[] = [];
+    for (const pipeline of this.pipelines) {
+      if (pipeline.isComplete()) {
+        completePipelines.push(pipeline);
+      }
+    }
+    return completePipelines;
   }
 
   /**

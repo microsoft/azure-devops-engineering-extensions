@@ -48,7 +48,7 @@ export class ServiceComment {
     numberPipelinesForHealth: string
   ) {
     this.removeLastLine();
-    tl.debug("type of table to create: " + tableType);
+    console.log("type of table to create: " + tableType);
     this.manageTable(
       tableType,
       currentPipeline,
@@ -88,7 +88,7 @@ export class ServiceComment {
     numberPipelinesForHealth: string
   ): void {
     const table: AbstractTable = TableFactory.create(tableType, this.content);
-    tl.debug("comment data: " + table.getCurrentCommentData());
+    console.log("comment data before adding: " + table.getCurrentCommentData());
     table.addHeader(target.getTruncatedName(), percentile, numberPipelinesForHealth);
     table.addSection(
       currentPipeline,

@@ -8,6 +8,7 @@ import {
 import { AbstractPipeline } from "../dataModels/AbstractPipeline";
 import { PipelineData } from "../config/PipelineData";
 import { PullRequest } from "../dataModels/PullRequest";
+import { pipeline } from "stream";
 
 export abstract class AbstractAzureApi {
   private connection: WebApi;
@@ -38,11 +39,58 @@ export abstract class AbstractAzureApi {
     branchName: string
   ): Promise<AbstractPipeline[]>;
 
-  public abstract async findPipelinesForAndBeforeMergeCommit(
+  public async findPipelinesForAndBeforeMergeCommit(
     project: string,
-    pipelinesToParse: AbstractPipeline[],
     mergeCommit: string,
-  ): Promise<AbstractPipeline[]>;
+    currentPipeline: AbstractPipeline,
+    maxNumber: number,
+    branchName: string
+  ): Promise<AbstractPipeline[]> {
+    const pipelines = await this.getMostRecentPipelinesOfCurrentType(
+      project,
+      currentPipeline,
+      maxNumber,
+      branchName
+    );
+    console.log("in call to getMostRecentPipelinesOfCurrentType, found " + pipelines.length + " pipelines");
+    console.log("last merge target commit id: " + mergeCommit);
+    console.log(
+      "triggering alias: " + currentPipeline.getTriggeringArtifactAlias()
+    );
+    for (let index = 0; index < pipelines.length; index++) {
+      const artifactId: number = pipelines[index].getIdFromArtifact(
+        currentPipeline.getTriggeringArtifactAlias()
+      );
+      tl.debug(
+        "artifact alias found for pipeline " +
+          pipelines[index].toString() +
+          " = " +
+          artifactId
+      );
+      const buildChanges: azureBuildInterfaces.Change[] = await this.getBuildChanges(
+        project,
+        artifactId
+      );
+      tl.debug("commits of pipeline: ");
+      for (const change of buildChanges) {
+        tl.debug(change.id);
+        if (change.id === mergeCommit) {
+          for (const thisPipeline of pipelines.slice(index)) {
+            console.log(
+              "using pipeline: " +
+                thisPipeline.toString()
+            );
+          }
+          console.log(
+            "found " + pipelines.slice(index).length + " before merge commit"
+          );
+          return pipelines.slice(index);
+        }
+      }
+    }
+    console.log("found no pipelines with merge commit");
+    return [];
+  }
 
   /**
    * Fetches pipeline definition data
@@ -222,6 +270,11 @@ export abstract class AbstractAzureApi {
     );
   }
 
+  /**
+   * Gets all changes for a specific build, shows commits included in build
+   * @param projectName Name of project build is in
+   * @param buildId Id of build for which to get changes
+   */
   public async getBuildChanges(
     projectName: string,
     buildId: number

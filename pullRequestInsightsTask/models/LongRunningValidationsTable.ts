@@ -59,7 +59,7 @@ export class LongRunningValidationsTable extends AbstractTable {
             durationWithRegressionText
           );
         }
-        tl.debug(
+        console.log(
           "adding long running task: " +
             validation.getName() +
             " And task has duration/regression of " +

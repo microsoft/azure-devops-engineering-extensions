@@ -28,20 +28,25 @@ export class FailureTable extends AbstractTable {
         numberPipelinesToConsiderForHealth
       )) {
         let symbolToAdd = messages.success;
-        tl.debug(
+        console.log(
           "using pipeline for failure table: " +
-            pipelineToConsider.getName() +
-            " , id: " +
-            pipelineToConsider.getId()
+            pipelineToConsider.toString()
         );
         if (pipelineToConsider.isFailure()) {
           symbolToAdd = messages.failure;
         }
-        statusColumn += symbolToAdd;
+        statusColumn += messages.link.format(
+          symbolToAdd,
+          pipelineToConsider.getLink()
+        );
       }
-      const insightsColumn = messages[
+      let insightsColumn = messages[
         target.getStatus(numberPipelinesToConsiderForHealth)
       ].format(target.getTruncatedName(), currentDefinitionLink);
+      if (statusColumn.length === 0) {
+        statusColumn = messages.noPipelines;
+        insightsColumn = "";
+      }
 
       this.addTextToTableInComment(
         AbstractTable.NEW_LINE +
