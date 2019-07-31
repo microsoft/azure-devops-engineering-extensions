@@ -63,6 +63,7 @@ async function run(): Promise<void> {
     data.setMimimumValidationRegressionSeconds(
       Number(tl.getInput("longRunningValidationMinimumRegression"))
     );
+    data.setTaskTypesForLongRunningValidations(null);
     if (tl.getInput("longRunningValidationTaskTypes")) {
       data.setTaskTypesForLongRunningValidations(
         tl
