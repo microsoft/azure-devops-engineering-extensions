@@ -2,6 +2,9 @@ import { AbstractPipelineTaskRun } from "./AbstractPipelineTaskRun";
 import * as azureBuildInterfaces from "azure-devops-node-api/interfaces/BuildInterfaces";
 import { ITaskRunReference } from "./ITaskRunReference";
 
+/**
+ * This class represents a single run of an AzureDevOps build task
+ */
 export class BuildTaskRun extends AbstractPipelineTaskRun {
   private state: azureBuildInterfaces.TimelineRecordState;
   private result: azureBuildInterfaces.TaskResult;

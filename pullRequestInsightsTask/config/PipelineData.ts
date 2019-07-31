@@ -1,3 +1,7 @@
+/**
+ * This class contains all variables needed for PR Insights task to run, including variables fetched from the environemnt and variables set by user inputs
+ * Enables greater testability by creating single object with all varaibles relied upon by task
+ */
 export class PipelineData {
   private projectName: string;
   private accessKey: string;

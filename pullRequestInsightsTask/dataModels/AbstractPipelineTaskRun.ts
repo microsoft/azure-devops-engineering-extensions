@@ -1,6 +1,9 @@
 import tl = require("azure-pipelines-task-lib/task");
 import { ITaskRunReference } from "./ITaskRunReference";
 
+/**
+ * This class represents a single run of a pipeline task
+ */
 export abstract class AbstractPipelineTaskRun {
   private name: string;
   private id: string;

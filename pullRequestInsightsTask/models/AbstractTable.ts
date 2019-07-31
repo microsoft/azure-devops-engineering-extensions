@@ -4,6 +4,10 @@ import tl = require("azure-pipelines-task-lib/task");
 import { PipelineTask } from "../dataModels/PipelineTask";
 import { Branch } from "../dataModels/Branch";
 
+/**
+ * This class represents a table within a comment that can parse comment data in order to add a new table or
+ * add data to an existing table of the same type as itself
+ */
 export abstract class AbstractTable {
   private currentCommentData: string;
   private headerFormat: string;
@@ -93,7 +97,7 @@ export abstract class AbstractTable {
   }
 
   /**
-   * Adds text to table within existing comment, either by creating new table or 
+   * Adds text to table within existing comment, either by creating new table or
    * by editing table by locating end tag of this table
    * @param data Text to add to this table
    */

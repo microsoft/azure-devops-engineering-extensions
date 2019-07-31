@@ -3,6 +3,9 @@ import * as azureReleaseInterfaces from "azure-devops-node-api/interfaces/Releas
 import tl = require("azure-pipelines-task-lib/task");
 import { ITaskRunReference } from "./ITaskRunReference";
 
+/**
+ * This class represents a single run of an AzureDevOps release task
+ */
 export class ReleaseTaskRun extends AbstractPipelineTaskRun {
   private taskStatus: azureReleaseInterfaces.TaskStatus;
   private static readonly COMPLETE_TASK_STATUSES: azureReleaseInterfaces.TaskStatus[] = [

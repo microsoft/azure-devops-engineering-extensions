@@ -4,6 +4,10 @@ import { AbstractPipelineTaskRun } from "./AbstractPipelineTaskRun";
 import { BuildTaskRun } from "./BuildTaskRun";
 import { AbstractAzureApi } from "../dataProviders/AbstractAzureApi";
 
+/**
+ * This class represents an AzureDevOps build using AzureDevOps data concerning the build run and the timeline of the tasks 
+ * which ran during the build
+ */
 export class Build extends AbstractPipeline {
 
   private buildData: azureBuildInterfaces.Build;

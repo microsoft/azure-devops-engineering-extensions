@@ -1,5 +1,8 @@
 import tl = require("azure-pipelines-task-lib/task");
 
+/**
+ * This class provides access to all predefined environment variables from the pipeline in which this task is running in
+ */
 export class EnvironmentConfigurations {
   public static readonly TEAM_FOUNDATION_KEY: string =
     "SYSTEM_TEAMFOUNDATIONCOLLECTIONURI";

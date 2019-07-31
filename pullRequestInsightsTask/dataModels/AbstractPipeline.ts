@@ -3,6 +3,10 @@ import tl = require("azure-pipelines-task-lib/task");
 import { PipelineTask } from "./PipelineTask";
 import { AbstractAzureApi } from "../dataProviders/AbstractAzureApi";
 
+/**
+ * This class represent a pipeline, such as a build or release, which is characterized by attributes such as id and
+ * definition, as well as by the tasks that ran within it
+ */
 export abstract class AbstractPipeline {
   private tasks: PipelineTask[];
 

@@ -8,8 +8,10 @@ import {
 import { AbstractPipeline } from "../dataModels/AbstractPipeline";
 import { PipelineData } from "../config/PipelineData";
 import { PullRequest } from "../dataModels/PullRequest";
-import { pipeline } from "stream";
 
+/**
+ * This class represents a service to make all AzureDevOps Api calls and provide AzureDevOps data
+ */
 export abstract class AbstractAzureApi {
   private connection: WebApi;
 
