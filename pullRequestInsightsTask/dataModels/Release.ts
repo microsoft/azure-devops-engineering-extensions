@@ -98,6 +98,9 @@ export class Release extends AbstractPipeline {
     return null;
   }
 
+  /**
+   * Parses release data for tasks to add to this pipeline
+   */
   private parseForTasks(): AbstractPipelineTaskRun[] {
     const tasks: AbstractPipelineTaskRun[] = [];
     try {
@@ -123,6 +126,10 @@ export class Release extends AbstractPipeline {
     return tasks;
   }
 
+  /**
+   * Parses release data for artifacts to add to this pipeline
+   * @param artifacts 
+   */
   private parseForArtifacts(
     artifacts: azureReleaseInterfaces.Artifact[]
   ): void {
@@ -134,6 +141,10 @@ export class Release extends AbstractPipeline {
     }
   }
 
+  /**
+   * Chooses deployment from which to use data
+   * @param deploymentAttempts All deployment of this release
+   */
   private getSelectedDeployment(
     deploymentAttempts: azureReleaseInterfaces.DeploymentAttempt[]
   ): azureReleaseInterfaces.DeploymentAttempt {

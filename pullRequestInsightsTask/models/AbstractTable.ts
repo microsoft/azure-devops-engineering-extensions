@@ -68,8 +68,8 @@ export abstract class AbstractTable {
 
   /**
    * Adds section of row or rows to table to represent data from pipeline run
-   * @param current Current pipeline which task is running within
-   * @param currentDefinitionLink Link for failure status check
+   * @param current Pipeline which task is running within
+   * @param currentDefinitionLink Link for failed pipeline status check
    * @param target Target branch of pull request
    * @param numberPipelinesToConsiderForHealth Number of pipelines being used for failure table target branch status
    * @param longRunningValidations Regressive tasks
@@ -117,10 +117,17 @@ export abstract class AbstractTable {
     }
   }
 
+  /**
+   * Determines if current comment has any text
+   */
   private commentIsEmpty(): boolean {
     return !this.currentCommentData || this.currentCommentData === "";
   }
 
+  /**
+   * Finds the number of markdown columns in a string based on | characters
+   * @param line String for which count columns
+   */
   private getNumberColumns(line: string): number {
     let numberColumns: number = -1;
     for (const char of line) {

@@ -11,6 +11,10 @@ import { TelemetryInformation } from "./telemetry/TelemetryInformation";
 import { Branch } from "./dataModels/Branch";
 import { PullRequest } from "./dataModels/PullRequest";
 
+/**
+ * This class represents the logic of the PR Insights task
+ * Finds failure or long running validation data and posts it to pull request page as a comment
+ */
 export class TaskInsights {
   public static readonly NUMBER_PIPELINES_FOR_HEALTH = 3;
   public static readonly MINIMUM_PIPELINES_TO_FETCH_FOR_HEALTH = 10;
@@ -190,7 +194,10 @@ export class TaskInsights {
   ): boolean {
     return (
       task.hasRegressiveInstances() &&
-      (!this.data.getTaskTypesForLongRunningValidations() || this.data.getTaskTypesForLongRunningValidations().includes(task.getType()))
+      (!this.data.getTaskTypesForLongRunningValidations() ||
+        this.data
+          .getTaskTypesForLongRunningValidations()
+          .includes(task.getType()))
     );
   }
 

@@ -6,8 +6,6 @@ import tl = require("azure-pipelines-task-lib/task");
 import { AbstractPipeline } from "../dataModels/AbstractPipeline";
 
 export class BuildAzureApi extends AbstractAzureApi {
-  static readonly DESIRED_BUILD_STATUS: number =
-    azureBuildInterfaces.BuildStatus.Completed;
 
   static readonly DESIRED_BUILD_REASONS: number =
     azureBuildInterfaces.BuildReason.BatchedCI +
@@ -33,7 +31,6 @@ export class BuildAzureApi extends AbstractAzureApi {
       project,
       currentPipeline.getDefinitionId(),
       BuildAzureApi.DESIRED_BUILD_REASONS,
-      BuildAzureApi.DESIRED_BUILD_STATUS,
       maxNumber,
       branchName
     );
@@ -63,7 +60,6 @@ export class BuildAzureApi extends AbstractAzureApi {
     project: string,
     definition?: number,
     reason?: number,
-    status?: number,
     maxNumber?: number,
     branchName?: string
   ): Promise<AbstractPipeline[]> {
@@ -80,8 +76,7 @@ export class BuildAzureApi extends AbstractAzureApi {
       undefined,
       undefined,
       reason,
-      // status,
-      undefined, // if we only get complete builds, might miss the one with merge commit
+      undefined,
       undefined,
       undefined,
       undefined,

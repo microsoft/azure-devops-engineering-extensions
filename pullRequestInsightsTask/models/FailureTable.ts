@@ -5,6 +5,10 @@ import { PipelineTask } from "../dataModels/PipelineTask";
 import { AbstractPipeline } from "../dataModels/AbstractPipeline";
 import tl = require("azure-pipelines-task-lib/task");
 
+/**
+ * This class represents a table within a comment meant to display data about target branch
+ * health when the current pipeline fails
+ */
 export class FailureTable extends AbstractTable {
   constructor(currentCommentData?: string) {
     super(

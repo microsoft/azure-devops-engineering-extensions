@@ -5,6 +5,10 @@ import { PipelineTask } from "../dataModels/PipelineTask";
 import { AbstractTable } from "./AbstractTable";
 import { Branch } from "../dataModels/Branch";
 
+/**
+ * This class represents a table within a comment meant to display data about task regression when the 
+ * current pipeline has tasks that run over a threshold time
+ */
 export class LongRunningValidationsTable extends AbstractTable {
   private static readonly TIME_LABELS: Map<() => number, string> = new Map([
     [Date.prototype.getUTCHours, "h"],
@@ -78,6 +82,11 @@ export class LongRunningValidationsTable extends AbstractTable {
     }
   }
 
+  /**
+   * Formats duration and regression in milliseconds into display
+   * @param duration Amount of time task took in milliseconds
+   * @param regression Amount of time task regressed in milliseconds
+   */
   private formatDurationWithRegression(
     duration: number,
     regression: number
@@ -88,9 +97,13 @@ export class LongRunningValidationsTable extends AbstractTable {
     );
   }
 
-  private formatMillisecondsAsTime(duration: number): string {
+  /**
+   * Formats a time in milliseconds into hours, minutes, seconds
+   * @param timeInMilliseconds Amount of time to format
+   */
+  private formatMillisecondsAsTime(timeInMilliseconds: number): string {
     let formattedTime: string = "";
-    const date: Date = new Date(this.roundMillisecondsToSeconds(duration));
+    const date: Date = new Date(this.roundMillisecondsToSeconds(timeInMilliseconds));
     LongRunningValidationsTable.TIME_LABELS.forEach(
       (value: string, key: () => number) => {
         if (key.call(date) > 0) {
@@ -102,6 +115,10 @@ export class LongRunningValidationsTable extends AbstractTable {
     return formattedTime.trim();
   }
 
+  /**
+   * Rounds number of milliseconds to the closest second
+   * @param milliseconds Number of milliseconds to round
+   */
   private roundMillisecondsToSeconds(milliseconds: number): number {
     return 1000 * Math.round(milliseconds / 1000);
   }
