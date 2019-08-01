@@ -4,6 +4,8 @@
   "commentCompletedMessage": "Comment was successfully posted",
   "summaryLine": "\n #### Pull Request Validation Insights",
   "link": "[{0}]({1})",
+  "smallText": "<small>{0}</small>",
+  "inLineBreak": "<br>",
 
   "failureCommentTableHeading": "**Failed Validations** \n |Failed Pipeline|{0} Status <small title='Last {2} {0} runs before merge commit'>:grey_question:</small>|Insights|",
   "failureCommentTableEndName": "failureTable",
@@ -20,7 +22,7 @@
   "longRunningValidationTableEndName": "longRunningValidationTable",
   "longRunningValidationCommentFirstSectionRow": "|<center>[{0}]({1})</center>|<center> {2} </center>|<center> {3} </center>|",
   "longRunningValidationCommentLowerSectionRow": "| |<center> {2} </center>|<center> {3} </center>|",
-  "longRunningMultiAgentLine": "<br><small>(Regressed on {0}/{1} agents)</small>",
+  "longRunningMultiAgentLine": "(Regressed on {0}/{1} agents)",
   "durationWithRegressionFormat": "{0} [<span style='color:red'>+{1}</span>]",
   "durationRangeFormat": "{0} - <br>{1}"
 }

@@ -63,7 +63,7 @@ export class ServiceComment {
     if (!this.content) {
       this.initializeNewCommentContent();
     }
-    this.removeLineFromEndOfComment(feedbackLine);
+    this.removeFeedbackLineFromEndOfComment(feedbackLine);
     console.log("type of table to create: " + tableType);
     this.manageTable(
       tableType,
@@ -74,7 +74,7 @@ export class ServiceComment {
       percentile,
       numberPipelinesForHealth
     );
-    this.addLineToEndOfComment(feedbackLine);
+    this.addFeedbackLineToEndOfComment(feedbackLine);
   }
 
   /**
@@ -87,19 +87,20 @@ export class ServiceComment {
   /**
    * Attaches line to end of comment
    */
-  private addLineToEndOfComment(lineToAdd: string): void {
-    if (lineToAdd) {
-      this.content += AbstractTable.NEW_LINE + lineToAdd;
+  private addFeedbackLineToEndOfComment(feedbackLine: string): void {
+    if (feedbackLine) {
+      this.content +=
+        AbstractTable.NEW_LINE + messages.smallText.format(feedbackLine);
     }
   }
 
   /**
    * Removes line from end of comment if it matches the line to remove
    */
-  private removeLineFromEndOfComment(lineToRemove: string): void {
+  private removeFeedbackLineFromEndOfComment(feedbackLine: string): void {
     // feedback line is always last
     const splitMessage: string[] = this.content.split(AbstractTable.NEW_LINE);
-    if (splitMessage[splitMessage.length - 1] === lineToRemove) {
+    if (splitMessage[splitMessage.length - 1] === feedbackLine) {
       this.content = splitMessage
         .splice(0, splitMessage.length - 1)
         .join(AbstractTable.NEW_LINE);
