@@ -96,6 +96,9 @@ export class TaskInsights {
       "most recent source commit = " +
         this.pullRequest.getMostRecentSourceCommitId()
     );
+    console.log(
+      "current commit = " + this.data.getCurrentSourceCommitIteration()
+    );
     return (
       this.pullRequest.getMostRecentSourceCommitId() ===
       this.data.getCurrentSourceCommitIteration()
