@@ -4,6 +4,10 @@ import { AbstractPipelineTaskRun } from "./AbstractPipelineTaskRun";
 import { BuildTaskRun } from "./BuildTaskRun";
 import { AbstractAzureApi } from "../dataProviders/AbstractAzureApi";
 
+/**
+ * This class represents an AzureDevOps build using AzureDevOps data concerning the build run and the timeline of the tasks 
+ * which ran during the build
+ */
 export class Build extends AbstractPipeline {
 
   private buildData: azureBuildInterfaces.Build;
@@ -14,23 +18,7 @@ export class Build extends AbstractPipeline {
   ) {
     super();
     this.buildData = buildData;
-    const tasks: AbstractPipelineTaskRun[] = [];
-    if (timelineData) {
-      for (const taskRecord of timelineData.records) {
-        tasks.push(
-          new BuildTaskRun(
-            taskRecord.task,
-            taskRecord.name,
-            taskRecord.startTime,
-            taskRecord.finishTime,
-            taskRecord.workerName,
-            taskRecord.state,
-            taskRecord.result
-          )
-        );
-      }
-    }
-    this.addTaskRuns(tasks);
+    this.addTaskRuns(this.parseTasksFromTimeline(timelineData));
   }
 
   public isFailure(): boolean {
@@ -80,5 +68,29 @@ export class Build extends AbstractPipeline {
   // Included to preserve pipeline hierarchy for builds and releases
   public getIdFromArtifact(artifactAlias: string): number {
     return this.getId();
+  }
+
+  /**
+   * Adds tasks to this pipeline from build timeline
+   * @param timelineData Timeline of this build
+   */
+  private parseTasksFromTimeline(timelineData: azureBuildInterfaces.Timeline): AbstractPipelineTaskRun[] {
+    const tasks: AbstractPipelineTaskRun[] = [];
+    if (timelineData) {
+      for (const taskRecord of timelineData.records) {
+        tasks.push(
+          new BuildTaskRun(
+            taskRecord.task,
+            taskRecord.name,
+            taskRecord.startTime,
+            taskRecord.finishTime,
+            taskRecord.workerName,
+            taskRecord.state,
+            taskRecord.result
+          )
+        );
+      }
+    }
+    return tasks;
   }
 }

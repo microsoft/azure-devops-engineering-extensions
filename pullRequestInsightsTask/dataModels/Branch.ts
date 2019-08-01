@@ -4,6 +4,9 @@ import stats from "stats-lite";
 import { PipelineTask } from "./PipelineTask";
 import { BranchStatus } from "./BranchStatus";
 
+/**
+ * This class represents a repository branch that has pipelines run on it and whose health/status are determined by those runs
+ */
 export class Branch {
   private pipelines: AbstractPipeline[];
   private name: string;

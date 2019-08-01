@@ -5,6 +5,9 @@ import { HostTypeError } from "../exceptions/HostTypeError";
 import { PipelineData } from "../config/PipelineData";
 import { ReleaseAzureApi } from "../dataProviders/ReleaseAzureApi";
 
+/**
+ * This factory creates different subclasses of AbstractAzureApi as necesitated by type of pipeline
+ */
 export class AzureApiFactory {
   public static readonly BUILD: string = "build";
   public static readonly RELEASE: string = "release";

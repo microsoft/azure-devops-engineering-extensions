@@ -1,6 +1,11 @@
 import { AbstractPipelineTaskRun } from "./AbstractPipelineTaskRun";
 import tl = require("azure-pipelines-task-lib/task");
 
+/**
+ * This class represents a pipeline task, such as a build or release task
+ * Holds information about the task as well as multiple instances of its runs\
+ * Analyzes regression to determine long running data
+ */
 export class PipelineTask {
   private name: string;
   private id: string;

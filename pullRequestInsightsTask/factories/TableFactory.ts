@@ -2,6 +2,9 @@ import { AbstractTable } from "../models/AbstractTable";
 import { FailureTable } from "../models/FailureTable";
 import { LongRunningValidationsTable } from "../models/LongRunningValidationsTable";
 
+/**
+ * This class creates differen subclasses of AbstractTable
+ */
 export class TableFactory {
   public static readonly LONG_RUNNING_VALIDATIONS: string = "longRunning";
   public static readonly FAILURE: string = "failure";

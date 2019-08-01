@@ -4,6 +4,10 @@ import tl = require("azure-pipelines-task-lib/task");
 import { PipelineTask } from "../dataModels/PipelineTask";
 import { Branch } from "../dataModels/Branch";
 
+/**
+ * This class represents a table within a comment that can parse comment data in order to add a new table or
+ * add data to an existing table of the same type as itself
+ */
 export abstract class AbstractTable {
   private currentCommentData: string;
   private headerFormat: string;
@@ -64,8 +68,8 @@ export abstract class AbstractTable {
 
   /**
    * Adds section of row or rows to table to represent data from pipeline run
-   * @param current Current pipeline which task is running within
-   * @param currentDefinitionLink Link for failure status check
+   * @param current Pipeline which task is running within
+   * @param currentDefinitionLink Link for failed pipeline status check
    * @param target Target branch of pull request
    * @param numberPipelinesToConsiderForHealth Number of pipelines being used for failure table target branch status
    * @param longRunningValidations Regressive tasks
@@ -93,7 +97,7 @@ export abstract class AbstractTable {
   }
 
   /**
-   * Adds text to table within existing comment, either by creating new table or 
+   * Adds text to table within existing comment, either by creating new table or
    * by editing table by locating end tag of this table
    * @param data Text to add to this table
    */
@@ -113,10 +117,17 @@ export abstract class AbstractTable {
     }
   }
 
+  /**
+   * Determines if current comment has any text
+   */
   private commentIsEmpty(): boolean {
     return !this.currentCommentData || this.currentCommentData === "";
   }
 
+  /**
+   * Finds the number of markdown columns in a string based on | characters
+   * @param line String for which count columns
+   */
   private getNumberColumns(line: string): number {
     let numberColumns: number = -1;
     for (const char of line) {

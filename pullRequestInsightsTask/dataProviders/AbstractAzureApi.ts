@@ -8,8 +8,10 @@ import {
 import { AbstractPipeline } from "../dataModels/AbstractPipeline";
 import { PipelineData } from "../config/PipelineData";
 import { PullRequest } from "../dataModels/PullRequest";
-import { pipeline } from "stream";
 
+/**
+ * This class represents a service to make all AzureDevOps Api calls and provide AzureDevOps data
+ */
 export abstract class AbstractAzureApi {
   private connection: WebApi;
 
@@ -26,7 +28,7 @@ export abstract class AbstractAzureApi {
   ): Promise<AbstractPipeline>;
 
   /**
-   * Fetches certain number of most recent pipelines on current branch, either build or release depending on AzureApi subclass
+   * Fetches certain number or fewer of most recent pipelines on current branch, either build or release depending on AzureApi subclass
    * @param project Name of project from which to fetch pipelines
    * @param currentPipeline Pipeline task is currently running within
    * @param maxNumber Maximum number of pipelines to return
@@ -39,6 +41,15 @@ export abstract class AbstractAzureApi {
     branchName: string
   ): Promise<AbstractPipeline[]>;
 
+  /**
+   * Fetches most recent pipelines that occured for merge commit and before merge commit on current branch,
+   * either build or release depending on AzureApi subclass
+   * @param project Name of project from which to fetch pipelines
+   * @param mergeCommit Commit to get pipelines for and before
+   * @param currentPipeline Pipeline task is currently running within
+   * @param maxNumber Maximum number of pipelines to return
+   * @param branchName Name of branch pipelines are running on
+   */
   public async findPipelinesForAndBeforeMergeCommit(
     project: string,
     mergeCommit: string,
@@ -60,12 +71,6 @@ export abstract class AbstractAzureApi {
     for (let index = 0; index < pipelines.length; index++) {
       const artifactId: number = pipelines[index].getIdFromArtifact(
         currentPipeline.getTriggeringArtifactAlias()
-      );
-      tl.debug(
-        "artifact alias found for pipeline " +
-          pipelines[index].toString() +
-          " = " +
-          artifactId
       );
       const buildChanges: azureBuildInterfaces.Change[] = await this.getBuildChanges(
         project,

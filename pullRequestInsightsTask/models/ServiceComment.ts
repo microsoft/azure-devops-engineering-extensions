@@ -8,6 +8,9 @@ import { TaskInsights } from "../TaskInsights";
 import { Branch } from "../dataModels/Branch";
 import { PipelineTask } from "../dataModels/PipelineTask";
 
+/**
+ * This class builds the comment content from PR Insights task to be posted upon a pull request page
+ */
 export class ServiceComment {
   private id: number;
   private parentThreadId: number;
@@ -38,6 +41,16 @@ export class ServiceComment {
     return this.content;
   }
 
+  /**
+   * Formats data from task into appropriate comment string
+   * @param tableType Type of table to add to comment
+   * @param currentPipeline Pipeline which task is running within
+   * @param checkStatusLink Link for failed pipeline status check
+   * @param target Target branch of pull request
+   * @param longRunningValidations Regressive tasks
+   * @param percentile Percentile set for regression calculation
+   * @param numberPipelinesForHealth umber of pipelines being used for failure table target branch status
+   */
   public formatNewData(
     tableType: string,
     currentPipeline: AbstractPipeline,
@@ -66,10 +79,16 @@ export class ServiceComment {
     this.addFeedbackLine();
   }
 
+  /**
+   * Attaches line requesting feedback to end of comment
+   */
   private addFeedbackLine(): void {
     this.content += AbstractTable.NEW_LINE + messages.feedbackLine;
   }
 
+  /**
+   * Removes feedback line from end of comment in order to add other data
+   */
   private removeLastLine(): void {
     // feedback line is always last
     const splitMessage: string[] = this.content.split(AbstractTable.NEW_LINE);
@@ -78,6 +97,16 @@ export class ServiceComment {
       .join(AbstractTable.NEW_LINE);
   }
 
+  /**
+   * Puts task data into appropriate table with header and data section
+   * @param tableType Type of table to add to comment
+   * @param currentPipeline Pipeline which task is running within
+   * @param checkStatusLink Link for failed pipeline status check
+   * @param target Target branch of pull request
+   * @param longRunningValidations Regressive tasks
+   * @param percentile Percentile set for regression calculation
+   * @param numberPipelinesForHealth umber of pipelines being used for failure table target branch status
+   */
   private manageTable(
     tableType: string,
     currentPipeline: AbstractPipeline,
