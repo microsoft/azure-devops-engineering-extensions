@@ -64,7 +64,7 @@ export class BuildAzureApi extends AbstractAzureApi {
     branchName?: string
   ): Promise<AbstractPipeline[]> {
     console.log(
-      `getting builds with: ${project}, ${definition}, ${status}, ${maxNumber}, ${branchName}`
+      `getting builds with: ${project}, ${definition}, ${maxNumber}, ${branchName}`
     );
     const builds: Array<AbstractPipeline> = [];
     const rawBuildsData: azureBuildInterfaces.Build[] = await (await this.getConnection().getBuildApi()).getBuilds(

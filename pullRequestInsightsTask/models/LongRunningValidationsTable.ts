@@ -6,7 +6,7 @@ import { AbstractTable } from "./AbstractTable";
 import { Branch } from "../dataModels/Branch";
 
 /**
- * This class represents a table within a comment meant to display data about task regression when the 
+ * This class represents a table within a comment meant to display data about task regression when the
  * current pipeline has tasks that run over a threshold time
  */
 export class LongRunningValidationsTable extends AbstractTable {
@@ -46,9 +46,9 @@ export class LongRunningValidationsTable extends AbstractTable {
           validation.getLongestRegression()
         );
         if (validation.getNumberOfAgentsRegressedOn() > 1) {
-          nameText += messages.longRunningMultiAgentLine.format(
-            String(validation.getNumberOfAgentsRegressedOn()),
-            String(validation.getNumberOfAgentsRunOn())
+          nameText += this.formatMultiAgentLine(
+            validation.getNumberOfAgentsRegressedOn(),
+            validation.getNumberOfAgentsRunOn()
           );
         }
         if (
@@ -83,6 +83,26 @@ export class LongRunningValidationsTable extends AbstractTable {
   }
 
   /**
+   * Formats multiagent regression line
+   * @param agentsRegressedOn Number of agents task regressed on
+   * @param agentsRunOn Total number of agents task ran on
+   */
+  private formatMultiAgentLine(
+    agentsRegressedOn: number,
+    agentsRunOn: number
+  ): string {
+    return (
+      messages.inLineBreak +
+      messages.smallText.format(
+        messages.longRunningMultiAgentLine.format(
+          String(agentsRegressedOn),
+          String(agentsRunOn)
+        )
+      )
+    );
+  }
+
+  /**
    * Formats duration and regression in milliseconds into display
    * @param duration Amount of time task took in milliseconds
    * @param regression Amount of time task regressed in milliseconds
@@ -103,7 +123,9 @@ export class LongRunningValidationsTable extends AbstractTable {
    */
   private formatMillisecondsAsTime(timeInMilliseconds: number): string {
     let formattedTime: string = "";
-    const date: Date = new Date(this.roundMillisecondsToSeconds(timeInMilliseconds));
+    const date: Date = new Date(
+      this.roundMillisecondsToSeconds(timeInMilliseconds)
+    );
     LongRunningValidationsTable.TIME_LABELS.forEach(
       (value: string, key: () => number) => {
         if (key.call(date) > 0) {

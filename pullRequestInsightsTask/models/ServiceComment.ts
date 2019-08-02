@@ -23,8 +23,6 @@ export class ServiceComment {
     if (commentData) {
       this.id = commentData.id;
       this.content = commentData.content;
-    } else {
-      this.initializeNewCommentContent();
     }
     this.parentThreadId = parentThreadId;
   }
@@ -49,7 +47,8 @@ export class ServiceComment {
    * @param target Target branch of pull request
    * @param longRunningValidations Regressive tasks
    * @param percentile Percentile set for regression calculation
-   * @param numberPipelinesForHealth umber of pipelines being used for failure table target branch status
+   * @param numberPipelinesForHealth Number of pipelines being used for failure table target branch status
+   * @param feedbackLine Line to add to end of comment for giving a contact for feedback
    */
   public formatNewData(
     tableType: string,
@@ -58,9 +57,13 @@ export class ServiceComment {
     target: Branch,
     longRunningValidations: PipelineTask[],
     percentile: string,
-    numberPipelinesForHealth: string
+    numberPipelinesForHealth: string,
+    feedbackLine: string
   ) {
-    this.removeLastLine();
+    if (!this.content) {
+      this.initializeNewCommentContent();
+    }
+    this.removeFeedbackLineFromEndOfComment(feedbackLine);
     console.log("type of table to create: " + tableType);
     this.manageTable(
       tableType,
@@ -71,30 +74,37 @@ export class ServiceComment {
       percentile,
       numberPipelinesForHealth
     );
-    this.addFeedbackLine();
+    this.addFeedbackLineToEndOfComment(feedbackLine);
   }
 
+  /**
+   * Adds data to a brand new comment
+   */
   private initializeNewCommentContent(): void {
     this.content = messages.summaryLine;
-    this.addFeedbackLine();
   }
 
   /**
-   * Attaches line requesting feedback to end of comment
+   * Attaches line to end of comment
    */
-  private addFeedbackLine(): void {
-    this.content += AbstractTable.NEW_LINE + messages.feedbackLine;
+  private addFeedbackLineToEndOfComment(feedbackLine: string): void {
+    if (feedbackLine) {
+      this.content +=
+        AbstractTable.NEW_LINE + messages.smallText.format(feedbackLine);
+    }
   }
 
   /**
-   * Removes feedback line from end of comment in order to add other data
+   * Removes line from end of comment if it matches the line to remove
    */
-  private removeLastLine(): void {
+  private removeFeedbackLineFromEndOfComment(feedbackLine: string): void {
     // feedback line is always last
     const splitMessage: string[] = this.content.split(AbstractTable.NEW_LINE);
-    this.content = splitMessage
-      .splice(0, splitMessage.length - 1)
-      .join(AbstractTable.NEW_LINE);
+    if (splitMessage[splitMessage.length - 1] === feedbackLine) {
+      this.content = splitMessage
+        .splice(0, splitMessage.length - 1)
+        .join(AbstractTable.NEW_LINE);
+    }
   }
 
   /**
@@ -118,7 +128,11 @@ export class ServiceComment {
   ): void {
     const table: AbstractTable = TableFactory.create(tableType, this.content);
     console.log("comment data before adding: " + table.getCurrentCommentData());
-    table.addHeader(target.getTruncatedName(), percentile, numberPipelinesForHealth);
+    table.addHeader(
+      target.getTruncatedName(),
+      percentile,
+      numberPipelinesForHealth
+    );
     table.addSection(
       currentPipeline,
       checkStatusLink,

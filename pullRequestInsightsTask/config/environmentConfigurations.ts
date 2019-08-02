@@ -21,6 +21,7 @@ export class EnvironmentConfigurations {
   public static readonly RELEASE_ID_KEY: string = "RELEASE_RELEASEID";
   public static readonly HOST_KEY: string = "SYSTEM_HOSTTYPE";
   public static readonly BUILD_SOURCE_BRANCH_KEY: string = "BUILD_SOURCEBRANCH";
+  public static readonly FEEDBACK_KEY: string = "PRINSIGHTS_FEEDBACKLINE";
   public static readonly PULL_KEY: string = "pull";
   public static readonly SEPERATOR: string = "/";
 

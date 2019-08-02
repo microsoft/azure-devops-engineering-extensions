@@ -18,6 +18,7 @@ export class PipelineData {
   private mimimumValidationRegression: number;
   private taskTypesForLongRunningValidations: string[];
   private statusLink: string;
+  private feedbackLine: string;
 
   public setProjectName(projectName: string): void {
     this.projectName = projectName;
@@ -143,5 +144,13 @@ export class PipelineData {
 
   public setStatusLink(statusLink: string) {
     this.statusLink = statusLink;
+  }
+
+  public getFeedbackLine(): string {
+    return this.feedbackLine;
+  }
+
+  public setFeedbackLine(feedbackLine: string) {
+    this.feedbackLine = feedbackLine;
   }
 }

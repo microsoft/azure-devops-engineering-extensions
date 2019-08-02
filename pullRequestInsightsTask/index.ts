@@ -14,64 +14,8 @@ async function run(): Promise<void> {
   try {
     const environmentConfigurations: EnvironmentConfigurations = new EnvironmentConfigurations();
     const data: PipelineData = new PipelineData();
-    data.setAccessKey(environmentConfigurations.getAccessKey());
-    data.setCurrentSourceCommitIteration(
-      environmentConfigurations.getValue(
-        EnvironmentConfigurations.SOURCE_COMMIT_ITERATION_KEY
-      )
-    );
-    data.setHostType(
-      environmentConfigurations.getValue(EnvironmentConfigurations.HOST_KEY)
-    );
-    data.setProjectName(
-      environmentConfigurations.getValue(EnvironmentConfigurations.PROJECT_KEY)
-    );
-    data.setReleaseId(
-      Number(
-        environmentConfigurations.getValue(
-          EnvironmentConfigurations.RELEASE_ID_KEY
-        )
-      )
-    );
-    data.setBuildId(
-      Number(
-        environmentConfigurations.getValue(
-          EnvironmentConfigurations.BUILD_ID_KEY
-        )
-      )
-    );
-    data.setRepository(
-      environmentConfigurations.getValue(
-        EnvironmentConfigurations.REPOSITORY_KEY
-      )
-    );
-    data.setTeamUri(
-      environmentConfigurations.getValue(
-        EnvironmentConfigurations.TEAM_FOUNDATION_KEY
-      )
-    );
-    data.setPullRequestId(environmentConfigurations.getPullRequestId());
-    data.setIsLongRunningValidationFeatureEnabled(
-      tl.getBoolInput("enableLongRunningValidationAnalysis")
-    );
-    data.setDurationPercentile(
-      Number(tl.getInput("longRunningValidationPercentile"))
-    );
-    data.setMimimumValidationDurationSeconds(
-      Number(tl.getInput("longRunningValidationMinimumDuration"))
-    );
-    data.setMimimumValidationRegressionSeconds(
-      Number(tl.getInput("longRunningValidationMinimumRegression"))
-    );
-    data.setTaskTypesForLongRunningValidations(null);
-    if (tl.getInput("longRunningValidationTaskTypes")) {
-      data.setTaskTypesForLongRunningValidations(
-        tl
-          .getInput("longRunningValidationTaskTypes", true)
-          .toLowerCase()
-          .split(",")
-      );
-    }
+    setEnvironmentConfigurations(environmentConfigurations, data);
+    setUserInputs(data);
     data.setStatusLink(tl.getInput("checkStatusLink"));
     console.log("pipline data: " + JSON.stringify(data));
 
@@ -83,6 +27,72 @@ async function run(): Promise<void> {
     }
   } catch (err) {
     console.log("error!", err);
+  }
+}
+
+function setEnvironmentConfigurations(
+  environmentConfigurations: EnvironmentConfigurations,
+  data: PipelineData
+) {
+  data.setAccessKey(environmentConfigurations.getAccessKey());
+  data.setCurrentSourceCommitIteration(
+    environmentConfigurations.getValue(
+      EnvironmentConfigurations.SOURCE_COMMIT_ITERATION_KEY
+    )
+  );
+  data.setHostType(
+    environmentConfigurations.getValue(EnvironmentConfigurations.HOST_KEY)
+  );
+  data.setProjectName(
+    environmentConfigurations.getValue(EnvironmentConfigurations.PROJECT_KEY)
+  );
+  data.setReleaseId(
+    Number(
+      environmentConfigurations.getValue(
+        EnvironmentConfigurations.RELEASE_ID_KEY
+      )
+    )
+  );
+  data.setBuildId(
+    Number(
+      environmentConfigurations.getValue(EnvironmentConfigurations.BUILD_ID_KEY)
+    )
+  );
+  data.setRepository(
+    environmentConfigurations.getValue(EnvironmentConfigurations.REPOSITORY_KEY)
+  );
+  data.setTeamUri(
+    environmentConfigurations.getValue(
+      EnvironmentConfigurations.TEAM_FOUNDATION_KEY
+    )
+  );
+  data.setFeedbackLine(
+    environmentConfigurations.getValue(EnvironmentConfigurations.FEEDBACK_KEY)
+  );
+  data.setPullRequestId(environmentConfigurations.getPullRequestId());
+}
+
+function setUserInputs(data: PipelineData) {
+  data.setIsLongRunningValidationFeatureEnabled(
+    tl.getBoolInput("enableLongRunningValidationAnalysis")
+  );
+  data.setDurationPercentile(
+    Number(tl.getInput("longRunningValidationPercentile"))
+  );
+  data.setMimimumValidationDurationSeconds(
+    Number(tl.getInput("longRunningValidationMinimumDuration"))
+  );
+  data.setMimimumValidationRegressionSeconds(
+    Number(tl.getInput("longRunningValidationMinimumRegression"))
+  );
+  data.setTaskTypesForLongRunningValidations(null);
+  if (tl.getInput("longRunningValidationTaskTypes")) {
+    data.setTaskTypesForLongRunningValidations(
+      tl
+        .getInput("longRunningValidationTaskTypes", true)
+        .toLowerCase()
+        .split(",")
+    );
   }
 }
 
