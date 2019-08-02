@@ -14,7 +14,7 @@ When a pull request validation fails, it is often unclear whether the failure is
 owner or if the failure was due to existing problems on the target branch. This extension aims to combat this issue by giving insight
 into possible causes of the failure and suggested actions for the PR owner to take.
 
-![Image of failure insights](.\failure_comment_example.PNG)
+![Image of failure insights](failure_comment_example.PNG)
 
 ### Long Running Validation Insights
 
