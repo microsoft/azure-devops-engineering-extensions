@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "PullRequestInsightsExtensionPP",
   "name": "Pull Request Insights Extension Pre-Production",
-  "version": "0.1.17",
+  "version": "0.1.18",
   "publisher": "epsteam",
   "targets": [
     {
