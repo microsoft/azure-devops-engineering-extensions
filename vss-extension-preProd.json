@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "PullRequestInsightsExtensionPP",
   "name": "Pull Request Insights Extension Pre-Production",
-  "version": "0.1.14",
+  "version": "0.1.15",
   "publisher": "epsteam",
   "targets": [
     {
@@ -19,6 +19,14 @@
       "path": "pullRequestInsightsTask"
     }
   ],
+  "content": {
+    "details": {
+      "path": "README.md"
+    },
+    "license": {
+      "path": "LICENSE"
+    }
+  },
   "contributions": [
     {
       "id": "c4ffd380-3a3b-4fa6-b02a-00ee18afe1f5",
