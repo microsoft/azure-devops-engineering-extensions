@@ -173,9 +173,12 @@ export class TaskInsights {
     );
     for (const validation of this.longRunningValidations) {
       console.log("Name of long running validation = " + validation.getName());
-      tl.debug("Threshold time " + validation.getRegressionThreshold());
-      tl.debug("Durations of all tasks: " + validation.getAllDurations());
-      tl.debug(
+      console.log("Threshold time " + validation.getRegressionThreshold());
+      console.log(
+        "Durations of all task run instances for all agents in this pipeline: " +
+          validation.getAllDurations()
+      );
+      console.log(
         "Number of agents regressed on: " +
           validation.getNumberOfAgentsRegressedOn()
       );
