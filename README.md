@@ -48,7 +48,6 @@ Packaging:
 npm run pack:dev 
 npm run pack:prod
 ```
-Note: pack:dev doesn't create a VSIX file. Instead, it prepares the output task folder ready for upload to specific AzureDevOps account.
-For More information on packaging the extension code into a vsix file, see [this page](https://docs.microsoft.com/en-us/azure/devops/extend/develop/add-build-task?view=azure-devops#packageext).
+* Note: "pack:dev" doesn't create a VSIX file. Instead, it prepares the output task folder ready for upload to an AzureDevOps account and test it.
 
 ####
