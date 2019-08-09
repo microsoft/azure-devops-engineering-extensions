@@ -1,19 +1,12 @@
 {
-  "name": "pullrequestinsightstask",
+  "name": "azure-devops-engineering-tasks",
   "version": "1.0.0",
   "description": "",
-  "main": "webpack.config.js",
   "scripts": {
-    "test": "jest",
-    "buildPreProd": "npm run clean && webpack && npm run package:preProd",
-    "buildProd": "npm run clean && webpack && npm run package:prod",
-    "deploy": "webpack && npm run package:dev && npm run package:publish",
-    "watch": "webpack --watch",
-    "package:preProd": "node ./commands/packagePreProd",
-    "package:prod": "node ./commands/packageProd",
-    "package:publish": "node ./commands/packagePublish",
-    "dev:webpack": "webpack --watch",
-    "dev:http": "webpack-dev-server --progress --colors --content-base ./ --port 3001",
+    "test": "npm run jest",
+    "build": "tsc -p Tasks\\pullRequestInsightsTask\\tsconfig.json",
+    "pack:dev": "npm run clean && node ./commands/package.js pullRequestInsights dev",
+    "pack:prod": "npm run clean && node ./commands/package.js pullRequestInsights prod",
     "clean": "rimraf dist *.vsix"
   },
   "author": "",
@@ -24,17 +17,13 @@
     "@types/string-template": "^1.0.2",
     "azure-devops-node-api": "^8.0.0",
     "azure-pipelines-task-lib": "^2.8.0",
-    "moment": "^2.24.0",
     "stats-lite": "^2.0.0",
-    "string-template": "^1.0.0",
     "ts-mockito": "^2.3.1"
   },
   "devDependencies": {
     "@types/jest": "^24.0.15",
     "@types/node": "^12.0.4",
     "@types/q": "^1.5.2",
-    "clean-webpack-plugin": "^3.0.0",
-    "copy-webpack-plugin": "^4.5.2",
     "jest": "^20.0.4",
     "sinon": "^7.3.2",
     "source-map-loader": "^0.2.3",
@@ -43,10 +32,6 @@
     "ts-loader": "^6.0.4",
     "typescript": "^3.5.3",
     "typings": "^2.1.1",
-    "webpack": "^4.26.0",
-    "webpack-bundle-analyzer": "^3.0.3",
-    "webpack-cli": "^3.1.2",
-    "webpack-dev-server": "^3.7.2",
     "rimraf": "^2.6.3"
   }
 }

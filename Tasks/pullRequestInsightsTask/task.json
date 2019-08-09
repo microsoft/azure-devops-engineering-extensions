@@ -1,0 +1,66 @@
+{
+    "id": "c4ffd380-3a3b-4fa6-b02a-00ee18afe1f5",
+    "name": "PRInsightsPP",
+    "friendlyName": "PR Insights Pre-Production",
+    "description": "Gets insight into pull requests",
+    "helpMarkDown": "",
+    "category": "Utility",
+    "author": "Microsoft Corporation",
+    "version": {
+        "Major": 0,
+        "Minor": 1,
+        "Patch": 18
+    },
+    "instanceNameFormat": "PR Insights",
+    "inputs": [
+        {
+            "name": "enableLongRunningValidationAnalysis",
+            "type": "boolean",
+            "defaultValue": "false",
+            "label": "Enable Long Running Validation Analysis",
+            "required": false,
+            "helpMarkDown": "Enabling this option allows PR Insights to post information on pipeline tasks that regress a configurable amount over a configurable percentile on the target branch"
+        },
+        {
+            "name": "longRunningValidationTaskTypes",
+            "type": "string",
+            "label": "Long Running Validation Task Types",
+            "required": false,
+            "helpMarkDown": "Types of tasks to be potentially considered as long running, if no types are given, all types will be analyzed \n Note: Seperate each type with a comma"
+        },
+        {
+            "name": "longRunningValidationPercentile",
+            "type": "number",
+            "defaultValue": 90,
+            "label": "Long Running Validation Percentile",
+            "required": false,
+            "helpMarkDown": "The duration percentile on the target branch to compare validations with in order to determine if the validations are long running"
+        },
+        {
+            "name": "longRunningValidationMinimumDuration",
+            "type": "number",
+            "label": "Long Running Validation Minimum Duration (in seconds)",
+            "required": true,
+            "helpMarkDown": "The minimum duration (in seconds) of a validation for it to be potentially considered long running \n Note: Minimum is 1 second"
+        },
+        {
+            "name": "longRunningValidationMinimumRegression",
+            "type": "number",
+            "label": "Long Running Validation Minimum Regression (in seconds)",
+            "required": true,
+            "helpMarkDown": "The minimum regression (in seconds) of a validation from the given duration percentile on the target branch for it to be potentially considered long running \n Note: Minimum is 1 second"
+        }, 
+        {
+            "name": "checkStatusLink",
+            "type": "string",
+            "label": "Check Status Link",
+            "required": false,
+            "helpMarkDown": "A link that is offered to users to check on the status of the target branch \n Note: Default link is to definition summary page"
+        }
+    ],
+    "execution": {
+        "Node": {
+            "target": "Index.js"
+        }
+    }
+}
