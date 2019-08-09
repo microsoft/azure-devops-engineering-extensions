@@ -1,0 +1,13 @@
+{
+  "name": "pullrequestinsightstask",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "azure-devops-node-api": "^8.0.0",
+    "azure-pipelines-task-lib": "^2.8.0",
+    "stats-lite": "^2.0.0"
+  }
+}
