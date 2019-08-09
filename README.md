@@ -2,13 +2,13 @@
 
 AzureDevOps Marketplace Extensions to do various engineering tasks.
 
-## [Pull Request Insights Task](Tasks/pullRequestInsightsTask/README.md)]
+## Pull Request Insights Task
 PullRequestInsightsTask provides insights into pipelines. This extension has two main functions:
 
 1. Investigating pull request validation failures
 2. Alerting pull request owners to the introduction of long running tasks.
 
-All insights are provided in the form of a comment on the page of the pull request that triggered the validation. See 
+Read more [here](Tasks/pullRequestInsightsTask/README.md).
 
 # Contributing
 
