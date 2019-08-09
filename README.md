@@ -35,15 +35,12 @@ To run unit tests (at root):
 npm test
 ```
 
-To try the task without installing it on a pipeline, the file .\js\pullRequestInsightsExtension\pullRequestInsightsTask\tests\_\_e_to_e_tests\_\_\invokeTest.js
-can be run to invoke an end to end test.
-Before running the test, all variables should be set within the test in order to simultate the environment configurations the extension
-would access when running as a task within a pipeline.
-To run the test, enter the pullRequestInsightsTask folder and run
+To run any task E2E w/o installing it on a pipeline: 
 
 ```
-node C:\azure-pipelines-prinsights\pullRequestInsightsTask\tests\_\_e_to_e_tests\_\_\invokeTest.js
+npm run e2e:prinsights
 ```
+Note: E2E test(s) will fail by default with 401 errors as the restclients are not authenticated without providing correct credentials. Change E2E test code to supply correct credentials to test the scenario.
 
 Packaging:
 

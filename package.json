@@ -7,6 +7,7 @@
     "build": "tsc -p Tasks\\pullRequestInsightsTask\\tsconfig.json",
     "pack:dev": "npm run clean && node ./commands/package.js pullRequestInsights dev",
     "pack:prod": "npm run clean && node ./commands/package.js pullRequestInsights prod",
+    "e2e:prinsights": "node js/pullRequestInsightsExtension/pullRequestInsightsTask/tests/__e_to_e_tests__/InvokeTest.js",
     "clean": "rimraf dist *.vsix"
   },
   "author": "",
