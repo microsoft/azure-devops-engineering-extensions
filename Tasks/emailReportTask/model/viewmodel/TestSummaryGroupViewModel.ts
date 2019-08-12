@@ -13,10 +13,9 @@ export class TestSummaryGroupViewModel {
   public SummaryItems: TestSummaryItemViewModelWrapper;
   private SupportedPriorityColumns: Set<number>;
 
-  constructor(testSummaryGroup: TestSummaryGroupModel, 
+  constructor(testSummaryGroup: TestSummaryGroupModel,
     config: PipelineConfiguration,
-    includeOthersInTotal: boolean)
-  {
+    includeOthersInTotal: boolean) {
     this.GroupName = this.getDescription(testSummaryGroup.groupedBy);
     this.InitializeSummaryItems(testSummaryGroup, config, includeOthersInTotal);
 
@@ -24,10 +23,9 @@ export class TestSummaryGroupViewModel {
   }
 
   private InitializeSummaryItems(
-    testSummaryGroup: TestSummaryGroupModel, 
+    testSummaryGroup: TestSummaryGroupModel,
     config: PipelineConfiguration,
-    includeOthersInTotal: boolean): void
-  {
+    includeOthersInTotal: boolean): void {
     this.SummaryItems = new TestSummaryItemViewModelWrapper();
     this.SummaryItems.TestSummaryItemViewModel = [];
     testSummaryGroup.runs.forEach(testSummaryItem => {
@@ -39,18 +37,16 @@ export class TestSummaryGroupViewModel {
     this.SupportedPriorityColumns = new Set<number>();
 
     this.SummaryItems.TestSummaryItemViewModel.forEach(item =>
-      item.TestsByPriority.TestInfoByPriorityViewModel.forEach(testsByPriorityVm =>
-      {
-          if (testsByPriorityVm.Priority <= TestResultSummaryViewModel.MaxSupportedPriority)
-          {
-            this.SupportedPriorityColumns.add(testsByPriorityVm.Priority);
-          }
+      item.TestsByPriority.TestInfoByPriorityViewModel.forEach(testsByPriorityVm => {
+        if (testsByPriorityVm.Priority <= TestResultSummaryViewModel.MaxSupportedPriority) {
+          this.SupportedPriorityColumns.add(testsByPriorityVm.Priority);
+        }
       })
     );
   }
 
   private getDescription(groupedBy: GroupTestResultsBy): string {
-    switch(groupedBy) {
+    switch (groupedBy) {
       case GroupTestResultsBy.Priority: return "Priority";
       case GroupTestResultsBy.Run: return "Test Run";
       default: return "Team";

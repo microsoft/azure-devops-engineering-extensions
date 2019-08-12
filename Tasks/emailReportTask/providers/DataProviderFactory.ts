@@ -18,13 +18,13 @@ export class DataProviderFactory implements IDataProviderFactory {
   private dataProviders: IDataProvider[] = [];
   private postProcessors: IPostProcessor[] = [];
 
-	constructor($pipelineConfig: PipelineConfiguration) {
-		this.pipelineConfig = $pipelineConfig;
-	}
- 
+  constructor($pipelineConfig: PipelineConfiguration) {
+    this.pipelineConfig = $pipelineConfig;
+  }
+
   public getDataProviders(): IDataProvider[] {
-    if(this.dataProviders.length < 1) {
-      if(this.pipelineConfig.$pipelineType == PipelineType.Release) {
+    if (this.dataProviders.length < 1) {
+      if (this.pipelineConfig.$pipelineType == PipelineType.Release) {
         const pipelineRestClient = new ReleaseRestClient(this.pipelineConfig);
         const testResultsClient = new TestResultsClient(this.pipelineConfig);
         const workItemClient = new WorkItemClient(this.pipelineConfig);
@@ -37,13 +37,13 @@ export class DataProviderFactory implements IDataProviderFactory {
     }
 
     return this.dataProviders;
-  }  
-  
+  }
+
   public getPostProcessors(): IPostProcessor[] {
-    if(this.postProcessors.length < 1) {
+    if (this.postProcessors.length < 1) {
       this.postProcessors.push(new SendMailConditionProcessor());
     }
 
     return this.postProcessors;
-  } 
+  }
 }

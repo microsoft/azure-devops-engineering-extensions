@@ -9,7 +9,7 @@ export class ArtifactViewModelWrapper {
 
 export class ArtifactViewModel {
   public ArtifactDefinitionUrl: string;
-  public BranchName: string; 
+  public BranchName: string;
   public BuildSummaryUrl: string;
   public Name: string;
   public Version: string;

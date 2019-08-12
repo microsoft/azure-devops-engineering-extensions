@@ -12,7 +12,7 @@ export class PhaseViewModel {
   public Status: string;
   public Rank: number;
   public Name: string;
- 
+
   constructor(phase: PhaseModel) {
     this.Status = phase.$status;
     this.Rank = phase.$rank;
@@ -23,24 +23,21 @@ export class PhaseViewModel {
   private InitializeDeploymentJobs(phase: PhaseModel) {
     const deploymentJobs = phase.$jobs;
 
-    if (deploymentJobs.length > 0)
-    {
-        this.DeploymentJob = new DeploymentJobViewModel(deploymentJobs);
-        this.InitializeTasksDuration();
+    if (deploymentJobs.length > 0) {
+      this.DeploymentJob = new DeploymentJobViewModel(deploymentJobs);
+      this.InitializeTasksDuration();
     }
-    else
-    {
-        // This can happen if we have an empty phase or a phase with only disabled steps
-        // TODO- Log.LogWarning($"No deployment jobs found in phase {Name}");
+    else {
+      // This can happen if we have an empty phase or a phase with only disabled steps
+      // TODO- Log.LogWarning($"No deployment jobs found in phase {Name}");
     }
   }
 
-  private InitializeTasksDuration() : void {
+  private InitializeTasksDuration(): void {
     // Evaluate job duration and format it
-    if (this.DeploymentJob.MaxTaskFinishTime != null && this.DeploymentJob.MinTaskStartTime != null)
-    {
-        this.TasksDuration = `${TimeFormatter.FormatDuration(
-            this.DeploymentJob.MaxTaskFinishTime.getTime() - this.DeploymentJob.MinTaskStartTime.getTime())}`;
+    if (this.DeploymentJob.MaxTaskFinishTime != null && this.DeploymentJob.MinTaskStartTime != null) {
+      this.TasksDuration = `${TimeFormatter.FormatDuration(
+        this.DeploymentJob.MaxTaskFinishTime.getTime() - this.DeploymentJob.MinTaskStartTime.getTime())}`;
     }
   }
 }

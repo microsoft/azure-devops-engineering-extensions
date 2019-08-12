@@ -1,8 +1,8 @@
 import { ReportError } from "./ReportError";
 
-export class PipelineNotFoundError extends ReportError {
+export class InputError extends ReportError {
   constructor(message: string) {
     super(message);
-    this.name = "PipelineNotFoundError";
+    this.name = InputError.name;
   }
 }

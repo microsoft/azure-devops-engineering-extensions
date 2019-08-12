@@ -1,6 +1,8 @@
-export class DataProviderError extends Error {
+import { ReportError } from "./ReportError";
+
+export class DataProviderError extends ReportError {
   constructor(message: string) {
     super(message);
-    this.name = "DataProviderError";
+    this.name = DataProviderError.name;
   }
 }

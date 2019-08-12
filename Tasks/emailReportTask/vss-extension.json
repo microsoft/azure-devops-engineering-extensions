@@ -10,7 +10,9 @@
     }
   ],
   "description": "Extension to send a detailed email report for a build or release pipeline",
-  "categories": ["Azure Pipelines"],
+  "categories": [
+    "Azure Pipelines"
+  ],
   "icons": {},
   "tags": [],
   "scopes": [],
@@ -31,7 +33,9 @@
     {
       "id": "c4ffd380-3a3b-4fa6-b02a-00ee18afe1f4",
       "type": "ms.vss-distributed-task.task",
-      "targets": ["ms.vss-distributed-task.tasks"],
+      "targets": [
+        "ms.vss-distributed-task.tasks"
+      ],
       "properties": {
         "name": "emailReportTask"
       }

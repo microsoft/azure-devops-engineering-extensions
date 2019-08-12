@@ -6,18 +6,28 @@ import { ReportProvider } from "./providers/ReportProvider";
 import { DataProviderFactory } from "./providers/DataProviderFactory";
 import { HTMLReportCreator } from "./htmlreport/HTMLReportCreator";
 import { EmailSender } from "./EmailSender";
+import { ReportError } from "./exceptions/ReportError";
 
 async function run(): Promise<void> {
-  const configProvider = new ConfigurationProvider();
-  const reportConfiguration = new ReportConfiguration(configProvider);
-  const reportProvider = new ReportProvider(new DataProviderFactory(configProvider.getPipelineConfiguration()));
+  try {
+    const configProvider = new ConfigurationProvider();
+    const reportConfiguration = new ReportConfiguration(configProvider);
+    const reportProvider = new ReportProvider(new DataProviderFactory(configProvider.getPipelineConfiguration()));
 
-  const reportManager = new ReportManager(
-    reportProvider,
-    new HTMLReportCreator(),
-    new EmailSender());
+    const reportManager = new ReportManager(
+      reportProvider,
+      new HTMLReportCreator(),
+      new EmailSender());
 
-  await reportManager.sendReportAsync(reportConfiguration);
+    await reportManager.sendReportAsync(reportConfiguration);
+  }
+  catch (err) {
+    if (err instanceof ReportError) {
+      console.log(err.getMessage());
+    }
+    // Fail task
+    throw err;
+  }
 }
 
 run();

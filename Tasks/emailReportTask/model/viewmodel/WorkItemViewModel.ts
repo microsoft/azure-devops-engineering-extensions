@@ -16,18 +16,17 @@ export class WorkItemViewModel {
   public Url: string;
 
   constructor(config: PipelineConfiguration, workItem: WorkItem) {
-      if (workItem.id != null)
-      {
-        this.Id = workItem.id;
-        this.Url = LinkHelper.getWorkItemLink(config, workItem.id);
-      }
+    if (workItem.id != null) {
+      this.Id = workItem.id;
+      this.Url = LinkHelper.getWorkItemLink(config, workItem.id);
+    }
 
     this.Title = workItem.fields["System.Title"];
 
     // This is for display in email report only
     var assignToRef = workItem.fields["System.AssignedTo"];
     // Prefer Display name to Unique Name in report
-    this.AssignedTo = assignToRef == null ? "" : 
+    this.AssignedTo = assignToRef == null ? "" :
       (StringUtils.isNullOrWhiteSpace(assignToRef.DisplayName) ? assignToRef.UniqueName : assignToRef.DisplayName);
 
     this.State = workItem.fields["System.State"];

@@ -5,6 +5,8 @@
     "module": "commonjs",                     /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', or 'ESNext'. */
     "strictPropertyInitialization": false,
     "noImplicitReturns": true,
+    "declaration": true,
+    "sourceMap": true,    
     /* Strict Type-Checking Options */
     "strict": false,                           /* Enable all strict type-checking options. */
     "noImplicitAny": true,                 /* Raise error on expressions and declarations with an implied 'any' type. */

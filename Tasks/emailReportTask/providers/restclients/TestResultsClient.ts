@@ -7,8 +7,8 @@ import { IdentityRef } from "azure-devops-node-api/interfaces/common/VSSInterfac
 
 export class TestResultsClient extends AbstractClient implements ITestResultsClient {
 
-  private readonly MaxItemsSupported : number = 100;
-  private testApiPromise : Promise<ITestApi>;
+  private readonly MaxItemsSupported: number = 100;
+  private testApiPromise: Promise<ITestApi>;
 
   constructor(pipelineConfig: PipelineConfiguration) {
     super(pipelineConfig);
@@ -42,12 +42,12 @@ export class TestResultsClient extends AbstractClient implements ITestResultsCli
 
   public async getTestResultOwnersAsync(resultsToFetch: TestCaseResult[]): Promise<IdentityRef[]> {
     var query = new TestResultsQueryImpl();
-    query.fields = [ "Owner" ];
+    query.fields = ["Owner"];
 
     const tasks: Promise<TestResultsQuery>[] = [];
     const testApi = await this.testApiPromise;
-    for (let i=0,j = resultsToFetch.length; i<j; i+= this.MaxItemsSupported) {
-      const tempArray = resultsToFetch.slice(i,i + this.MaxItemsSupported);
+    for (let i = 0, j = resultsToFetch.length; i < j; i += this.MaxItemsSupported) {
+      const tempArray = resultsToFetch.slice(i, i + this.MaxItemsSupported);
       query.results = tempArray;
       tasks.push(testApi.getTestResultsByQuery(query, this.pipelineConfig.$projectName));
     }
@@ -59,9 +59,9 @@ export class TestResultsClient extends AbstractClient implements ITestResultsCli
 
     const ownerMap = new Map<string, IdentityRef>();
     results.forEach(r => {
-      if(this.isValid(r.owner)) {
+      if (this.isValid(r.owner)) {
         const key = this.getUniqueName(r.owner);
-        if(!ownerMap.has(key)) {
+        if (!ownerMap.has(key)) {
           ownerMap.set(key, r.owner);
         }
       }
@@ -70,7 +70,7 @@ export class TestResultsClient extends AbstractClient implements ITestResultsCli
     return Object.values(ownerMap.values);
   }
 
-  public async getTestResultsDetailsAsync(groupBy: string, outcomeFilters?: TestOutcome[]) : Promise<TestResultsDetails> {
+  public async getTestResultsDetailsAsync(groupBy: string, outcomeFilters?: TestOutcome[]): Promise<TestResultsDetails> {
     const filter = this.getOutcomeFilter(outcomeFilters);
     return await (await this.testApiPromise).getTestResultDetailsForRelease(
       this.pipelineConfig.$projectName,
@@ -81,34 +81,30 @@ export class TestResultsClient extends AbstractClient implements ITestResultsCli
       filter);
   }
 
-  public async getTestResultSummaryAsync(includeFailures: boolean) : Promise<TestResultSummary>
-  {
-      return await (await this.testApiPromise).queryTestResultsReportForRelease(
-        this.pipelineConfig.$projectName,
-        this.pipelineConfig.$pipelineId,
-        this.pipelineConfig.$environmentId,
-        null,
-        includeFailures);
+  public async getTestResultSummaryAsync(includeFailures: boolean): Promise<TestResultSummary> {
+    return await (await this.testApiPromise).queryTestResultsReportForRelease(
+      this.pipelineConfig.$projectName,
+      this.pipelineConfig.$pipelineId,
+      this.pipelineConfig.$environmentId,
+      null,
+      includeFailures);
   }
 
-  private getOutcomeFilter(outcomes: TestOutcome[]): string
-  {
+  private getOutcomeFilter(outcomes: TestOutcome[]): string {
     let filter: string = null;
-    if(outcomes != null && outcomes.length > 0) {
+    if (outcomes != null && outcomes.length > 0) {
       const outComeString = Array.from(new Set(outcomes.map(o => Number(o)))).join(",");
       filter = `Outcome eq ${outComeString}`;
     }
     return filter;
   }
 
-  private getUniqueName(identity: IdentityRef): string
-  {
-      return identity.uniqueName == null ? identity.displayName : identity.uniqueName;
+  private getUniqueName(identity: IdentityRef): string {
+    return identity.uniqueName == null ? identity.displayName : identity.uniqueName;
   }
 
-  private isValid(identity: IdentityRef): boolean
-  {
-      return identity != null && ( identity.displayName != null || identity.uniqueName != null);
+  private isValid(identity: IdentityRef): boolean {
+    return identity != null && (identity.displayName != null || identity.uniqueName != null);
 
   }
 }

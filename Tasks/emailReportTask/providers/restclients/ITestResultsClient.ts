@@ -5,7 +5,7 @@ export interface ITestResultsClient {
   queryTestResultBugs(automatedTestName: string, resultId: number): Promise<WorkItemReference[]>;
   getTestResultById(testRunId: number, resultId: number): Promise<TestCaseResult>;
   queryTestResultsReportAsync(): Promise<void>;
-  getTestResultOwnersAsync(resultsToFetch: TestCaseResult[]): Promise<IdentityRef[]>;  
+  getTestResultOwnersAsync(resultsToFetch: TestCaseResult[]): Promise<IdentityRef[]>;
   getTestResultsDetailsAsync(groupBy: string, outcomeFilters?: TestOutcome[]): Promise<TestResultsDetails>;
-  getTestResultSummaryAsync(includeFailures: boolean) : Promise<TestResultSummary>;
+  getTestResultSummaryAsync(includeFailures: boolean): Promise<TestResultSummary>;
 }

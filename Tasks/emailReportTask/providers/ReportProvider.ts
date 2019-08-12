@@ -5,6 +5,7 @@ import { IDataProviderFactory } from "./IDataProviderFactory";
 import { IDataProvider } from "./IDataProvider";
 import { IPostProcessor } from "./IPostProcessor";
 import { ReportFactory } from "../model/ReportFactory";
+import { ReportError } from "../exceptions/ReportError";
 
 export class ReportProvider implements IReportProvider {
 
@@ -32,6 +33,12 @@ export class ReportProvider implements IReportProvider {
     }
     catch(err)
     {
+      if(err instanceof ReportError) {
+      }
+      else {
+
+      }
+      
       if(finalReport == null) finalReport = ReportFactory.createNewReport(reportConfig.$pipelineConfiguration);
       finalReport.$dataMissing = true;
       console.error(`Error while generating report: ${err}`);

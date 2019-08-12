@@ -13,7 +13,7 @@
         "${workspaceFolder}/**/InvokeTest.js"
       ],
       "args": [
-        "accessToken", "smtpusername", "smtppassword"
+        "accesstoken", "smtpuser", "smtppassword"
       ]
     }
   ]

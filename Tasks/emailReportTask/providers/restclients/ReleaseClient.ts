@@ -34,7 +34,7 @@ export class ReleaseRestClient extends AbstractClient implements IReleaseRestCli
       null,
       releaseStatusFilter,
       envStatusFilter,
-      null, 
+      null,
       null,
       ReleaseQueryOrder.Descending,
       1,
@@ -46,12 +46,10 @@ export class ReleaseRestClient extends AbstractClient implements IReleaseRestCli
       sourceBranchFilter
     );
 
-    if(releases != null && release.length < 1)
-    {
+    if (releases != null && release.length < 1) {
       console.log(`Unable to fetch last completed release for release definition:${pipelineDefId} and environmentid: ${envDefId}`);
     }
-    else
-    {
+    else {
       lastRelease = releases[0];
     }
 
@@ -66,8 +64,7 @@ export class ReleaseRestClient extends AbstractClient implements IReleaseRestCli
       this.pipelineConfig.$pipelineId,
       prevPipelineId);
 
-    if(changes == null || changes.length < 1)
-    {
+    if (changes == null || changes.length < 1) {
       console.log(`No changes found between releases - ${prevPipelineId} & ${this.pipelineConfig.$pipelineId}`);
       return [];
     }
