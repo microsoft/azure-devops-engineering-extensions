@@ -19,10 +19,19 @@ import { IHTMLReportCreator } from "../../htmlreport/IHTMLReportCreator";
 import { Report } from "../../model/Report";
 import { EmailReportViewModel } from "../../model/viewmodel/EmailReportViewModel";
 import { EmailSender } from "../../EmailSender";
+import { isNullOrUndefined } from "util";
 
 const fs = require("fs");
 const js2xmlparser = require("js2xmlparser");
 
+const accessKey = process.env.AccessKey;
+const smtpUser = process.env.SMTPUSER;
+const smtpPassword = process.env.SMTPPASSWORD;
+
+if(isNullOrUndefined(accessKey) || isNullOrUndefined(smtpUser) || isNullOrUndefined(smtpPassword)) {
+  console.error("Set Environment Vars for AccessKey, SMTPUSER, SMTPPASSWORD to test E2E.");
+}
+ 
 export class FileWriter {
 
   static writeToFile(content: string, fileName: string): void {
@@ -60,17 +69,14 @@ export class ReportCreatorWrapper implements IHTMLReportCreator {
 export class MockConfigProvider implements IConfigurationProvider {
 
   getPipelineConfiguration(): PipelineConfiguration {
-    const accessKey = process.argv[process.argv.length - 3];
     return new PipelineConfiguration(PipelineType.Release, 11571808, "AzureDevOps", "AzureDevOps", 133233996, 9462, true, "https://dev.azure.com/mseng", accessKey);
   }
 
   getMailConfiguration(): MailConfiguration {
-    const username = process.argv[process.argv.length - 2];
-    const password = process.argv[process.argv.length - 1];
     return new MailConfiguration("Test",
       new RecipientsConfiguration("svajjala@microsoft.com", false, false, false, false),
       new RecipientsConfiguration("svajjala@microsoft.com", false, false, false, false),
-      new SmtpConfiguration(username, password, "smtp.live.com", false),
+      new SmtpConfiguration(smtpUser, smtpPassword, "smtp.live.com", false),
       "microsoft.com");
   }
 

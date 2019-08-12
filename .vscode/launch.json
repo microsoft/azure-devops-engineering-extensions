@@ -11,9 +11,6 @@
       "program": "${workspaceFolder}\\js\\emailReportExtension\\emailReportTask\\tests\\__e_to_e_tests__\\InvokeTest.js",
       "outFiles": [
         "${workspaceFolder}/**/InvokeTest.js"
-      ],
-      "args": [
-        "accesstoken", "smtpuser", "smtppassword"
       ]
     }
   ]
