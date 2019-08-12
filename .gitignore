@@ -1,6 +1,5 @@
 node_modules/
 *.vsix
 *.taskkey
-package-lock.json
 js/
 dist/
