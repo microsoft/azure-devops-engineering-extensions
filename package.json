@@ -38,14 +38,13 @@
     "@types/jest": "^24.0.15",
     "@types/node": "^12.0.4",
     "@types/q": "^1.5.2",
-    "jest": "^20.0.4",
+    "jest": "^24.8.0",
+    "rimraf": "^2.6.3",
     "sinon": "^7.3.2",
     "source-map-loader": "^0.2.3",
     "tfx-cli": "^0.7.8",
     "ts-jest": "^24.0.2",
     "ts-loader": "^6.0.4",
-    "typescript": "^3.5.3",
-    "typings": "^2.1.1",
-    "rimraf": "^2.6.3"
+    "typescript": "^3.5.3"
   }
 }
