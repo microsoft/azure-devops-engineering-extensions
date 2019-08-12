@@ -10,13 +10,13 @@ export class TestOwnersDataProvider implements IDataProvider {
 
   private testResultsClient: ITestResultsClient;
 
-  constructor(testResultsClient: ITestResultsClient)  {
+  constructor(testResultsClient: ITestResultsClient) {
     this.testResultsClient = testResultsClient;
   }
 
- public async getReportDataAsync(pipelineConfig: PipelineConfiguration, reportDataConfig: ReportDataConfiguration): Promise<Report> {
+  public async getReportDataAsync(pipelineConfig: PipelineConfiguration, reportDataConfig: ReportDataConfiguration): Promise<Report> {
     const report = ReportFactory.createNewReport(pipelineConfig);
-    const failedTestResultDetails = await this.testResultsClient.getTestResultsDetailsAsync("TestRun", [ TestOutcome.Failed ]);
+    const failedTestResultDetails = await this.testResultsClient.getTestResultsDetailsAsync("TestRun", [TestOutcome.Failed]);
 
     const resultsToFetch: TestCaseResult[] = [];
     failedTestResultDetails.resultsForGroup.forEach(r => {

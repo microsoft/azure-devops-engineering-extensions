@@ -25,15 +25,16 @@ const js2xmlparser = require("js2xmlparser");
 
 export class FileWriter {
 
- static writeToFile(content: string, fileName: string): void {
+  static writeToFile(content: string, fileName: string): void {
     const currDir = __dirname;
     console.log(`CurrentDir: ${currDir}`);
     var msgPath = `${currDir}\\${fileName}`;
     fs.writeFile(msgPath, content, (err: string) => {
-      if(err) {
-          return console.log(err);
+      if (err) {
+        return console.log(err);
       }
-      console.log("File saved successfully!")}
+      console.log("File saved successfully!")
+    }
     );
   }
 }
@@ -53,7 +54,7 @@ export class ReportCreatorWrapper implements IHTMLReportCreator {
     return actualCreator.createHtmlReport(report, reportConfiguration);
   }
 
-  
+
 }
 
 export class MockConfigProvider implements IConfigurationProvider {
@@ -61,21 +62,21 @@ export class MockConfigProvider implements IConfigurationProvider {
   getPipelineConfiguration(): PipelineConfiguration {
     const accessKey = process.argv[process.argv.length - 3];
     return new PipelineConfiguration(PipelineType.Release, 11571808, "AzureDevOps", "AzureDevOps", 133233996, 9462, true, "https://dev.azure.com/mseng", accessKey);
-  }  
-  
+  }
+
   getMailConfiguration(): MailConfiguration {
     const username = process.argv[process.argv.length - 2];
     const password = process.argv[process.argv.length - 1];
-    return new MailConfiguration("Test", 
+    return new MailConfiguration("Test",
       new RecipientsConfiguration("svajjala@microsoft.com", false, false, false, false),
       new RecipientsConfiguration("svajjala@microsoft.com", false, false, false, false),
-      new SmtpConfiguration(username, password, "smtp.live.com", false), 
+      new SmtpConfiguration(username, password, "smtp.live.com", false),
       "microsoft.com");
   }
 
   getReportDataConfiguration(): ReportDataConfiguration {
     const testResultsConfig = new TestResultsConfiguration(true, false, false, false, false, GroupTestResultsBy.Run, 10);
-    return new ReportDataConfiguration(true, false, true, [ GroupTestResultsBy.Run ], testResultsConfig);
+    return new ReportDataConfiguration(true, false, true, [GroupTestResultsBy.Run], testResultsConfig);
   }
 
   getSendMailCondition(): SendMailCondition {
@@ -88,7 +89,7 @@ async function run(): Promise<void> {
   const configProvider = new MockConfigProvider();
   const reportConfiguration = new ReportConfiguration(configProvider);
   const reportManager = new ReportManager(
-    new ReportProvider(new DataProviderFactory(configProvider.getPipelineConfiguration())), 
+    new ReportProvider(new DataProviderFactory(configProvider.getPipelineConfiguration())),
     new ReportCreatorWrapper(),
     new EmailSender());
 

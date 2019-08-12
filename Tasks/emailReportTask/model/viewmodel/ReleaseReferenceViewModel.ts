@@ -5,7 +5,7 @@ import { ReleaseReference } from "azure-devops-node-api/interfaces/ReleaseInterf
 export class ReleaseReferenceViewModel {
   public Id: number;
   public Name: string;
-  public Url: string; 
+  public Url: string;
 
   constructor(config: PipelineConfiguration, releaseReference: ReleaseReference) {
     this.Id = releaseReference.id;

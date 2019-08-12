@@ -13,7 +13,7 @@ export class ChangeViewModel {
   public Id: string;
   public Message: string;
   public TimeStamp: string;
-  public Url: string; 
+  public Url: string;
   public ShortId: string;
 
   constructor(change: ChangeModel, config: PipelineConfiguration) {
