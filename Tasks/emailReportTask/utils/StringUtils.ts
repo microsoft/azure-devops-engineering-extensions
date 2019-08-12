@@ -1,5 +1,5 @@
 export class StringUtils {
-  public static isNullOrWhiteSpace( input: string ) : boolean {
+  public static isNullOrWhiteSpace(input: string): boolean {
 
     if (typeof input === 'undefined' || input == null) return true;
 
@@ -7,26 +7,23 @@ export class StringUtils {
   }
 
   public static CompressNewLines(content: string): string {
-    if (content != null)
-    {
+    if (content != null) {
       const lines = this.getNonEmptyLines(content);
       content = lines.join("\n");
     }
     return content;
   }
 
-  private static getNonEmptyLines(s: string): string[]
-  {
-      s = s.replace("\r", "");
-      return s.split('\n')
-          .filter(str => !this.isNullOrWhiteSpace(str))
-          .map(str => str.trim());
+  private static getNonEmptyLines(s: string): string[] {
+    s = s.replace("\r", "");
+    return s.split('\n')
+      .filter(str => !this.isNullOrWhiteSpace(str))
+      .map(str => str.trim());
   }
 
   public static ReplaceNewlineWithBrTag(content: string): string {
-    if (content == null)
-    {
-        return null;
+    if (content == null) {
+      return null;
     }
 
     const lines = this.getNonEmptyLines(content);
@@ -34,10 +31,9 @@ export class StringUtils {
   }
 
   public static getFirstNLines(content: string, lineCount: number): string {
-    if (content != null)
-    {
-        var lines = this.getNonEmptyLines(content);
-        return lines.slice(0, lineCount).join("\n");
+    if (content != null) {
+      var lines = this.getNonEmptyLines(content);
+      return lines.slice(0, lineCount).join("\n");
     }
     return null;
   }

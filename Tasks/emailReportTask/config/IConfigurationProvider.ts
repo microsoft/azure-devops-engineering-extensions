@@ -4,7 +4,7 @@ import { MailConfiguration } from "./mail/MailConfiguration";
 import { ReportDataConfiguration } from "./report/ReportDataConfiguration";
 
 export interface IConfigurationProvider {
-  
+
   getPipelineConfiguration(): PipelineConfiguration;
 
   getMailConfiguration(): MailConfiguration;

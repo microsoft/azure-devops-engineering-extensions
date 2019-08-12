@@ -9,16 +9,14 @@ export class TestInfoByPriorityViewModel {
   public Priority: number;
   public PassingRate: string;
   public TestCount: number;
-  
-  constructor(priority: number, 
+
+  constructor(priority: number,
     testCountByOutcome: Map<TestOutcomeForPriority, number>,
-    includeOthersInTotal: boolean)
-  {
+    includeOthersInTotal: boolean) {
     this.Priority = priority;
     this.TestCount = TestResultsHelper.getTotalTestCountBasedOnUserConfigurationPriority(
-          testCountByOutcome, includeOthersInTotal);
-    if (this.TestCount > 0)
-    {
+      testCountByOutcome, includeOthersInTotal);
+    if (this.TestCount > 0) {
       var passingTests = this.getPassingTestCountByOutcome(testCountByOutcome);
       this.PassingRate = TestResultsHelper.getTestOutcomePercentageString(passingTests, this.TestCount);
     }

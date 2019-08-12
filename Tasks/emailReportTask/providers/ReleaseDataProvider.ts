@@ -17,105 +17,96 @@ import { ReportFactory } from "../model/ReportFactory";
 
 export class ReleaseDataProvider implements IDataProvider {
 
-  private pipelineRestClient : IReleaseRestClient;
+  private pipelineRestClient: IReleaseRestClient;
 
-  constructor(pipelineRestClient: IReleaseRestClient)  {
+  constructor(pipelineRestClient: IReleaseRestClient) {
     this.pipelineRestClient = pipelineRestClient;
   }
 
   async getReportDataAsync(pipelineConfig: PipelineConfiguration, reportDataConfiguration: ReportDataConfiguration): Promise<Report> {
     const report = ReportFactory.createNewReport(pipelineConfig) as ReleaseReport;
     const release = await this.pipelineRestClient.getPipelineAsync();
-    if (release == null)
-    {
-        throw new PipelineNotFoundError(`ProjectId: ${pipelineConfig.$projectId}, ${pipelineConfig.$pipelineId}`);
+    if (release == null) {
+      throw new PipelineNotFoundError(`ProjectId: ${pipelineConfig.$projectId}, ${pipelineConfig.$pipelineId}`);
     }
 
-    const environment = this.getEnvironment(release, pipelineConfig);        
+    const environment = this.getEnvironment(release, pipelineConfig);
     const phases = this.getPhases(environment);
     const lastCompletedRelease = await this.getReleaseByLastCompletedEnvironmentAsync(pipelineConfig, release, environment);
 
     let changes: ChangeModel[] = [];
     // check if last completed one isn't latter one, then changes don't make sense
-    if(lastCompletedRelease != null && lastCompletedRelease.id < release.id) {
-        console.log(`Getting changes between releases ${release.id} & ${lastCompletedRelease.id}`);
-        changes = await this.getReleaseChangesAsync(pipelineConfig, release, lastCompletedRelease.id);
+    if (lastCompletedRelease != null && lastCompletedRelease.id < release.id) {
+      console.log(`Getting changes between releases ${release.id} & ${lastCompletedRelease.id}`);
+      changes = await this.getReleaseChangesAsync(pipelineConfig, release, lastCompletedRelease.id);
     }
     else {
-        console.log("Unable to find any last completed release");
+      console.log("Unable to find any last completed release");
     }
-    
+
     console.log("Fetched release data");
     report.setReleaseData(release, environment, lastCompletedRelease, phases, changes);
 
     return report;
   }
 
-  private getEnvironment(release: Release, pipelineConfig: PipelineConfiguration) : ReleaseEnvironment
-  {
-      let environment : ReleaseEnvironment;
-      const environments = release.environments;
-      for(var i: number = 0; i < environments.length; i++)
-      {
-        if(environments[i].id == pipelineConfig.$environmentId)
-        {
-          environment = environments[i];
-          break;
-        }
+  private getEnvironment(release: Release, pipelineConfig: PipelineConfiguration): ReleaseEnvironment {
+    let environment: ReleaseEnvironment;
+    const environments = release.environments;
+    for (var i: number = 0; i < environments.length; i++) {
+      if (environments[i].id == pipelineConfig.$environmentId) {
+        environment = environments[i];
+        break;
       }
+    }
 
-      if (pipelineConfig.$usePreviousEnvironment && environments.indexOf(environment) > 0)
-      {
-          environment = environments[environments.indexOf(environment) - 1];
-      }
+    if (pipelineConfig.$usePreviousEnvironment && environments.indexOf(environment) > 0) {
+      environment = environments[environments.indexOf(environment) - 1];
+    }
 
-      if (environment != null)
-      {
-          return environment;
-      }
+    if (environment != null) {
+      return environment;
+    }
 
-      throw new DataProviderError(`Unable to find environment with environment id - ${pipelineConfig.$environmentId} in release - ${release.id}`);
+    throw new DataProviderError(`Unable to find environment with environment id - ${pipelineConfig.$environmentId} in release - ${release.id}`);
   }
 
-  private getPhases(environment: ReleaseEnvironment) : PhaseModel[] {
+  private getPhases(environment: ReleaseEnvironment): PhaseModel[] {
     var releaseDeployPhases = EnvironmentExtensions.getPhases(environment);
-    return releaseDeployPhases.map(r => new PhaseModel(r.name, this.getJobModelsFromPhase(r.deploymentJobs), DeployPhaseStatus[r.status], r.rank));         
+    return releaseDeployPhases.map(r => new PhaseModel(r.name, this.getJobModelsFromPhase(r.deploymentJobs), DeployPhaseStatus[r.status], r.rank));
   }
 
-  private getJobModelsFromPhase(deploymentJobs: DeploymentJob[]) : JobModel[] {
+  private getJobModelsFromPhase(deploymentJobs: DeploymentJob[]): JobModel[] {
     const jobModels = deploymentJobs.map(job => {
-        const issues = job.job.issues.map(i => new IssueModel(i.issueType, i.message));
-        const tasks = job.tasks.map(t =>
-            {
-                const issues = t.issues.map(i => new IssueModel(i.issueType, i.message));
-                return new TaskModel(t.name, t.status, issues, t.agentName, t.finishTime, t.startTime);
-            });
-        return new JobModel(job.job.name, job.job.status, issues, tasks);
+      const issues = job.job.issues.map(i => new IssueModel(i.issueType, i.message));
+      const tasks = job.tasks.map(t => {
+        const issues = t.issues.map(i => new IssueModel(i.issueType, i.message));
+        return new TaskModel(t.name, t.status, issues, t.agentName, t.finishTime, t.startTime);
+      });
+      return new JobModel(job.job.name, job.job.status, issues, tasks);
     });
     return jobModels;
   }
 
-  private async getReleaseByLastCompletedEnvironmentAsync(pipelineConfig: PipelineConfiguration, release: Release, environment: ReleaseEnvironment) : Promise<Release> {
+  private async getReleaseByLastCompletedEnvironmentAsync(pipelineConfig: PipelineConfiguration, release: Release, environment: ReleaseEnvironment): Promise<Release> {
     let branchId: string = null;
 
-    if (release.artifacts != null && release.artifacts.length > 0)
-    {
-        const primaryArtifact = release.artifacts.filter(a => a.isPrimary)[0];
-        const defRef = primaryArtifact.definitionReference["branch"];
-        branchId = defRef != null ? defRef.id : null;
+    if (release.artifacts != null && release.artifacts.length > 0) {
+      const primaryArtifact = release.artifacts.filter(a => a.isPrimary)[0];
+      const defRef = primaryArtifact.definitionReference["branch"];
+      branchId = defRef != null ? defRef.id : null;
     }
 
     console.log(`Fetching last release by completed environment id - ${pipelineConfig.$environmentId} and branch id ${branchId}`);
     return await this.pipelineRestClient.getLastPipelineAsync(release.releaseDefinition.id, environment.definitionEnvironmentId, branchId);
-  }  
-  
+  }
+
   private async getReleaseChangesAsync(pipelineConfig: PipelineConfiguration, release: Release, prevReleaseId: number): Promise<ChangeModel[]> {
     console.log(`Fetching changes between releases - ${prevReleaseId} & ${release.id}`);
     const releaseChanges = await this.pipelineRestClient.getPipelineChangesAsync(prevReleaseId);
 
-    if (releaseChanges == null || releaseChanges.length < 1)
-    {
-        console.log(`No changes found between releases - ${prevReleaseId} & ${release.id}`);
+    if (releaseChanges == null || releaseChanges.length < 1) {
+      console.log(`No changes found between releases - ${prevReleaseId} & ${release.id}`);
     }
     return releaseChanges.map(item => new ChangeModel(item.id, item.author, item.location, item.timestamp, item.message));
   }

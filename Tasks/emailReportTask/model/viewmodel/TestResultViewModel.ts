@@ -14,10 +14,10 @@ export class TestResultViewModelWrapper {
 
 export class TestResultViewModel {
   private readonly StackTraceLineCount = 5;
-  public  AssociatedBugs: WorkItemViewModelWrapper;
+  public AssociatedBugs: WorkItemViewModelWrapper;
   public CreateBugLink: string;
   public Duration: string;
-  public ErrorMessage: string; 
+  public ErrorMessage: string;
   public FailingSinceBuild: any;
   public FailingSinceRelease: ReleaseReferenceViewModel;
   public FailingSinceTime: string;
@@ -36,10 +36,9 @@ export class TestResultViewModel {
     this.ErrorMessage = StringUtils.ReplaceNewlineWithBrTag(result.errorMessage);
     this.TestOutcome = result.outcome;
     this.StackTrace = StringUtils.ReplaceNewlineWithBrTag(
-        StringUtils.getFirstNLines(result.stackTrace, this.StackTraceLineCount));
+      StringUtils.getFirstNLines(result.stackTrace, this.StackTraceLineCount));
 
-    if (result.priority != 255)
-    {
+    if (result.priority != 255) {
       this.Priority = DisplayNameHelper.getPriorityDisplayName(result.priority == null ? "" : result.priority.toString());
     }
 
@@ -49,25 +48,23 @@ export class TestResultViewModel {
     this.Owner = result.owner == null ? null : result.owner.displayName;
 
     if (result.failingSince != null) {
-    let failingSinceNotCurrent = result.failingSince.release == null ? false : 
-      result.failingSince.release.id != config.$pipelineId;
+      let failingSinceNotCurrent = result.failingSince.release == null ? false :
+        result.failingSince.release.id != config.$pipelineId;
 
-        //TODO case Config.BuildConfiguration buildConfig:
-        //    failingSinceNotCurrent = result.FailingSince?.Build?.Id != buildConfig.BuildId;
-        //    break;
+      //TODO case Config.BuildConfiguration buildConfig:
+      //    failingSinceNotCurrent = result.FailingSince?.Build?.Id != buildConfig.BuildId;
+      //    break;
 
-      if (failingSinceNotCurrent)
-      {
-          this.FailingSinceTime = result.failingSince.date.toDateString();
-          if (result.failingSince.release != null)
-          {
-            this.FailingSinceRelease = new ReleaseReferenceViewModel(config, result.failingSince.release);
-          }
+      if (failingSinceNotCurrent) {
+        this.FailingSinceTime = result.failingSince.date.toDateString();
+        if (result.failingSince.release != null) {
+          this.FailingSinceRelease = new ReleaseReferenceViewModel(config, result.failingSince.release);
+        }
 
-          // if (result.failingSince.Build != null)
-          // {
-          //   this.FailingSinceBuild = new BuildReferenceViewModel(config, result.FailingSince.Build);
-          // }
+        // if (result.failingSince.Build != null)
+        // {
+        //   this.FailingSinceBuild = new BuildReferenceViewModel(config, result.FailingSince.Build);
+        // }
       }
     }
 
@@ -76,18 +73,16 @@ export class TestResultViewModel {
   }
 
   private InitializeAssociatedBugs(config: PipelineConfiguration, associatedBugs: WorkItem[]): void {
-      this.AssociatedBugs = new WorkItemViewModelWrapper();
-      this.AssociatedBugs.WorkItemViewModel = [];
-      if (associatedBugs == null)
-      {
-          return;
-      }
+    this.AssociatedBugs = new WorkItemViewModelWrapper();
+    this.AssociatedBugs.WorkItemViewModel = [];
+    if (associatedBugs == null) {
+      return;
+    }
 
-      associatedBugs.forEach(workItem => {
-          if (workItem.id != null)
-          {
-            this.AssociatedBugs.WorkItemViewModel.push(new WorkItemViewModel(config, workItem));
-          }
-      });
+    associatedBugs.forEach(workItem => {
+      if (workItem.id != null) {
+        this.AssociatedBugs.WorkItemViewModel.push(new WorkItemViewModel(config, workItem));
+      }
+    });
   }
 }

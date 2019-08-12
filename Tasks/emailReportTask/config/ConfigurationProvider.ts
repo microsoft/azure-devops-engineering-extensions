@@ -5,12 +5,13 @@ import { SendMailCondition } from "./report/SendMailCondition";
 import { MailConfiguration } from "./mail/MailConfiguration";
 import { RecipientsConfiguration } from "./mail/RecipientsConfiguration";
 import { SmtpConfiguration } from "./mail/SmtpConfiguration";
-import { ReportInputError } from "../exceptions/ReportInputError";
+import { InputError } from "../exceptions/InputError";
 import { ReportDataConfiguration } from "./report/ReportDataConfiguration";
 import { TestResultsConfiguration } from "./report/TestResultsConfiguration";
 import { GroupTestResultsBy } from "./report/GroupTestResultsBy";
 import { PipelineConfiguration } from "./pipeline/PipelineConfiguration";
 import { PipelineType } from "./pipeline/PipelineType";
+import { StringUtils } from "../utils/StringUtils";
 
 export class ConfigurationProvider implements IConfigurationProvider {
   private pipelineConfiguration: PipelineConfiguration;
@@ -49,29 +50,28 @@ export class ConfigurationProvider implements IConfigurationProvider {
     );
   }
 
-  private initPipelineConfiguration() : void {
-      const hostType = tl.getVariable(TaskConstants.HOST_KEY);
-      const pipelineType = hostType == "build" ? PipelineType.Build : PipelineType.Release;
-      const pipelineIdKey = pipelineType == PipelineType.Build ? TaskConstants.BUILD_ID_KEY : TaskConstants.RELEASE_ID_KEY;
+  private initPipelineConfiguration(): void {
+    const hostType = tl.getVariable(TaskConstants.HOST_KEY);
+    const pipelineType = hostType == "build" ? PipelineType.Build : PipelineType.Release;
+    const pipelineIdKey = pipelineType == PipelineType.Build ? TaskConstants.BUILD_ID_KEY : TaskConstants.RELEASE_ID_KEY;
 
-      const pipelineId = Number(tl.getVariable(pipelineIdKey));
-      const projectId = tl.getVariable(TaskConstants.PROJECTID_KEY);
-      const projectName = tl.getVariable(TaskConstants.PROJECTNAME_KEY);
+    const pipelineId = Number(tl.getVariable(pipelineIdKey));
+    const projectId = tl.getVariable(TaskConstants.PROJECTID_KEY);
+    const projectName = tl.getVariable(TaskConstants.PROJECTNAME_KEY);
 
-      const envId = Number(tl.getVariable(TaskConstants.ENVIRONMENTID_KEY));
-      const envDefId = Number(tl.getVariable(TaskConstants.ENVIRONMENTDEFID_KEY));
+    const envId = Number(tl.getVariable(TaskConstants.ENVIRONMENTID_KEY));
+    const envDefId = Number(tl.getVariable(TaskConstants.ENVIRONMENTDEFID_KEY));
 
-      const usePrevEnvironment = tl.getBoolInput(TaskConstants.USEPREVENV_INPUTKEY);
-      const teamUri = tl.getVariable(TaskConstants.TEAM_FOUNDATION_KEY)
-      this.pipelineConfiguration = new PipelineConfiguration(pipelineType, pipelineId, projectId, projectName, envId, envDefId, usePrevEnvironment, teamUri, this.getAccessKey());
+    const usePrevEnvironment = tl.getBoolInput(TaskConstants.USEPREVENV_INPUTKEY);
+    const teamUri = tl.getVariable(TaskConstants.TEAM_FOUNDATION_KEY)
+    this.pipelineConfiguration = new PipelineConfiguration(pipelineType, pipelineId, projectId, projectName, envId, envDefId, usePrevEnvironment, teamUri, this.getAccessKey());
   }
 
   private initMailConfiguration(): void {
     //SMTP
     const endPointScheme = tl.getEndpointAuthorizationScheme(TaskConstants.SMTPCONNECTION_INPUTKEY, true);
-    if(endPointScheme != "UsernamePassword")
-    {
-      throw new ReportInputError("Incorrect EndPoint Scheme Provided. Only UserName and Password type Endpoints allowed.");
+    if (endPointScheme != "UsernamePassword") {
+      throw new InputError("Incorrect EndPoint Scheme Provided. Only UserName and Password type Endpoints allowed.");
     }
 
     const smtpHost = tl.getEndpointUrl(TaskConstants.SMTPCONNECTION_INPUTKEY, true);
@@ -83,10 +83,14 @@ export class ConfigurationProvider implements IConfigurationProvider {
 
     // Mail Subject
     const mailSubject = tl.getInput(TaskConstants.SUBJECT_INPUTKEY, true);
+    if (StringUtils.isNullOrWhiteSpace(mailSubject))
+    {
+      throw new InputError("Email subject not set");
+    }
 
     // Optional inputs
     const toAddresses = tl.getInput(TaskConstants.TOADDRESS_INPUTKEY, false);
-    const ccAddresses = tl.getInput(TaskConstants.CCADDRESS_INPUTKEY, false);  
+    const ccAddresses = tl.getInput(TaskConstants.CCADDRESS_INPUTKEY, false);
     const includeInToAddressesConfig = tl.getInput(TaskConstants.INCLUDEINTO_INPUTKEY, false);
     const includeInCCAddressesConfig = tl.getInput(TaskConstants.INCLUDEINCC_INPUTKEY, false);
 
@@ -110,14 +114,13 @@ export class ConfigurationProvider implements IConfigurationProvider {
     const includeResultsStr = tl.getInput(TaskConstants.INCLUDERESULTS_INPUTKEY, false);
     const groupTestSummaryByStr = tl.getInput(TaskConstants.GROUPTESTSUMMARYBY_INPUTKEY, false);
 
-    const groupTestSummaryBy: Array<GroupTestResultsBy> = new Array();  
-    if( groupTestSummaryByStr != null )
-    {
-      groupTestSummaryByStr.split(",").forEach(element => { groupTestSummaryBy.push(this.getGroupTestResultsByEnumFromString(element))  });
+    const groupTestSummaryBy: Array<GroupTestResultsBy> = new Array();
+    if (groupTestSummaryByStr != null) {
+      groupTestSummaryByStr.split(",").forEach(element => { groupTestSummaryBy.push(this.getGroupTestResultsByEnumFromString(element)) });
     }
 
     // derived input values
-    const includeResultsConfig = includeResultsStr == null ? includeResultsStr.split(",") : []; 
+    const includeResultsConfig = includeResultsStr == null ? includeResultsStr.split(",") : [];
     const includeFailedTests = includeResultsConfig.includes("1");
     const includeOtherTests = includeResultsConfig.includes("2");
     const includePassedTests = includeResultsConfig.includes("3");
@@ -132,20 +135,17 @@ export class ConfigurationProvider implements IConfigurationProvider {
   initSendMailCondition(): void {
     const sendMailConditionStr = tl.getInput(TaskConstants.SENDMAILCONDITION_INPUTKEY);
     let sendMailCondition: SendMailCondition;
-    switch(sendMailConditionStr)
-    {
-      case "On Failure" : sendMailCondition = SendMailCondition.OnFailure; break;
-      case "On Success" : sendMailCondition = SendMailCondition.OnSuccess; break;
-      case "On New Failures Only" : sendMailCondition = SendMailCondition.OnNewFailuresOnly; break;      
+    switch (sendMailConditionStr) {
+      case "On Failure": sendMailCondition = SendMailCondition.OnFailure; break;
+      case "On Success": sendMailCondition = SendMailCondition.OnSuccess; break;
+      case "On New Failures Only": sendMailCondition = SendMailCondition.OnNewFailuresOnly; break;
       default: sendMailCondition = SendMailCondition.Always; break;
     }
     this.sendMailCondition = sendMailCondition;
   }
 
-  private getRecipientConfiguration(namedRecipients: string, includeConfigStr: string): RecipientsConfiguration {                  
-    
-    if(includeConfigStr != null) 
-    {
+  private getRecipientConfiguration(namedRecipients: string, includeConfigStr: string): RecipientsConfiguration {
+    if (includeConfigStr != null) {
       const includeConfig = includeConfigStr.split(",");
       const includeChangesetOwners = includeConfig.includes("1");
       const includeTestOwners = includeConfig.includes("2");
@@ -157,13 +157,11 @@ export class ConfigurationProvider implements IConfigurationProvider {
 
     return new RecipientsConfiguration(namedRecipients);
   }
-  
-  private getGroupTestResultsByEnumFromString(groupResultsByStr: string) : GroupTestResultsBy
-  {        
-    switch(groupResultsByStr)
-    {
-      case "Priority" : return GroupTestResultsBy.Priority;
-      case "Team" : return GroupTestResultsBy.Team;
+
+  private getGroupTestResultsByEnumFromString(groupResultsByStr: string): GroupTestResultsBy {
+    switch (groupResultsByStr) {
+      case "Priority": return GroupTestResultsBy.Priority;
+      case "Team": return GroupTestResultsBy.Team;
       default: return GroupTestResultsBy.Run;
     }
   }

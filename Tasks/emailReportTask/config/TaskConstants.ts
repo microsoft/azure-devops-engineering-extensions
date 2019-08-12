@@ -1,5 +1,4 @@
-export class TaskConstants
-{
+export class TaskConstants {
   public static readonly SUBJECT_INPUTKEY = "subject";
   public static readonly SENDMAILCONDITION_INPUTKEY = "sendMailConditionConfig";
   public static readonly INCLUDECOMMITS_INPUTKEY = "includeCommits";
@@ -18,17 +17,12 @@ export class TaskConstants
   public static readonly DEFAULTDOMAIN_INPUTKEY = "defaultDomain";
 
   public static readonly TEAM_FOUNDATION_KEY: string =
-  "SYSTEM_TEAMFOUNDATIONCOLLECTIONURI";
+    "SYSTEM_TEAMFOUNDATIONCOLLECTIONURI";
   public static readonly VSS_CONNECTION_KEY: string = "SYSTEMVSSCONNECTION";
   public static readonly ACCESS_PARAMETER: string = "ACCESSTOKEN";
-  public static readonly REPOSITORY_KEY: string = "BUILD_REPOSITORY_NAME";
-  public static readonly PULL_REQUEST_ID_KEYS: string[] = [
-  "SYSTEM_PULLREQUEST_PULLREQUESTID",
-  "BUILD_PULLREQUEST_ID"
-  ];
   public static readonly PROJECTNAME_KEY: string = "SYSTEM_TEAMPROJECT";
   public static readonly PROJECTID_KEY: string = "SYSTEM_TEAMPROJECTID";
-  public static readonly BUILD_ID_KEY: string = "BUILD_BUILDID";   
+  public static readonly BUILD_ID_KEY: string = "BUILD_BUILDID";
   public static readonly RELEASE_ID_KEY: string = "RELEASE_RELEASEID";
   public static readonly HOST_KEY: string = "SYSTEM_HOSTTYPE";
 

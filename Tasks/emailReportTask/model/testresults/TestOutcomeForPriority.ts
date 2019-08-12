@@ -1,8 +1,7 @@
-export enum TestOutcomeForPriority
-{
-    Failed,
-    Inconclusive,
-    NotExecuted,
-    Passed,
-    Other
+export enum TestOutcomeForPriority {
+  Failed,
+  Inconclusive,
+  NotExecuted,
+  Passed,
+  Other
 }
