@@ -6,9 +6,9 @@ import { TestResultSummary, AggregatedResultsByOutcome, TestOutcome } from "azur
 import { TestResultsGroupModel } from "./testresults/TestResultGroupModel";
 import { PipelineConfiguration } from "../config/pipeline/PipelineConfiguration";
 import { isNullOrUndefined } from "util";
-import { ReleaseViewModel } from "./viewmodel/ReleaseViewModel";
 import { ArtifactViewModel } from "./viewmodel/ArtifactViewModel";
-import { PipelineViewModel } from "./viewmodel/PipelineViewModel";
+import { BuildReferenceViewModel } from "./viewmodel/BuildReferenceViewModel";
+import { ReleaseViewModel } from "./viewmodel/ReleaseViewModel";
 
 export abstract class Report {
   private dataMissing: boolean = false;
@@ -108,7 +108,7 @@ export abstract class Report {
 
   public abstract getEnvironmentStatus(): string;
 
-  public abstract getPipelineViewModel(config: PipelineConfiguration): PipelineViewModel;
+  public abstract getPipelineViewModel(config: PipelineConfiguration): BuildReferenceViewModel | ReleaseViewModel;
 
   public abstract getArtifactViewModels(config: PipelineConfiguration): ArtifactViewModel[];
 

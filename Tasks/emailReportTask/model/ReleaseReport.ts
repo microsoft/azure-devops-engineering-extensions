@@ -6,7 +6,6 @@ import { PipelineConfiguration } from "../config/pipeline/PipelineConfiguration"
 import { JobModel } from "./JobModel";
 import { ArtifactViewModel } from "./viewmodel/ArtifactViewModel";
 import { ReleaseViewModel } from "./viewmodel/ReleaseViewModel";
-import { PipelineViewModel } from "./viewmodel/PipelineViewModel";
 
 export class ReleaseReport extends Report {
 
@@ -175,7 +174,7 @@ export class ReleaseReport extends Report {
     return jobs.length > 0;
   }
 
-  public getPipelineViewModel(config: PipelineConfiguration): PipelineViewModel {
+  public getPipelineViewModel(config: PipelineConfiguration): ReleaseViewModel {
     return new ReleaseViewModel(this.environment, config);
   }
 
