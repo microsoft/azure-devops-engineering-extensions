@@ -33,11 +33,12 @@ export class TestResultsClient extends AbstractClient implements ITestResultsCli
     return result;
   }
 
-  public async queryTestResultsReportAsync(): Promise<void> {
-    await (await this.testApiPromise).queryTestResultsReportForRelease(
-      this.pipelineConfig.$projectName,
-      this.pipelineConfig.$pipelineId,
-      this.pipelineConfig.$environmentId);
+  public async queryTestResultsReportAsync(parameterConfig: PipelineConfiguration = null): Promise<TestResultSummary> {
+    const config = parameterConfig != null ? parameterConfig : this.pipelineConfig;
+    return await (await this.testApiPromise).queryTestResultsReportForRelease(
+      config.$projectName,
+      config.$pipelineId,
+      config.$environmentId);
   }
 
   public async getTestResultOwnersAsync(resultsToFetch: TestCaseResult[]): Promise<IdentityRef[]> {
@@ -70,24 +71,30 @@ export class TestResultsClient extends AbstractClient implements ITestResultsCli
     return Object.values(ownerMap.values);
   }
 
-  public async getTestResultsDetailsAsync(groupBy: string, outcomeFilters?: TestOutcome[]): Promise<TestResultsDetails> {
+  public async getTestResultsDetailsAsync(groupBy: string, outcomeFilters?: TestOutcome[], parameterConfig: PipelineConfiguration = null): Promise<TestResultsDetails> {
     const filter = this.getOutcomeFilter(outcomeFilters);
+    const config = parameterConfig != null ? parameterConfig : this.pipelineConfig;
     return await (await this.testApiPromise).getTestResultDetailsForRelease(
-      this.pipelineConfig.$projectName,
-      this.pipelineConfig.$pipelineId,
-      this.pipelineConfig.$environmentId,
+      config.$projectName,
+      config.$pipelineId,
+      config.$environmentId,
       null,
       groupBy,
       filter);
   }
 
-  public async getTestResultSummaryAsync(includeFailures: boolean): Promise<TestResultSummary> {
+  public async getTestResultSummaryAsync(includeFailures: boolean, parameterConfig: PipelineConfiguration = null): Promise<TestResultSummary> {
+    const config = parameterConfig != null ? parameterConfig : this.pipelineConfig;
     return await (await this.testApiPromise).queryTestResultsReportForRelease(
-      this.pipelineConfig.$projectName,
-      this.pipelineConfig.$pipelineId,
-      this.pipelineConfig.$environmentId,
+      config.$projectName,
+      config.$pipelineId,
+      config.$environmentId,
       null,
       includeFailures);
+  }
+
+  public async getTestResultsByQueryAsync(query: TestResultsQuery): Promise<TestResultsQuery> {
+    return await (await this.testApiPromise).getTestResultsByQuery(query, this.pipelineConfig.$projectId);
   }
 
   private getOutcomeFilter(outcomes: TestOutcome[]): string {
