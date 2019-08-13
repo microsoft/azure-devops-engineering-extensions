@@ -5,11 +5,12 @@ import { Report } from "./Report";
 import { Release, ReleaseEnvironment } from "azure-devops-node-api/interfaces/ReleaseInterfaces";
 import { ChangeModel } from "./ChangeModel";
 import { PhaseModel } from "./PhaseModel";
+import { BuildReport } from "./BuildReport";
 
 export class ReportFactory {
 
   static createNewReport(pipelineConfig: PipelineConfiguration) {
-    return (pipelineConfig.$pipelineType == PipelineType.Build) ? null : new ReleaseReport();
+    return (pipelineConfig.$pipelineType == PipelineType.Build) ? new BuildReport() : new ReleaseReport();
   }
 
   static mergeReports(reports: Report[]): Report {

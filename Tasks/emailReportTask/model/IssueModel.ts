@@ -3,7 +3,7 @@ export class IssueModel {
   private message: string;
   private issueType: string;
 
-  constructor($message: string, $issueType: string) {
+  constructor($issueType: string, $message: string) {
     this.message = $message;
     this.issueType = $issueType;
   }

@@ -2,10 +2,11 @@ import { Release, Change, EnvironmentStatus, ReleaseStatus, ReleaseExpands, Rele
 import tl = require("azure-pipelines-task-lib/task");
 import { AbstractClient } from "./AbstractClient";
 import { release } from "os";
-import { IReleaseRestClient } from "./IReleaseRestClient";
+import { IPipelineRestClient } from "./IPipelineRestClient";
 import { PipelineConfiguration } from "../../config/pipeline/PipelineConfiguration";
+import { ChangeModel } from "../../model/ChangeModel";
 
-export class ReleaseRestClient extends AbstractClient implements IReleaseRestClient {
+export class ReleaseRestClient extends AbstractClient implements IPipelineRestClient {
 
   constructor(pipelineConfig: PipelineConfiguration) {
     super(pipelineConfig);
@@ -56,7 +57,7 @@ export class ReleaseRestClient extends AbstractClient implements IReleaseRestCli
     return lastRelease;
   }
 
-  public async getPipelineChangesAsync(prevPipelineId: number): Promise<Change[]> {
+  public async getPipelineChangesAsync(prevPipelineId: number): Promise<ChangeModel[]> {
 
     console.log(`Fetching changes between releases - ${prevPipelineId} & ${this.pipelineConfig.$pipelineId}`);
     const changes = await (await this.connection.getReleaseApi()).getReleaseChanges(
@@ -68,6 +69,11 @@ export class ReleaseRestClient extends AbstractClient implements IReleaseRestCli
       console.log(`No changes found between releases - ${prevPipelineId} & ${this.pipelineConfig.$pipelineId}`);
       return [];
     }
-    return changes;
+
+    return changes.map(item => new ChangeModel(item.id, item.author, item.location, item.timestamp, item.message));
+  }
+
+  getPipelineTimelineAsync(pipelineId: number): Promise<import("azure-devops-node-api/interfaces/BuildInterfaces").Timeline> {
+    throw new Error("Method not supported.");
   }
 }

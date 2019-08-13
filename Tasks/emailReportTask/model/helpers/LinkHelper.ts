@@ -23,7 +23,7 @@ export class LinkHelper {
       config);
   }
 
-  public static getBuildDefinitionLinkById(definitionId: string, config: PipelineConfiguration): string {
+  public static getBuildDefinitionLinkById(definitionId: any, config: PipelineConfiguration): string {
     var collectionUri = config.$teamUri;
     var parameters = new Map<string, string>();
     parameters.set("definitionId", definitionId.toString());
@@ -40,7 +40,7 @@ export class LinkHelper {
       config);
   }
 
-  public static getBuildSummaryLinkById(buildId: string, config: PipelineConfiguration): string {
+  public static getBuildSummaryLinkById(buildId: any, config: PipelineConfiguration): string {
     var collectionUri = config.$teamUri;
     var parameters = new Map<string, string>();
     parameters.set("buildId", buildId.toString());
@@ -118,7 +118,7 @@ export class LinkHelper {
   }
 
   public static getTestTabLinkInRelease(config: PipelineConfiguration): string {
-    return LinkHelper.getReleaseLinkTab(config.$pipelineId, config, "ms.vss-test-web.test-result-in-release-environment-editor-tab");
+    return LinkHelper.getReleaseLinkTab(config.$pipelineId, config, this.ReleaseLinkTestExtensionId);
   }
 
   public static getWorkItemLink(config: PipelineConfiguration, workItemId: number): string {
@@ -137,12 +137,21 @@ export class LinkHelper {
     return null;
   }
 
-  private static GetBuildLink(config: PipelineConfiguration, collectionUri: string, parameters: Map<string, string>): string {
-    return collectionUri + "\\" + LinkHelper.getBuildRelativeUrl(config.$projectName) + "\\" + LinkHelper.getQueryParameter(parameters);
-  }
-
   private static getBuildRelativeUrl(projectName: string): string {
     return projectName + "/" + LinkHelper.BuildPipelineExtension;
+  }
+
+  private static getTestTabLinkInBuild(config: PipelineConfiguration) {
+    var collectionUri = config.$teamUri;
+    var parameters = new Map<string, string>(
+      [
+        ["buildId", config.$pipelineId.toString()],
+        ["_a", "summary"],
+        ["tab", "ms.vss-test-web.test-result-details"]
+      ]);
+
+    var uri = this.getBuildLink(config, collectionUri, parameters);
+    return uri;
   }
 
   private static getReleaseLinkTab(releaseId: number, config: PipelineConfiguration, tab: string): string {
@@ -166,7 +175,6 @@ export class LinkHelper {
   public static getTestTabLink(pipelineConfiguration: PipelineConfiguration): string {
     return pipelineConfiguration.$pipelineType == PipelineType.Release ?
       this.getTestTabLinkInRelease(pipelineConfiguration) :
-      // TODO: build
-      "";
+      this.getTestTabLinkInBuild(pipelineConfiguration);
   }
 }

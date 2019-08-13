@@ -29,7 +29,7 @@ export class PhaseViewModel {
     }
     else {
       // This can happen if we have an empty phase or a phase with only disabled steps
-      // TODO- Log.LogWarning($"No deployment jobs found in phase {Name}");
+      console.warn(`No deployment jobs found in phase ${this.Name}`);
     }
   }
 

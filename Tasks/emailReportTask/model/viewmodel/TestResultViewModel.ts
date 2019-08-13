@@ -7,6 +7,8 @@ import { TimeFormatter } from "../helpers/TimeFormatter";
 import { WorkItem } from "azure-devops-node-api/interfaces/WorkItemTrackingInterfaces";
 import { DisplayNameHelper } from "../../utils/DisplayNameHelper";
 import { ReleaseReferenceViewModel } from "./ReleaseReferenceViewModel";
+import { PipelineType } from "../../config/pipeline/PipelineType";
+import { BuildReferenceViewModel } from "./BuildReferenceViewModel";
 
 export class TestResultViewModelWrapper {
   public TestResultViewModel: TestResultViewModel[];
@@ -48,23 +50,18 @@ export class TestResultViewModel {
     this.Owner = result.owner == null ? null : result.owner.displayName;
 
     if (result.failingSince != null) {
-      let failingSinceNotCurrent = result.failingSince.release == null ? false :
-        result.failingSince.release.id != config.$pipelineId;
-
-      //TODO case Config.BuildConfiguration buildConfig:
-      //    failingSinceNotCurrent = result.FailingSince?.Build?.Id != buildConfig.BuildId;
-      //    break;
+      const failingSincePipeline: any = config.$pipelineType == PipelineType.Build ? result.failingSince.release : result.failingSince.build;
+      const failingSinceNotCurrent = failingSincePipeline == null ? false : failingSincePipeline.id != config.$pipelineId;
 
       if (failingSinceNotCurrent) {
         this.FailingSinceTime = result.failingSince.date.toDateString();
-        if (result.failingSince.release != null) {
+
+        if (result.failingSince.release != null && result.failingSince.release.id > 0) {
           this.FailingSinceRelease = new ReleaseReferenceViewModel(config, result.failingSince.release);
         }
-
-        // if (result.failingSince.Build != null)
-        // {
-        //   this.FailingSinceBuild = new BuildReferenceViewModel(config, result.FailingSince.Build);
-        // }
+        if (result.failingSince.build != null && result.failingSince.build.id > 0) {
+          this.FailingSinceBuild = new BuildReferenceViewModel(config, null, result.failingSince.build);
+        }
       }
     }
 

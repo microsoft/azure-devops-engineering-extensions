@@ -13,7 +13,7 @@ export class TaskIssueSummaryViewModel {
     var allIssues: TaskIssueViewModel[] = [];
     this.ErrorMessage = `Failed on ${tasks.filter(t => t.$status == TaskStatus.Failed || t.$status == TaskStatus.Canceled).length}/${tasks.length} Agents`;
     tasks.forEach(task => {
-      if (task.$issues != null || task.$issues.length > 0) {
+      if (task.$issues != null && task.$issues.length > 0) {
         task.$issues.forEach(issue => {
           if (!StringUtils.isNullOrWhiteSpace(issue.$message)) {
             if (issue.$issueType.toLowerCase() == IssueTypeConstants.Error) {

@@ -13,6 +13,8 @@ import { ArtifactViewModelWrapper } from "./ArtifactViewModel";
 import { ChangeViewModel, ChangeViewModelWrapper } from "./ChangeViewModel";
 import { TestSummaryGroupViewModel, TestSummaryGroupViewModelWrapper } from "./TestSummaryGroupViewModel";
 import { TestResultsGroupViewModel, TestResultsGroupViewModelWrapper } from "./TestResultsGroupViewModel";
+import { PipelineType } from "../../config/pipeline/PipelineType";
+import { BuildReferenceViewModel } from "./BuildReferenceViewModel";
 
 export class EmailReportViewModel {
 
@@ -39,8 +41,13 @@ export class EmailReportViewModel {
   constructor(report: Report, reportConfiguration: ReportConfiguration) {
     this.ProjectName = reportConfiguration.$pipelineConfiguration.$projectName;
     this.HasTaskFailures = report.hasFailedTasks();
-    this.Release = report.getReleaseViewModel(reportConfiguration.$pipelineConfiguration);
-    //this.Build = emailReportDto.GetBuildViewModel(config);
+
+    if(reportConfiguration.$pipelineConfiguration.$pipelineType == PipelineType.Build) {
+      this.Build = report.getPipelineViewModel(reportConfiguration.$pipelineConfiguration) as BuildReferenceViewModel;
+    } else {
+      this.Release = report.getPipelineViewModel(reportConfiguration.$pipelineConfiguration) as ReleaseViewModel;
+    }
+
     this.Artifacts = new ArtifactViewModelWrapper();
     this.Artifacts.ArtifactViewModel = report.getArtifactViewModels(reportConfiguration.$pipelineConfiguration);
 
@@ -49,8 +56,6 @@ export class EmailReportViewModel {
 
     this.EmailSubject = this.GetMailSubject(report, reportConfiguration);
     this.HasFailedTests = report.hasFailedTests(reportConfiguration.$reportDataConfiguration.$includeOthersInTotal);
-
-    //const summaryGroupModel = isNullOrUndefined(report.$testSummaryGroups) || report.$testSummaryGroups.length < 1 ? null : report.$testSummaryGroups[0];
 
     if (report.testResultSummary != null) {
       this.AllTests = new TestResultSummaryViewModel(null, report.testResultSummary, reportConfiguration.$pipelineConfiguration, reportConfiguration.$reportDataConfiguration.$includeOthersInTotal);
