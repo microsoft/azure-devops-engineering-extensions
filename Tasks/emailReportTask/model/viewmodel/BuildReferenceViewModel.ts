@@ -1,9 +1,8 @@
 import { PipelineConfiguration } from "../../config/pipeline/PipelineConfiguration";
 import { BuildReference, Build } from "azure-devops-node-api/interfaces/BuildInterfaces";
 import { LinkHelper } from "../helpers/LinkHelper";
-import { PipelineViewModel } from "./PipelineViewModel";
 
-export class BuildReferenceViewModel extends PipelineViewModel {
+export class BuildReferenceViewModel {
   public Id: string;
   public Number: string;
   public Branch: string;
@@ -12,7 +11,6 @@ export class BuildReferenceViewModel extends PipelineViewModel {
   public DefinitionName: string;
 
   constructor(config: PipelineConfiguration, buildReference: BuildReference, build: Build)  {
-    super();
     if(buildReference != null) {
       this.Id = buildReference.id.toString();
       this.Number = buildReference.buildNumber;

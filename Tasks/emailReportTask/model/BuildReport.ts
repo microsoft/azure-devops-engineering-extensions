@@ -2,7 +2,6 @@ import { Build, Timeline, TaskResult, TimelineRecord } from "azure-devops-node-a
 import { Report } from "./Report";
 import { isNullOrUndefined } from "util";
 import { PipelineConfiguration } from "../config/pipeline/PipelineConfiguration";
-import { PipelineViewModel } from "./viewmodel/PipelineViewModel";
 import { ArtifactViewModel } from "./viewmodel/ArtifactViewModel";
 import { PipelineType } from "../config/pipeline/PipelineType";
 import { BuildReferenceViewModel } from "./viewmodel/BuildReferenceViewModel";
@@ -85,7 +84,7 @@ export class BuildReport extends Report {
     }
   }
 
-  public getPipelineViewModel(config: PipelineConfiguration): PipelineViewModel {
+  public getPipelineViewModel(config: PipelineConfiguration): BuildReferenceViewModel {
     return new BuildReferenceViewModel(config, null, this.build);
   }
 
