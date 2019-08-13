@@ -8,6 +8,7 @@ import { PipelineConfiguration } from "../config/pipeline/PipelineConfiguration"
 import { isNullOrUndefined } from "util";
 import { ReleaseViewModel } from "./viewmodel/ReleaseViewModel";
 import { ArtifactViewModel } from "./viewmodel/ArtifactViewModel";
+import { PipelineViewModel } from "./viewmodel/PipelineViewModel";
 
 export abstract class Report {
   private dataMissing: boolean = false;
@@ -107,7 +108,7 @@ export abstract class Report {
 
   public abstract getEnvironmentStatus(): string;
 
-  public abstract getReleaseViewModel(config: PipelineConfiguration): ReleaseViewModel;
+  public abstract getPipelineViewModel(config: PipelineConfiguration): PipelineViewModel;
 
   public abstract getArtifactViewModels(config: PipelineConfiguration): ArtifactViewModel[];
 

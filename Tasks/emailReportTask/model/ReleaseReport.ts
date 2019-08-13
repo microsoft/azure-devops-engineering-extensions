@@ -6,6 +6,7 @@ import { PipelineConfiguration } from "../config/pipeline/PipelineConfiguration"
 import { JobModel } from "./JobModel";
 import { ArtifactViewModel } from "./viewmodel/ArtifactViewModel";
 import { ReleaseViewModel } from "./viewmodel/ReleaseViewModel";
+import { PipelineViewModel } from "./viewmodel/PipelineViewModel";
 
 export class ReleaseReport extends Report {
 
@@ -123,8 +124,18 @@ export class ReleaseReport extends Report {
   }
 
   public getPrevConfig(config: PipelineConfiguration): PipelineConfiguration {
-    // TODO
-    return null;
+    var prevConfig = new PipelineConfiguration(
+      config.$pipelineType, 
+      this.lastCompletedRelease.id,
+      config.$projectId, 
+      config.$projectName, 
+      this.lastCompletedEnvironment.id,
+      this.lastCompletedEnvironment.definitionEnvironmentId,
+      config.$usePreviousEnvironment, 
+      config.$teamUri,
+      config.$accessKey);
+
+    return prevConfig;
   }
 
   public getEnvironmentStatus(): string {
@@ -164,7 +175,7 @@ export class ReleaseReport extends Report {
     return jobs.length > 0;
   }
 
-  public getReleaseViewModel(config: PipelineConfiguration): ReleaseViewModel {
+  public getPipelineViewModel(config: PipelineConfiguration): PipelineViewModel {
     return new ReleaseViewModel(this.environment, config);
   }
 

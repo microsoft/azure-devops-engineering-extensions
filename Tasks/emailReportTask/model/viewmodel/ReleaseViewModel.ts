@@ -2,8 +2,9 @@ import { ReleaseEnvironment } from "azure-devops-node-api/interfaces/ReleaseInte
 import { PipelineConfiguration } from "../../config/pipeline/PipelineConfiguration";
 import { LinkHelper } from "../helpers/LinkHelper";
 import { ReleaseEnvironmentViewModel } from "./ReleaseEnvironmentViewModel";
+import { PipelineViewModel } from "./PipelineViewModel";
 
-export class ReleaseViewModel {
+export class ReleaseViewModel extends PipelineViewModel {
   public CurrentEnvironment: ReleaseEnvironmentViewModel;
   public ReleaseDefinitionName: string;
   public ReleaseDefinitionUrl: string;
@@ -13,6 +14,7 @@ export class ReleaseViewModel {
   public ReleaseLogsLink: string;
 
   constructor(currentEnvironment: ReleaseEnvironment, releaseConfig: PipelineConfiguration) {
+    super();
     if (currentEnvironment != null) {
       this.CurrentEnvironment = new ReleaseEnvironmentViewModel(currentEnvironment);
       this.ReleaseDefinitionName = currentEnvironment.releaseDefinition == null ? null : currentEnvironment.releaseDefinition.name;

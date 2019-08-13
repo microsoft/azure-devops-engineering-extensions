@@ -1,31 +1,31 @@
-import { IDataProvider } from "./IDataProvider";
-import { Report } from "../model/Report";
-import { IReleaseRestClient } from "./restclients/IReleaseRestClient";
-import { PipelineNotFoundError } from "../exceptions/PipelineNotFoundError";
+import { IDataProvider } from "../IDataProvider";
+import { Report } from "../../model/Report";
+import { IPipelineRestClient } from "../restclients/IPipelineRestClient";
+import { PipelineNotFoundError } from "../../exceptions/PipelineNotFoundError";
 import { Release, ReleaseEnvironment, DeployPhaseStatus, DeploymentJob, Artifact } from "azure-devops-node-api/interfaces/ReleaseInterfaces";
-import { PipelineConfiguration } from "../config/pipeline/PipelineConfiguration";
-import { DataProviderError } from "../exceptions/DataProviderError";
-import { PhaseModel } from "../model/PhaseModel";
-import { EnvironmentExtensions } from "../utils/EnvironmentExtensions";
-import { JobModel } from "../model/JobModel";
-import { TaskModel } from "../model/TaskModel";
-import { IssueModel } from "../model/IssueModel";
-import { ChangeModel } from "../model/ChangeModel";
-import { ReleaseReport } from "../model/ReleaseReport";
-import { ReportDataConfiguration } from "../config/report/ReportDataConfiguration";
-import { ReportFactory } from "../model/ReportFactory";
+import { PipelineConfiguration } from "../../config/pipeline/PipelineConfiguration";
+import { DataProviderError } from "../../exceptions/DataProviderError";
+import { PhaseModel } from "../../model/PhaseModel";
+import { EnvironmentExtensions } from "../../utils/EnvironmentExtensions";
+import { JobModel } from "../../model/JobModel";
+import { TaskModel } from "../../model/TaskModel";
+import { IssueModel } from "../../model/IssueModel";
+import { ChangeModel } from "../../model/ChangeModel";
+import { ReleaseReport } from "../../model/ReleaseReport";
+import { ReportDataConfiguration } from "../../config/report/ReportDataConfiguration";
+import { ReportFactory } from "../../model/ReportFactory";
 
 export class ReleaseDataProvider implements IDataProvider {
 
-  private pipelineRestClient: IReleaseRestClient;
+  private pipelineRestClient: IPipelineRestClient;
 
-  constructor(pipelineRestClient: IReleaseRestClient) {
+  constructor(pipelineRestClient: IPipelineRestClient) {
     this.pipelineRestClient = pipelineRestClient;
   }
 
   async getReportDataAsync(pipelineConfig: PipelineConfiguration, reportDataConfiguration: ReportDataConfiguration): Promise<Report> {
     const report = ReportFactory.createNewReport(pipelineConfig) as ReleaseReport;
-    const release = await this.pipelineRestClient.getPipelineAsync();
+    const release = await this.pipelineRestClient.getPipelineAsync() as Release;
     if (release == null) {
       throw new PipelineNotFoundError(`ProjectId: ${pipelineConfig.$projectId}, ${pipelineConfig.$pipelineId}`);
     }
@@ -38,7 +38,7 @@ export class ReleaseDataProvider implements IDataProvider {
     // check if last completed one isn't latter one, then changes don't make sense
     if (lastCompletedRelease != null && lastCompletedRelease.id < release.id) {
       console.log(`Getting changes between releases ${release.id} & ${lastCompletedRelease.id}`);
-      changes = await this.getReleaseChangesAsync(pipelineConfig, release, lastCompletedRelease.id);
+      changes = await this.pipelineRestClient.getPipelineChangesAsync(lastCompletedRelease.id);
     }
     else {
       console.log("Unable to find any last completed release");
@@ -98,16 +98,7 @@ export class ReleaseDataProvider implements IDataProvider {
     }
 
     console.log(`Fetching last release by completed environment id - ${pipelineConfig.$environmentId} and branch id ${branchId}`);
-    return await this.pipelineRestClient.getLastPipelineAsync(release.releaseDefinition.id, environment.definitionEnvironmentId, branchId);
-  }
-
-  private async getReleaseChangesAsync(pipelineConfig: PipelineConfiguration, release: Release, prevReleaseId: number): Promise<ChangeModel[]> {
-    console.log(`Fetching changes between releases - ${prevReleaseId} & ${release.id}`);
-    const releaseChanges = await this.pipelineRestClient.getPipelineChangesAsync(prevReleaseId);
-
-    if (releaseChanges == null || releaseChanges.length < 1) {
-      console.log(`No changes found between releases - ${prevReleaseId} & ${release.id}`);
-    }
-    return releaseChanges.map(item => new ChangeModel(item.id, item.author, item.location, item.timestamp, item.message));
+    const lastRelease = await this.pipelineRestClient.getLastPipelineAsync(release.releaseDefinition.id, environment.definitionEnvironmentId, branchId);
+    return lastRelease as Release;
   }
 }

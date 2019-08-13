@@ -21,7 +21,6 @@ export class ChangeViewModel {
     this.ShortId = isNaN(Number.parseInt(this.Id)) ? this.Id : this.Id.substring(0, this.ConstHashLength);
     this.Message = StringUtils.CompressNewLines(change.$message);
     this.AuthorName = change.$author == null ? null : change.$author.displayName;
-    // TODO - Local TimeZone stamp
     this.TimeStamp = change.$timeStamp.toDateString();
 
     this.Url = LinkHelper.getCommitLink(change.$id, change.$location, config);
