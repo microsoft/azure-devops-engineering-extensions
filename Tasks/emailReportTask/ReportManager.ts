@@ -34,8 +34,8 @@ export class ReportManager {
         console.log(`Not sending mail, as the user send mail condition - '${reportConfig.$sendMailCondition}' is not satisfied.`);
       }
     } catch (err) {
-      console.error(err);
-      throw err;
+      // Exit Task with Error to fail the task
+      ReportError.HandleError(err, true);
     }
   }
 }

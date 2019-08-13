@@ -28,9 +28,6 @@ const accessKey = process.env.AccessKey;
 const smtpUser = process.env.SMTPUSER;
 const smtpPassword = process.env.SMTPPASSWORD;
 
-if(isNullOrUndefined(accessKey) || isNullOrUndefined(smtpUser) || isNullOrUndefined(smtpPassword)) {
-  console.error("Set Environment Vars for AccessKey, SMTPUSER, SMTPPASSWORD to test E2E.");
-}
  
 export class FileWriter {
 
@@ -69,6 +66,7 @@ export class ReportCreatorWrapper implements IHTMLReportCreator {
 export class MockConfigProvider implements IConfigurationProvider {
 
   getPipelineConfiguration(): PipelineConfiguration {
+    //return new PipelineConfiguration(PipelineType.Build, 10176130, "AzureDevOps", "AzureDevOps", null, null, true, "https://dev.azure.com/mseng", accessKey);
     return new PipelineConfiguration(PipelineType.Release, 11571808, "AzureDevOps", "AzureDevOps", 133233996, 9462, true, "https://dev.azure.com/mseng", accessKey);
   }
 
@@ -102,5 +100,9 @@ async function run(): Promise<void> {
   reportManager.sendReportAsync(reportConfiguration);
 }
 
-run();
 
+if(isNullOrUndefined(accessKey) || isNullOrUndefined(smtpUser) || isNullOrUndefined(smtpPassword)) {
+  console.error("Set Environment Vars for AccessKey, SMTPUSER, SMTPPASSWORD to test E2E.");
+} else {
+  run();
+}

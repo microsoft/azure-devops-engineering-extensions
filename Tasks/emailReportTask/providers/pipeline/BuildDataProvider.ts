@@ -1,16 +1,12 @@
 import { IDataProvider } from "../IDataProvider";
 import { Report } from "../../model/Report";
 import { PipelineNotFoundError } from "../../exceptions/PipelineNotFoundError";
-import { Release, ReleaseEnvironment, DeployPhaseStatus, DeploymentJob, TaskStatus } from "azure-devops-node-api/interfaces/ReleaseInterfaces";
+import { TaskStatus } from "azure-devops-node-api/interfaces/ReleaseInterfaces";
 import { PipelineConfiguration } from "../../config/pipeline/PipelineConfiguration";
-import { DataProviderError } from "../../exceptions/DataProviderError";
 import { PhaseModel } from "../../model/PhaseModel";
-import { EnvironmentExtensions } from "../../utils/EnvironmentExtensions";
 import { JobModel } from "../../model/JobModel";
 import { TaskModel } from "../../model/TaskModel";
 import { IssueModel } from "../../model/IssueModel";
-import { ChangeModel } from "../../model/ChangeModel";
-import { ReleaseReport } from "../../model/ReleaseReport";
 import { ReportDataConfiguration } from "../../config/report/ReportDataConfiguration";
 import { ReportFactory } from "../../model/ReportFactory";
 import { BuildReport } from "../../model/BuildReport";
@@ -47,22 +43,23 @@ export class BuildDataProvider implements IDataProvider {
   }
 
   private getPhases(timeline: Timeline): PhaseModel[] {
-    return timeline.records
-      .filter(r => !isNullOrUndefined(r.parentId))
-      .sort( (a: TimelineRecord, b: TimelineRecord) => this.getOrder(a) - this.getOrder(b))
-      .map(phase => {
-        const jobModels = timeline.records
-          .filter(r1 => r1.parentId == phase.id)
-          .sort( (a: TimelineRecord, b: TimelineRecord) => this.getOrder(a) - this.getOrder(b))
-          .map(job => {
-            const tasks = timeline.records
-              .filter(r2 => r2.parentId == job.id)
-              .sort( (a: TimelineRecord, b: TimelineRecord) => this.getOrder(a) - this.getOrder(b))
-              .map(task => {
-                const issues = task.issues.map(i => new IssueModel(i.type == IssueType.Error ? "Error" : "Warning", i.message));
+    const records = timeline.records.sort( (a: TimelineRecord, b: TimelineRecord) => this.getOrder(a) - this.getOrder(b));
+    const phases = records.filter(r => r.type == "Phase");
+    if(phases.length > 0) {
+      const jobs = records.filter(r => r.type == "Job");
+      if(jobs.length > 0) {
+        const tasks = records.filter(r => r.type == "Task");
+        const phaseModels = phases.map(phase => {
+          const jobModels = jobs
+            .filter(j => j.parentId == phase.id)
+            .map(j => {
+              const tasksForThisJob = tasks.filter(t => t.parentId == j.id);
+              const taskModels = tasksForThisJob.map(task => {
+                const issues: IssueModel[] = isNullOrUndefined(task.issues) || task.issues.length < 1 ? [] :
+                  task.issues.map(i => new IssueModel(i.type == IssueType.Error ? "Error" : "Warning", i.message));
                 return new TaskModel(task.name, this.getTaskState(task.result), issues, task.workerName, task.finishTime, task.startTime);
               });
-              return new JobModel(null, TaskStatus.Unknown, [], tasks);
+              return new JobModel(j.name, this.getTaskState(j.result), [], taskModels);
           });
           return new PhaseModel(
             phase.name, 
@@ -70,6 +67,10 @@ export class BuildDataProvider implements IDataProvider {
             phase.result.toString(),            
             this.getOrder(phase));
         });
+        return phaseModels;
+      }
+    }
+    return [];
   }
 
   private getTaskState(result: TaskResult): TaskStatus

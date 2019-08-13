@@ -56,10 +56,10 @@ export class TestResultViewModel {
       if (failingSinceNotCurrent) {
         this.FailingSinceTime = result.failingSince.date.toDateString();
 
-        if (result.failingSince.release != null) {
+        if (result.failingSince.release != null && result.failingSince.release.id > 0) {
           this.FailingSinceRelease = new ReleaseReferenceViewModel(config, result.failingSince.release);
         }
-        if (result.failingSince.build != null) {
+        if (result.failingSince.build != null && result.failingSince.build.id > 0) {
           this.FailingSinceBuild = new BuildReferenceViewModel(config, null, result.failingSince.build);
         }
       }

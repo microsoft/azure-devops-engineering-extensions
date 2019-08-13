@@ -5,10 +5,10 @@ import { TestResultsDetails, TestResultSummary, TestOutcome, TestResultsQuery, T
 import { ITestResultsClient } from "./ITestResultsClient";
 import { IdentityRef } from "azure-devops-node-api/interfaces/common/VSSInterfaces";
 
-export class TestResultsClient extends AbstractClient implements ITestResultsClient {
+export abstract class AbstractTestResultsClient extends AbstractClient implements ITestResultsClient {
 
   private readonly MaxItemsSupported: number = 100;
-  private testApiPromise: Promise<ITestApi>;
+  protected testApiPromise: Promise<ITestApi>;
 
   constructor(pipelineConfig: PipelineConfiguration) {
     super(pipelineConfig);
@@ -35,12 +35,9 @@ export class TestResultsClient extends AbstractClient implements ITestResultsCli
 
   public async queryTestResultsReportAsync(parameterConfig: PipelineConfiguration = null): Promise<TestResultSummary> {
     const config = parameterConfig != null ? parameterConfig : this.pipelineConfig;
-    return await (await this.testApiPromise).queryTestResultsReportForRelease(
-      config.$projectName,
-      config.$pipelineId,
-      config.$environmentId);
+    return await this.queryTestResultsReportForPipelineAsync(null, config);
   }
-
+  
   public async getTestResultOwnersAsync(resultsToFetch: TestCaseResult[]): Promise<IdentityRef[]> {
     var query = new TestResultsQueryImpl();
     query.fields = ["Owner"];
@@ -74,30 +71,22 @@ export class TestResultsClient extends AbstractClient implements ITestResultsCli
   public async getTestResultsDetailsAsync(groupBy: string, outcomeFilters?: TestOutcome[], parameterConfig: PipelineConfiguration = null): Promise<TestResultsDetails> {
     const filter = this.getOutcomeFilter(outcomeFilters);
     const config = parameterConfig != null ? parameterConfig : this.pipelineConfig;
-    return await (await this.testApiPromise).getTestResultDetailsForRelease(
-      config.$projectName,
-      config.$pipelineId,
-      config.$environmentId,
-      null,
-      groupBy,
-      filter);
+    return await this.getTestResultsDetailsForPipelineAsync(groupBy, filter, config);
   }
-
+  
   public async getTestResultSummaryAsync(includeFailures: boolean, parameterConfig: PipelineConfiguration = null): Promise<TestResultSummary> {
     const config = parameterConfig != null ? parameterConfig : this.pipelineConfig;
-    return await (await this.testApiPromise).queryTestResultsReportForRelease(
-      config.$projectName,
-      config.$pipelineId,
-      config.$environmentId,
-      null,
-      includeFailures);
+    return await this.queryTestResultsReportForPipelineAsync(includeFailures, config);
   }
 
   public async getTestResultsByQueryAsync(query: TestResultsQuery): Promise<TestResultsQuery> {
     return await (await this.testApiPromise).getTestResultsByQuery(query, this.pipelineConfig.$projectId);
   }
 
-  private getOutcomeFilter(outcomes: TestOutcome[]): string {
+  protected abstract getTestResultsDetailsForPipelineAsync(groupBy: string, filter: string, config: PipelineConfiguration): Promise<TestResultsDetails>;
+  protected abstract queryTestResultsReportForPipelineAsync(includeFailures: boolean, config: PipelineConfiguration): Promise<TestResultSummary>;
+
+  protected getOutcomeFilter(outcomes: TestOutcome[]): string {
     let filter: string = null;
     if (outcomes != null && outcomes.length > 0) {
       const outComeString = Array.from(new Set(outcomes.map(o => Number(o)))).join(",");
@@ -112,7 +101,6 @@ export class TestResultsClient extends AbstractClient implements ITestResultsCli
 
   private isValid(identity: IdentityRef): boolean {
     return identity != null && (identity.displayName != null || identity.uniqueName != null);
-
   }
 }
 

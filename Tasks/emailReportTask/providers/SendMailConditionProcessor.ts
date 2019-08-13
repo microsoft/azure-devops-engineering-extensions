@@ -6,8 +6,8 @@ import { PipelineConfiguration } from "../config/pipeline/PipelineConfiguration"
 import { ITestResultsClient } from "./restclients/ITestResultsClient";
 import { TestResultSummary, TestOutcome, TestCaseResult, TestResultsQuery } from "azure-devops-node-api/interfaces/TestInterfaces";
 import { isNullOrUndefined } from "util";
-import { TestResultsQueryImpl } from "./restclients/TestResultsClient";
 import { TcmHelper } from "./tcmproviders/TcmHelper";
+import { TestResultsQueryImpl } from "./restclients/AbstractTestResultsClient";
 
 export class SendMailConditionProcessor implements IPostProcessor {
   private testResultsClient: ITestResultsClient;
