@@ -65,7 +65,9 @@ export abstract class AbstractTestResultsClient extends AbstractClient implement
       }
     });
 
-    return Object.values(ownerMap.values);
+    const identities: IdentityRef[] = [];
+    ownerMap.forEach( (value: IdentityRef, key: string) => identities.push(value));
+    return identities;
   }
 
   public async getTestResultsDetailsAsync(groupBy: string, outcomeFilters?: TestOutcome[], parameterConfig: PipelineConfiguration = null): Promise<TestResultsDetails> {

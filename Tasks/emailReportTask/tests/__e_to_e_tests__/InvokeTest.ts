@@ -1,4 +1,3 @@
-import tl = require("azure-pipelines-task-lib/task");
 import { IConfigurationProvider } from "../../config/IConfigurationProvider";
 import { SendMailCondition } from "../../config/report/SendMailCondition";
 import { PipelineConfiguration } from "../../config/pipeline/PipelineConfiguration";
@@ -71,7 +70,7 @@ export class MockConfigProvider implements IConfigurationProvider {
   }
 
   getMailConfiguration(): MailConfiguration {
-    return new MailConfiguration("Test",
+    return new MailConfiguration("[{environmentStatus}] {passPercentage} tests passed in $(Release.EnvironmentName) environment for $(Build.BuildNumber)",
       new RecipientsConfiguration("svajjala@microsoft.com", false, false, false, false),
       new RecipientsConfiguration("svajjala@microsoft.com", false, false, false, false),
       new SmtpConfiguration(smtpUser, smtpPassword, "smtp.live.com", false),

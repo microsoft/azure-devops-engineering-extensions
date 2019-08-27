@@ -1,6 +1,7 @@
 var exec = require("child_process").exec;
 const path = require('path');
 const common = require("./common");
+var process = require('process');
 
 // // *.json
 const extJsonFile = common.CopyFile(common.TaskSrcDir, "vss-extension.json", common.ExtensionOutDir);
@@ -12,6 +13,19 @@ common.CopyFile(path.resolve(`${__dirname}/..`), `LICENSE`, common.ExtensionOutD
 // Load existing publisher
 var manifest = require(extJsonFile);
 var extensionId = manifest.id;
+
+const cwd = process.cwd();
+process.chdir(common.TaskOutDir);
+
+var npmInstallCommand = "npm install"
+console.log(`Running: ${npmInstallCommand}`);
+exec(npmInstallCommand, function (error) {
+  if (error) {
+    console.log(`NPM Install Error: ${error}`);
+  } else {
+    console.log("NPM Install Done");
+  }
+});
 
 // Package extension only for prod
 if(common.ReleaseType.toLowerCase() == "prod") {
@@ -27,3 +41,5 @@ if(common.ReleaseType.toLowerCase() == "prod") {
 } else {
   console.log(`Navigate to ${common.TaskOutDir} and run the tfx upload command on the desired azure devops account to upload task directly. Command: 'tfx login && tfx build tasks upload --task-path .'`);
 }
+
+process.chdir(cwd);

@@ -56,4 +56,13 @@ export class MailConfiguration {
   public get $toRecipientsConfig(): RecipientsConfiguration {
     return this.toRecipientsConfig;
   }
+
+  /**
+ * Setter $mailSubject
+ * @param {string} value
+ */
+  public set $mailSubject(value: string) {
+    this.mailSubject = value;
+  }
+
 }
