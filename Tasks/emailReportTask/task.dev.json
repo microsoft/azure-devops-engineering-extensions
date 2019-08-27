@@ -1,7 +1,7 @@
 {
   "id": "59a02370-5b4b-4236-95bd-673180e2cbf2",
-  "name": "EmailReportDevVersion",
-  "friendlyName": "Email Report (Dev Version)",
+  "name": "EmailReportPPE",
+  "friendlyName": "Email Report PPE (Testing Purposes)",
   "description": "Send rich email report for test results and for tasks in this stage",
   "helpMarkDown": "Sets 'EmailReportTask.EmailSent' variable to true if it sent email successfully.",
   "category": "Utility",
@@ -11,9 +11,9 @@
   ],
   "author": "Microsoft Corporation",
   "version": {
-    "Major": 0,
-    "Minor": 0,
-    "Patch": 1
+    "Major": 1,
+    "Minor": 1,
+    "Patch": 93
   },
   "groups": [
     {
@@ -116,7 +116,7 @@
       "name": "defaultDomain",
       "type": "string",
       "label": "Default Domain for Addresses",
-      "defaultValue": "",
+      "defaultValue": "microsoft.com",
       "required": true,
       "helpMarkDown": "Address Domains like microsoft.com. Will be used to resolve mail addresses. testOwner@domain for example.",
       "groupName": "emailConfiguration"

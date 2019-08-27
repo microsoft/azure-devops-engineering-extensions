@@ -11,9 +11,9 @@
   ],
   "author": "Microsoft Corporation",
   "version": {
-    "Major": 0,
+    "Major": 1,
     "Minor": 0,
-    "Patch": 1
+    "Patch": 5
   },
   "groups": [
     {
@@ -116,7 +116,7 @@
       "name": "defaultDomain",
       "type": "string",
       "label": "Default Domain for Addresses",
-      "defaultValue": "",
+      "defaultValue": "microsoft.com",
       "required": true,
       "helpMarkDown": "Address Domains like microsoft.com. Will be used to resolve mail addresses. testOwner@domain for example.",
       "groupName": "emailConfiguration"

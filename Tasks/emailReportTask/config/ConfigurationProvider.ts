@@ -1,4 +1,4 @@
-import tl = require("azure-pipelines-task-lib/task");
+import tl = require("azure-pipelines-task-lib");
 import { IConfigurationProvider } from "./IConfigurationProvider";
 import { TaskConstants } from "./TaskConstants";
 import { SendMailCondition } from "./report/SendMailCondition";
@@ -12,6 +12,7 @@ import { GroupTestResultsBy } from "./report/GroupTestResultsBy";
 import { PipelineConfiguration } from "./pipeline/PipelineConfiguration";
 import { PipelineType } from "./pipeline/PipelineType";
 import { StringUtils } from "../utils/StringUtils";
+import { EndpointAuthorization } from "azure-devops-node-api/interfaces/TaskAgentInterfaces";
 
 export class ConfigurationProvider implements IConfigurationProvider {
   private pipelineConfiguration: PipelineConfiguration;
@@ -68,17 +69,20 @@ export class ConfigurationProvider implements IConfigurationProvider {
   }
 
   private initMailConfiguration(): void {
-    //SMTP
-    const endPointScheme = tl.getEndpointAuthorizationScheme(TaskConstants.SMTPCONNECTION_INPUTKEY, true);
-    if (endPointScheme != "UsernamePassword") {
-      throw new InputError("Incorrect EndPoint Scheme Provided. Only UserName and Password type Endpoints allowed.");
-    }
+    const smtpConnectionId = tl.getInput(TaskConstants.SMTPCONNECTION_INPUTKEY, true);
+    console.log(`smtpConnection: ${smtpConnectionId}`);
 
-    const smtpHost = tl.getEndpointUrl(TaskConstants.SMTPCONNECTION_INPUTKEY, true);
-    const userName = tl.getEndpointAuthorizationParameter(TaskConstants.SMTPCONNECTION_INPUTKEY, "UserName", true);
-    const password = tl.getEndpointAuthorizationParameter(TaskConstants.SMTPCONNECTION_INPUTKEY, "Password", true);
+    const endPointScheme = tl.getEndpointAuthorizationScheme(smtpConnectionId, true);
+    if (endPointScheme != "UsernamePassword") {
+      throw new InputError(`Incorrect EndPoint Scheme Provided - '${endPointScheme}'. Only UserName and Password type Endpoints allowed.`);
+    }
+ 
+    const smtpHost = tl.getEndpointUrl(smtpConnectionId, true).replace(/(^\w+:|^)\/\//, '').replace(/\/$/, '');
+    const userName = tl.getEndpointAuthorizationParameter(smtpConnectionId, "UserName", true);
+    const password = tl.getEndpointAuthorizationParameter(smtpConnectionId, "Password", true);
     const enableSSLOnSmtpConnection = tl.getBoolInput(TaskConstants.ENABLESSL_INPUTKEY, true);
 
+    console.log(`SmtpHost: ${smtpHost}, SmtpUser: ${userName}`);
     const smtpConfig = new SmtpConfiguration(userName, password, smtpHost, enableSSLOnSmtpConnection);
 
     // Mail Subject

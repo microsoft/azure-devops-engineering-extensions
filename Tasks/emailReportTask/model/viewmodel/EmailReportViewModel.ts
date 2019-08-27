@@ -19,7 +19,6 @@ import { BuildReferenceViewModel } from "./BuildReferenceViewModel";
 export class EmailReportViewModel {
 
   public DataMissing: boolean;
-  public EmailSubject: string;
   public HasFailedTests: boolean;
   public HasFilteredTests: boolean;
   public HasTaskFailures: boolean;
@@ -54,7 +53,7 @@ export class EmailReportViewModel {
     this.HasCanceledPhases = report.hasCanceledPhases();
     this.InitializePhases(report);
 
-    this.EmailSubject = this.GetMailSubject(report, reportConfiguration);
+    this.SetMailSubject(report, reportConfiguration);
     this.HasFailedTests = report.hasFailedTests(reportConfiguration.$reportDataConfiguration.$includeOthersInTotal);
 
     if (report.testResultSummary != null) {
@@ -91,22 +90,18 @@ export class EmailReportViewModel {
     }
   }
 
-  private GetMailSubject(report: Report, reportConfig: ReportConfiguration): string {
-    var userDefinedSubject = reportConfig.$mailConfiguration.$mailSubject;
-    let subject: string;
+  private SetMailSubject(report: Report, reportConfig: ReportConfiguration): void {
+    var subject = reportConfig.$mailConfiguration.$mailSubject;
 
-    if (userDefinedSubject.includes("{passPercentage}")) {
+    if (subject.includes("{passPercentage}")) {
       var passPercentage = this.GetPassPercentage(report, reportConfig.$reportDataConfiguration.$includeOthersInTotal);
-      subject = userDefinedSubject.replace("{passPercentage}", passPercentage);
-    }
-    else {
-      subject = userDefinedSubject;
+      subject = subject.replace("{passPercentage}", passPercentage);
     }
 
-    if (userDefinedSubject.includes("{environmentStatus}")) {
-      subject = userDefinedSubject.replace("{environmentStatus}", report.getEnvironmentStatus());
+    if (subject.includes("{environmentStatus}")) {
+      subject = subject.replace("{environmentStatus}", report.getEnvironmentStatus());
     }
-    return subject;
+    reportConfig.$mailConfiguration.$mailSubject = subject;
   }
 
   private InitializeAssociatedChanges(report: Report, pipelineConfig: PipelineConfiguration): void {
