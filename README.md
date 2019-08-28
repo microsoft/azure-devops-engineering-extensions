@@ -63,7 +63,7 @@ npm run pack:t2 prod // Creates VSIX for pullRequestInsights
 ```
 Note: Option "dev" doesn't create a VSIX file. Instead, it prepares the output task folder ready for upload to an AzureDevOps account and test it.
 
-# HACK for azure-devops-node-api bug
+### HACK for azure-devops-node-api bug
 
 Currently, there's a bug in "queryTestResultsReportForBuild" API of azure-devops-node-api lib which causes a break in the email report data and make it report incorrectly. Until "9.0.2" version of this lib is released - below hack must be done:
 Go to "node_modules/azure-devops-node-api/Serialization.js" and change line number 216 from "return false" to "break". Should look like below. 
@@ -71,15 +71,15 @@ Go to "node_modules/azure-devops-node-api/Serialization.js" and change line numb
 Before publishing the emailreport task, do the same under "dist/emailreportextensions/emailreporttask/node_modules" folder (after running npm run pack:t1 but before tfx command). 
 
 ```
-                            if (lowerCaseEnumName !== enumName) {
-                                for (var name in enumType.enumValues) {
-                                    var value = enumType.enumValues[name];
-                                    if (name.toLowerCase() === lowerCaseEnumName) {
-                                        resultPart = value;
-                                        break; // replacing return false
-                                    }
-                                }
-                            }
+if (lowerCaseEnumName !== enumName) {
+    for (var name in enumType.enumValues) {
+        var value = enumType.enumValues[name];
+        if (name.toLowerCase() === lowerCaseEnumName) {
+            resultPart = value;
+            break; // replacing return false
+        }
+    }
+}
 ```
 
 ####
