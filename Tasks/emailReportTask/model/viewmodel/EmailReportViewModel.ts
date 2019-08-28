@@ -145,28 +145,14 @@ export class EmailReportViewModel {
 
   private GetPassPercentage(report: Report, includeOthersInTotal: boolean): string {
     var summary = report.testResultSummary;
-    var totalTests = 0;
-    var passedTests = 0;
-    var failedTests = 0;
-
+    let passedTests = 0, totalTests = 0;
     if (summary != null) {
-      const resultsByOutcomeFalse: AggregatedResultsByOutcome = (summary.aggregatedResultsAnalysis.resultsByOutcome as any).false;
-      const resultsByOutcomeTrue: AggregatedResultsByOutcome = (summary.aggregatedResultsAnalysis.resultsByOutcome as any).true;
-      if (!isNullOrUndefined(resultsByOutcomeFalse) && resultsByOutcomeFalse.outcome == TestOutcome.Passed) {
-        passedTests += resultsByOutcomeFalse.count;
-      }
 
-      if (!isNullOrUndefined(resultsByOutcomeTrue) && resultsByOutcomeFalse.outcome == TestOutcome.Passed) {
-        passedTests += resultsByOutcomeFalse.count;
-      }
+      const passedTestsAggregation = report.testResultSummary.aggregatedResultsAnalysis.resultsByOutcome[TestOutcome.Passed];
+      passedTests = isNullOrUndefined(passedTestsAggregation) ? 0 : passedTestsAggregation.count;
 
-      if (!isNullOrUndefined(resultsByOutcomeFalse) && resultsByOutcomeFalse.outcome == TestOutcome.Failed) {
-        failedTests += resultsByOutcomeFalse.count;
-      }
-
-      if (!isNullOrUndefined(resultsByOutcomeTrue) && resultsByOutcomeTrue.outcome == TestOutcome.Failed) {
-        failedTests += resultsByOutcomeTrue.count;
-      }
+      const failedTestsAggregation = report.testResultSummary.aggregatedResultsAnalysis.resultsByOutcome[TestOutcome.Failed];
+      const failedTests = isNullOrUndefined(failedTestsAggregation) ? 0 : failedTestsAggregation.count;
 
       totalTests = summary.aggregatedResultsAnalysis.totalTests;
 

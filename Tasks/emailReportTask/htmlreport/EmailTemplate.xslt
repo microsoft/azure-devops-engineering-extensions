@@ -1354,7 +1354,16 @@
                           </xsl:when>
                           <xsl:when test="HasSkipped = 'true'">
                             <div>⊘</div>
-                          </xsl:when>                          
+                          </xsl:when>   
+                          <xsl:when test="NotYetRun = 'true'">
+                            <div>🕓</div>
+                          </xsl:when>         
+                          <xsl:when test="HasPartiallySucceeded = 'true'">
+                            <div>⚠</div>
+                          </xsl:when>          
+                          <xsl:when test="GotCancelled = 'true'">
+                            <div>⏹</div>
+                          </xsl:when>                                                               
                           <xsl:otherwise>
                             <div>✔</div>
                           </xsl:otherwise>

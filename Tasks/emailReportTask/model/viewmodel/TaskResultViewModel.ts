@@ -12,7 +12,10 @@ export class TaskResultViewModel {
   public Duration: string;
   public HasFailed: boolean;
   public HasSkipped: boolean;
+  public NotYetRun: boolean; // tasks ahead of current email task
+  public HasPartiallySucceeded: boolean; 
   public HasNotRunOnSomeAgents: boolean;
+  public GotCancelled: boolean;
   public NotRunMessage: string;
   public IssuesSummary: TaskIssueSummaryViewModel;
   public Name: string;
@@ -24,6 +27,9 @@ export class TaskResultViewModel {
 
     this.HasFailed = tasks.filter(t => t.$status == TaskStatus.Failed || t.$status == TaskStatus.Canceled).length > 0;
     this.HasSkipped = tasks.filter(t => t.$status == TaskStatus.Skipped).length == tasks.length;
+    this.NotYetRun = tasks.filter(t => t.$status == TaskStatus.InProgress || t.$status == TaskStatus.Unknown || t.$status == TaskStatus.Pending).length > 0;
+    this.HasPartiallySucceeded = tasks.filter(t => t.$status == TaskStatus.PartiallySucceeded).length > 0;
+    this.GotCancelled = tasks.filter(t => t.$status == TaskStatus.Canceled).length > 0;
 
     if (tasks.length > 1) {
       this.HasNotRunOnSomeAgents = tasks.filter(t => t.$status == TaskStatus.Skipped).length > 0;
@@ -32,8 +38,8 @@ export class TaskResultViewModel {
 
     this.IssuesSummary = new TaskIssueSummaryViewModel(tasks);
 
-    // No point in calculating duration for skipped tasks
-    if (!this.HasSkipped) {
+    // No point in calculating duration for skipped/cancelled/not-yet-run tasks
+    if (!this.HasSkipped && !this.NotYetRun && !this.GotCancelled) {
       this.InitializeDuration(tasks.filter(t => t.$status != TaskStatus.Skipped));
     } else {
       this.Duration = "";

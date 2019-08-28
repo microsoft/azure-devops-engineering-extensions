@@ -8,7 +8,7 @@
       "type": "node",
       "request": "launch",
       "name": "Launch Program",
-      "program": "${workspaceFolder}\\js\\emailReportExtension\\emailReportTask\\tests\\__e_to_e_tests__\\InvokeTest.js",
+      "program": "${workspaceFolder}\\dist\\emailReportExtension\\emailReportTask\\tests\\__e_to_e_tests__\\InvokeTest.js",
       "outFiles": [
         "${workspaceFolder}/**/InvokeTest.js"
       ]

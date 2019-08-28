@@ -13,7 +13,7 @@
   "categories": [
     "Azure Pipelines"
   ],
-  "icons": {},
+  "icons": { "default": "images/outlook.png" },
   "tags": [],
   "scopes": [],
   "files": [

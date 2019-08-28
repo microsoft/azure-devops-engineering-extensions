@@ -23,6 +23,7 @@ export class EmailSender implements IReportSender {
     try {
       const result = await this.sendMailAsync(transporter, mailAddressViewModel, mailConfiguration, htmlReportMessage);
       console.log(`Mail Sent Successfully: ${result.response}`);
+      console.log("##vso[task.setvariable variable=EmailReportTask.EmailSent;]true");
     } catch(err) {
       throw new MailError(err);
     }

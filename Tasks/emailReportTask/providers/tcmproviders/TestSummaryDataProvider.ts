@@ -9,7 +9,7 @@ import { TestResultDetailsParserForRun } from "../helpers/TestResultDetailsParse
 import { TestOutcomeForPriority } from "../../model/testresults/TestOutcomeForPriority";
 import { TestResultDetailsParserForPriority } from "../helpers/TestResultDetailsParserForPriority";
 import { PipelineType } from "../../config/pipeline/PipelineType";
-import { TestResultsDetails, TestOutcome, AggregatedResultsByOutcome } from "azure-devops-node-api/interfaces/TestInterfaces";
+import { TestResultsDetails, TestOutcome } from "azure-devops-node-api/interfaces/TestInterfaces";
 import { ReportDataConfiguration } from "../../config/report/ReportDataConfiguration";
 import { TcmHelper } from "./TcmHelper";
 import { ReportFactory } from "../../model/ReportFactory";
@@ -32,10 +32,10 @@ export class TestSummaryDataProvider implements IDataProvider {
     report.testResultSummary = await this.testResultsClient.getTestResultSummaryAsync(true);
 
     // Hack - above testresultsummary is incomplete - bug filed
-    const passedResults = await this.testResultsClient.getTestResultsDetailsAsync("TestRun", [TestOutcome.Passed]);
-    const failedResults = await this.testResultsClient.getTestResultsDetailsAsync("TestRun", [TestOutcome.Failed]);
-    this.setOutComeData(report, testSummaryGroups, TestOutcome.Passed, passedResults);
-    this.setOutComeData(report, testSummaryGroups, TestOutcome.Failed, failedResults);
+    //const passedResults = await this.testResultsClient.getTestResultsDetailsAsync("TestRun", [TestOutcome.Passed]);
+    //const failedResults = await this.testResultsClient.getTestResultsDetailsAsync("TestRun", [TestOutcome.Failed]);
+    //this.setOutComeData(report, testSummaryGroups, TestOutcome.Passed, passedResults);
+    //this.setOutComeData(report, testSummaryGroups, TestOutcome.Failed, failedResults);
 
     if (reportDataConfiguration.$groupTestSummaryBy.includes(GroupTestResultsBy.Priority)) {
       testSummaryGroups.push(await this.getTestSummaryByPriorityAsync());
@@ -120,39 +120,39 @@ export class TestSummaryDataProvider implements IDataProvider {
     return testResultDetailsForOutcomes;
   }
 
-  // HACK
-  private setOutComeData(report: Report, summaryGroups: TestSummaryGroupModel[], outcome: TestOutcome, results: TestResultsDetails): void {
-    const outcomeObj = new AggregatedResultsByOutcomeImpl();
-    outcomeObj.count = 0;
-    outcomeObj.outcome = outcome;
-    outcomeObj.duration = 0;
-    results.resultsForGroup.forEach(resultsForGroup => {
+//   // HACK
+//   private setOutComeData(report: Report, summaryGroups: TestSummaryGroupModel[], outcome: TestOutcome, results: TestResultsDetails): void {
+//     const outcomeObj = new AggregatedResultsByOutcomeImpl();
+//     outcomeObj.count = 0;
+//     outcomeObj.outcome = outcome;
+//     outcomeObj.duration = 0;
+//     results.resultsForGroup.forEach(resultsForGroup => {
 
-      if (resultsForGroup.results.length > 0) {
-        summaryGroups.forEach(sg => {
-          sg.runs.forEach(sgr => {
-            if (sgr.$id == resultsForGroup.results[0].testRun.id) {
-              sgr.$testCountByOutcome.set(outcome, resultsForGroup.results.length);
-            }
-          });
-        });
-      }
+//       if (resultsForGroup.results.length > 0) {
+//         summaryGroups.forEach(sg => {
+//           sg.runs.forEach(sgr => {
+//             if (sgr.$id == resultsForGroup.results[0].testRun.id) {
+//               sgr.$testCountByOutcome.set(outcome, resultsForGroup.results.filter(r => !TcmHelper.isTestFlaky(r)).length);
+//             }
+//           });
+//         });
+//       }
 
-      outcomeObj.count += resultsForGroup.results.length;
-      resultsForGroup.results.forEach(r => {
-        outcomeObj.duration += isNaN(r.durationInMs) ? 0 : r.durationInMs;
-      });
-    });
-    report.testResultSummary.aggregatedResultsAnalysis.resultsByOutcome[outcome] = outcomeObj;
-  }
+//       outcomeObj.count += resultsForGroup.results.length;
+//       resultsForGroup.results.forEach(r => {
+//         outcomeObj.duration += isNaN(r.durationInMs) ? 0 : r.durationInMs;
+//       });
+//     });
+//     report.testResultSummary.aggregatedResultsAnalysis.resultsByOutcome[outcome] = outcomeObj;
+//   }
 
 }
 
-export class AggregatedResultsByOutcomeImpl implements AggregatedResultsByOutcome {
-  count?: number;
-  duration?: any;
-  groupByField?: string;
-  groupByValue?: any;
-  outcome?: TestOutcome;
-  rerunResultCount?: number;
-}
+// export class AggregatedResultsByOutcomeImpl implements AggregatedResultsByOutcome {
+//   count?: number;
+//   duration?: any;
+//   groupByField?: string;
+//   groupByValue?: any;
+//   outcome?: TestOutcome;
+//   rerunResultCount?: number;
+// }
