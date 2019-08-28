@@ -1,8 +1,8 @@
-import fs from 'fs';
 import { EmailReportViewModel } from '../model/viewmodel/EmailReportViewModel';
 import { IHTMLReportCreator } from './IHTMLReportCreator';
 import { Report } from '../model/Report';
 import { ReportConfiguration } from '../config/ReportConfiguration';
+const fs = require("fs");
 const js2xmlparser = require("js2xmlparser");
 const xsltProcessor = require("xslt-processor");
 const { xmlParse, xsltProcess } = xsltProcessor;

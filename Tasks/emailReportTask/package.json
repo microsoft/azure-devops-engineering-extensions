@@ -1,9 +1,11 @@
 {
-  "name": "emailreporttask",
-  "version": "1.0.0",
-  "description": "",
+  "name": "azure-devops-emailreporttask",
+  "version": "1.0.0-preview.2",
+  "description": "For Private Use ONLY by Author. Not Supported in any way.",
   "author": "",
   "license": "ISC",
+  "main": "../../dist/emailReportExtension/emailReportTask/index.js",
+  "types": "../../dist/emailReportExtension/emailReportTask/index.d.ts",
   "dependencies": {
     "azure-devops-node-api": "^8.0.0",
     "azure-pipelines-task-lib": "^2.8.0",
