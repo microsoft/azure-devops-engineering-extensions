@@ -31,6 +31,13 @@ export class TaskResultViewModel {
     this.HasPartiallySucceeded = tasks.filter(t => t.$status == TaskStatus.PartiallySucceeded).length > 0;
     this.GotCancelled = tasks.filter(t => t.$status == TaskStatus.Canceled).length > 0;
 
+    const inProgressTasks = tasks.filter(t => t.$status == TaskStatus.InProgress);
+    if(inProgressTasks.length == 1) {
+      // Must be this task - Mark it as completed assuming we will pass
+      // If we don't, then the email report won't be sent with this data
+      this.NotYetRun = false;
+    }
+
     if (tasks.length > 1) {
       this.HasNotRunOnSomeAgents = tasks.filter(t => t.$status == TaskStatus.Skipped).length > 0;
       this.NotRunMessage = `Not run on ${tasks.filter(t => t.$status == TaskStatus.Skipped).length}/${tasks.length} agents`;

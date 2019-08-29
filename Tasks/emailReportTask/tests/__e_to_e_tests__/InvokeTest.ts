@@ -73,7 +73,7 @@ export class MockConfigProvider implements IConfigurationProvider {
     return new MailConfiguration("[{environmentStatus}] {passPercentage} tests passed in $(Release.EnvironmentName) environment for $(Build.BuildNumber)",
       new RecipientsConfiguration("svajjala@microsoft.com", false, false, false, false),
       new RecipientsConfiguration("svajjala@microsoft.com", false, false, false, false),
-      new SmtpConfiguration(smtpUser, smtpPassword, "smtp.live.com", false),
+      new SmtpConfiguration(smtpUser, smtpPassword, "smtp.office365.com", true),
       "microsoft.com");
   }
 
