@@ -3,6 +3,7 @@ import { MailConfiguration } from "./config/mail/MailConfiguration";
 import { MailAddressViewModel } from "./model/viewmodel/MailAddressViewModel";
 import { Report } from "./model/Report";
 import { MailError } from "./exceptions/MailError";
+import { isNullOrUndefined } from "util";
 const nodemailer = require("nodemailer");
 
 export class EmailSender implements IReportSender {
@@ -37,6 +38,7 @@ export class EmailSender implements IReportSender {
       await transporter.sendMail({
         from: mailAddressViewModel.from,
         to: mailAddressViewModel.to.join(","),
+        cc: isNullOrUndefined(mailAddressViewModel.cc) || mailAddressViewModel.cc.length < 1 ? null : mailAddressViewModel.cc.join(","),
         subject: mailConfiguration.$mailSubject,
         html: message
       },
