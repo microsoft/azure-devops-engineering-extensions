@@ -27,8 +27,25 @@ exec(npmInstallCommand, function (error) {
   }
 });
 
+const fs = require("fs");
+var imagesDir = path.resolve(common.TaskSrcDir, "images");
+if (fs.existsSync(imagesDir)) {
+  var files = fs.readdirSync(imagesDir);
+  //listing all files using forEach
+  files.forEach(function (file) {
+    // Do whatever you want to do with the file
+    if (file.endsWith(".png")) {
+      common.CopyFile(imagesDir, file, `${common.ExtensionOutDir}/images/`);
+    }
+  });
+
+  if(fs.existsSync(path.resolve(imagesDir, "icon.png"))) {
+    common.CopyFile(imagesDir, "icon.png", `${common.TaskOutDir}`);
+  }
+}
+
 // Package extension only for prod
-if(common.ReleaseType.toLowerCase() == "prod") {
+if (common.ReleaseType.toLowerCase() == "prod") {
   var command = `tfx extension create --rev-version --root ${common.ExtensionOutDir} --output-path dist/ --manifest-globs ${extJsonFile} --extension-id ${extensionId} --no-prompt`;
   console.log(`Running: ${command}`);
   exec(command, function (error) {

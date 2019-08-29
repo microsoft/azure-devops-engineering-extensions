@@ -38,7 +38,7 @@ export class ReleaseRestClient extends AbstractClient implements IPipelineRestCl
       null,
       null,
       ReleaseQueryOrder.Descending,
-      1,
+      2,
       null,
       ReleaseExpands.Environments,
       null,
@@ -47,11 +47,15 @@ export class ReleaseRestClient extends AbstractClient implements IPipelineRestCl
       sourceBranchFilter
     );
 
-    if (releases != null && release.length < 1) {
+    if (releases != null && releases.length < 1) {
       console.log(`Unable to fetch last completed release for release definition:${pipelineDefId} and environmentid: ${envDefId}`);
     }
-    else {
+    else {      
+      // Ideally, first one should be last completed one. Unless someone's running the report after the release has completed for some reason. 
       lastRelease = releases[0];
+      if(lastRelease.id == this.pipelineConfig.$pipelineId && releases.length > 1) {
+        lastRelease = releases[1];
+      }
     }
 
     return lastRelease;

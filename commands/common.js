@@ -14,7 +14,6 @@ console.log(`ExtensionName: '${extName}', ReleaseType: '${taskReleaseType}'`);
 
 const fs = require('fs');
 const path = require('path');
-console.log(`Current dir: ${__dirname}`);
 const extensionOutDir = path.resolve(`${__dirname}/../dist/${extName}Extension/`);
 const taskOutDir = path.resolve(`${extensionOutDir}/${extName}Task/`);
 const taskSrcDir = path.resolve(`${__dirname}/../Tasks/${extName}Task/`);
