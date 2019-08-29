@@ -40,6 +40,10 @@ export class TimeFormatter {
     // 4- Keep only seconds not extracted to minutes:
     seconds = seconds % 60;
     seconds = Math.round(seconds);
+    if(minutes == 60) {
+      hours += 1;
+      minutes = 0;
+    }
     return this.getCombinedTimeString(hours, minutes, seconds);
   }
 
