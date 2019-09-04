@@ -19,6 +19,7 @@ import { BuildReferenceViewModel } from "./BuildReferenceViewModel";
 export class EmailReportViewModel {
 
   public DataMissing: boolean;
+  public HasTestResultsToShow: boolean;
   public HasFailedTests: boolean;
   public HasFilteredTests: boolean;
   public HasTaskFailures: boolean;
@@ -41,7 +42,7 @@ export class EmailReportViewModel {
     this.ProjectName = reportConfiguration.$pipelineConfiguration.$projectName;
     this.HasTaskFailures = report.hasFailedTasks();
 
-    if(reportConfiguration.$pipelineConfiguration.$pipelineType == PipelineType.Build) {
+    if (reportConfiguration.$pipelineConfiguration.$pipelineType == PipelineType.Build) {
       this.Build = report.getPipelineViewModel(reportConfiguration.$pipelineConfiguration) as BuildReferenceViewModel;
     } else {
       this.Release = report.getPipelineViewModel(reportConfiguration.$pipelineConfiguration) as ReleaseViewModel;
@@ -141,6 +142,19 @@ export class EmailReportViewModel {
     }
 
     this.HasFilteredTests = report.hasFilteredTests;
+
+    if (this.TestResultsGroups.TestResultsGroupViewModel.length > 0) {
+      const testResultsConfig = reportConfig.$reportDataConfiguration.$testResultsConfig;
+      if (testResultsConfig.$includePassedTests) {
+        this.HasTestResultsToShow = this.HasTestResultsToShow || this.TestResultsGroups.TestResultsGroupViewModel.filter(t => t.PassedTests.TestResultViewModel.length > 0).length > 0;
+      }
+      if (testResultsConfig.$includeFailedTests) {
+        this.HasTestResultsToShow = this.HasTestResultsToShow || this.TestResultsGroups.TestResultsGroupViewModel.filter(t => t.FailedTests.TestResultViewModel.length > 0).length > 0;
+      }
+      if (testResultsConfig.$includeOtherTests) {
+        this.HasTestResultsToShow = this.HasTestResultsToShow || this.TestResultsGroups.TestResultsGroupViewModel.filter(t => t.OtherTests.TestResultViewModel.length > 0).length > 0;
+      }
+    }
   }
 
   private GetPassPercentage(report: Report, includeOthersInTotal: boolean): string {

@@ -112,40 +112,35 @@ export abstract class Report {
 
   public abstract getArtifactViewModels(config: PipelineConfiguration): ArtifactViewModel[];
 
-  hasFailedTests(includeOthersInTotal: boolean): boolean {
-    if (this.testResultSummary == null) {
+  public hasFailedTests(includeOthersInTotal: boolean): boolean {
+    if (isNullOrUndefined(this.testResultSummary)) {
       return false;
     }
 
-    let passedTests = 0;
-    const resultsByOutcomeFalse: AggregatedResultsByOutcome = (this.testResultSummary.aggregatedResultsAnalysis.resultsByOutcome as any).false;
-    const resultsByOutcomeTrue: AggregatedResultsByOutcome = (this.testResultSummary.aggregatedResultsAnalysis.resultsByOutcome as any).true;
-
     if (!includeOthersInTotal) {
-      let failedTests = 0;
-      if (!isNullOrUndefined(resultsByOutcomeFalse) && resultsByOutcomeFalse.outcome == TestOutcome.Failed) {
-        failedTests += resultsByOutcomeFalse.count;
-      }
-
-      if (!isNullOrUndefined(resultsByOutcomeTrue) && resultsByOutcomeTrue.outcome == TestOutcome.Failed) {
-        failedTests += resultsByOutcomeTrue.count;
-      }
-      return failedTests > 0;
+      return this.getTestCountForOutcome(TestOutcome.Failed) > 0;
     }
 
-    if (!isNullOrUndefined(resultsByOutcomeFalse) && resultsByOutcomeFalse.outcome == TestOutcome.Failed) {
-      passedTests += resultsByOutcomeFalse.count;
+    // Others need to be included - Calculate failed as (total - passed)
+    const passedCount = this.getTestCountForOutcome(TestOutcome.Passed);
+    if (passedCount > 0) {
+      return (this.testResultSummary.aggregatedResultsAnalysis.totalTests - passedCount) > 0;
     }
 
-    if (!isNullOrUndefined(resultsByOutcomeTrue) && resultsByOutcomeTrue.outcome == TestOutcome.Failed) {
-      passedTests += resultsByOutcomeTrue.count;
-    }
-
-    if (passedTests > 0) {
-      return this.testResultSummary.aggregatedResultsAnalysis.totalTests - passedTests > 0;
-    }
-
+    // If no passed tests, then anything ran should be considered as failed since "other" outcomes need to be considered as failures
+    // if no tests ran, then we don't have failed tests 
     return this.testResultSummary.aggregatedResultsAnalysis.totalTests > 0;
+  }
+
+  private getTestCountForOutcome(outcome: TestOutcome) : number {
+    const resultsByOutcome = this.testResultSummary.aggregatedResultsAnalysis.resultsByOutcome;
+
+      let testsForOutcome = 0;
+      if (!isNullOrUndefined(resultsByOutcome) && !isNullOrUndefined(resultsByOutcome[outcome])) {
+        testsForOutcome += resultsByOutcome[outcome].count;
+      }
+
+      return testsForOutcome;
   }
 
   public abstract hasCanceledPhases(): boolean;
