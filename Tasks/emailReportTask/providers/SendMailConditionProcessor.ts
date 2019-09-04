@@ -8,6 +8,7 @@ import { TestResultSummary, TestOutcome, TestCaseResult, TestResultsQuery } from
 import { isNullOrUndefined } from "util";
 import { TcmHelper } from "./tcmproviders/TcmHelper";
 import { TestResultsQueryImpl } from "./restclients/AbstractTestResultsClient";
+import { EnumUtils } from "../utils/EnumUtils";
 
 export class SendMailConditionProcessor implements IPostProcessor {
   private testResultsClient: ITestResultsClient;
@@ -41,8 +42,8 @@ export class SendMailConditionProcessor implements IPostProcessor {
             console.log(`Has Phase cancellation(s) issues. Treating as new failure.`);
           }
           else {
-            console.log(`Looking for new failures, as the user send mail condition is '${sendMailCondition}'.`);
-            shouldSendMail = !this.hasPreviousReleaseGotSameFailuresAsync(report, reportConfig.$pipelineConfiguration, hasTestFailures, hasFailedTasks);
+            console.log(`Looking for new failures, as the user send mail condition is '${EnumUtils.GetMailConditionString(sendMailCondition)}'.`);
+            shouldSendMail = !(await this.hasPreviousReleaseGotSameFailuresAsync(report, reportConfig.$pipelineConfiguration, hasTestFailures, hasFailedTasks));
           }
         }
       }

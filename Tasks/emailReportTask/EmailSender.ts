@@ -3,6 +3,7 @@ import { MailConfiguration } from "./config/mail/MailConfiguration";
 import { MailAddressViewModel } from "./model/viewmodel/MailAddressViewModel";
 import { Report } from "./model/Report";
 import { MailError } from "./exceptions/MailError";
+import { isNullOrUndefined } from "util";
 const nodemailer = require("nodemailer");
 
 export class EmailSender implements IReportSender {
@@ -13,7 +14,7 @@ export class EmailSender implements IReportSender {
     let transporter = nodemailer.createTransport({
       host: mailConfiguration.$smtpConfig.$smtpHost,
       port: 587,
-      secure: mailConfiguration.$smtpConfig.$enableSSL, // SSL
+      tls:  mailConfiguration.$smtpConfig.$enableTLS,
       auth: {
         user: mailConfiguration.$smtpConfig.$userName,
         pass: mailConfiguration.$smtpConfig.$password
@@ -23,6 +24,7 @@ export class EmailSender implements IReportSender {
     try {
       const result = await this.sendMailAsync(transporter, mailAddressViewModel, mailConfiguration, htmlReportMessage);
       console.log(`Mail Sent Successfully: ${result.response}`);
+      console.log("##vso[task.setvariable variable=EmailReportTask.EmailSent;]true");
     } catch(err) {
       throw new MailError(err);
     }
@@ -36,6 +38,7 @@ export class EmailSender implements IReportSender {
       await transporter.sendMail({
         from: mailAddressViewModel.from,
         to: mailAddressViewModel.to.join(","),
+        cc: isNullOrUndefined(mailAddressViewModel.cc) || mailAddressViewModel.cc.length < 1 ? null : mailAddressViewModel.cc.join(","),
         subject: mailConfiguration.$mailSubject,
         html: message
       },

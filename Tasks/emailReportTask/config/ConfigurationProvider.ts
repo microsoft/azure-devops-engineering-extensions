@@ -12,7 +12,6 @@ import { GroupTestResultsBy } from "./report/GroupTestResultsBy";
 import { PipelineConfiguration } from "./pipeline/PipelineConfiguration";
 import { PipelineType } from "./pipeline/PipelineType";
 import { StringUtils } from "../utils/StringUtils";
-import { EndpointAuthorization } from "azure-devops-node-api/interfaces/TaskAgentInterfaces";
 
 export class ConfigurationProvider implements IConfigurationProvider {
   private pipelineConfiguration: PipelineConfiguration;
@@ -70,8 +69,6 @@ export class ConfigurationProvider implements IConfigurationProvider {
 
   private initMailConfiguration(): void {
     const smtpConnectionId = tl.getInput(TaskConstants.SMTPCONNECTION_INPUTKEY, true);
-    console.log(`smtpConnection: ${smtpConnectionId}`);
-
     const endPointScheme = tl.getEndpointAuthorizationScheme(smtpConnectionId, true);
     if (endPointScheme != "UsernamePassword") {
       throw new InputError(`Incorrect EndPoint Scheme Provided - '${endPointScheme}'. Only UserName and Password type Endpoints allowed.`);
@@ -80,10 +77,9 @@ export class ConfigurationProvider implements IConfigurationProvider {
     const smtpHost = tl.getEndpointUrl(smtpConnectionId, true).replace(/(^\w+:|^)\/\//, '').replace(/\/$/, '');
     const userName = tl.getEndpointAuthorizationParameter(smtpConnectionId, "UserName", true);
     const password = tl.getEndpointAuthorizationParameter(smtpConnectionId, "Password", true);
-    const enableSSLOnSmtpConnection = tl.getBoolInput(TaskConstants.ENABLESSL_INPUTKEY, true);
+    const enableTLS = tl.getBoolInput(TaskConstants.ENABLESSL_INPUTKEY, true);
 
-    console.log(`SmtpHost: ${smtpHost}, SmtpUser: ${userName}`);
-    const smtpConfig = new SmtpConfiguration(userName, password, smtpHost, enableSSLOnSmtpConnection);
+    const smtpConfig = new SmtpConfiguration(userName, password, smtpHost, enableTLS);
 
     // Mail Subject
     const mailSubject = tl.getInput(TaskConstants.SUBJECT_INPUTKEY, true);

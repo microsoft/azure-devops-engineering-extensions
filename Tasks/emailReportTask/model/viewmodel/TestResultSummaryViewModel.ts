@@ -1,7 +1,7 @@
 import { TestSummaryItemModel } from "../testresults/TestSummaryItemModel";
 import { PipelineConfiguration } from "../../config/pipeline/PipelineConfiguration";
 import { TimeFormatter } from "../helpers/TimeFormatter";
-import { TestResultSummary, AggregatedResultsByOutcome, TestOutcome } from "azure-devops-node-api/interfaces/TestInterfaces";
+import { TestResultSummary, TestOutcome } from "azure-devops-node-api/interfaces/TestInterfaces";
 import { TestResultsHelper } from "../helpers/TestResultsHelper";
 import { isNullOrUndefined } from "util";
 

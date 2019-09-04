@@ -2,13 +2,13 @@ export class SmtpConfiguration {
   private userName: string;
   private password: string;
   private smtpHost: string;
-  private enableSSL: boolean;
+  private enableTLS: boolean;
 
-  constructor($userName: string, $password: string, $smtpHost: string, $enableSSL: boolean) {
+  constructor($userName: string, $password: string, $smtpHost: string, $enableTLS: boolean) {
     this.userName = $userName;
     this.password = $password;
     this.smtpHost = $smtpHost;
-    this.enableSSL = $enableSSL;
+    this.enableTLS = $enableTLS;
   }
 
   /**
@@ -39,7 +39,7 @@ export class SmtpConfiguration {
    * Getter $enableSSL
    * @return {boolean}
    */
-  public get $enableSSL(): boolean {
-    return this.enableSSL;
+  public get $enableTLS(): boolean {
+    return this.enableTLS;
   }
 }

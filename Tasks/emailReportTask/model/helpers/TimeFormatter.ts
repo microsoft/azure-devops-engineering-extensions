@@ -1,6 +1,33 @@
 import { isNullOrUndefined } from "util";
 
 export class TimeFormatter {
+  static ConvertTimeStringToMilliSeconds(duration: string) : number {
+    const timeSpanArray = duration.split(".");
+    let durationNum: number = 0;
+
+    let hmsIndex = 0;
+    if(timeSpanArray.length > 3) {
+      console.warn("cannot format time duration");
+      return 0;
+    } else if(timeSpanArray.length == 3) {
+      // Eg: 1.03:04:05.567 = 1 day, 3 hours, 4 min, 5 seconds and 567 ms. 
+      // Days to ms
+      durationNum += Number(timeSpanArray[0]) * 24 * 3600;
+      hmsIndex = 1;
+    } 
+
+    let timeStrArray = timeSpanArray[hmsIndex].split(":");
+
+    if(timeStrArray.length != 3) {
+      console.warn("cannot format time duration properly. test run duration will not be accurate");
+    } else {
+      durationNum += Number(timeStrArray[2]); // secs
+      durationNum += Number(timeStrArray[1]) * 60; // mins to secs
+      durationNum += Number(timeStrArray[0]) * 3600; // hours to secs
+    }
+    return durationNum * 1000;
+  }
+
   public static FormatDuration(timeInMilliseconds: number): string {
     let timeStr = "";
     // 1- Convert to seconds:
@@ -13,6 +40,10 @@ export class TimeFormatter {
     // 4- Keep only seconds not extracted to minutes:
     seconds = seconds % 60;
     seconds = Math.round(seconds);
+    if(minutes == 60) {
+      hours += 1;
+      minutes = 0;
+    }
     return this.getCombinedTimeString(hours, minutes, seconds);
   }
 

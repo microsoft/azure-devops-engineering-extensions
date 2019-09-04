@@ -66,14 +66,14 @@ export class MockConfigProvider implements IConfigurationProvider {
 
   getPipelineConfiguration(): PipelineConfiguration {
     //return new PipelineConfiguration(PipelineType.Build, 10176130, "AzureDevOps", "AzureDevOps", null, null, true, "https://dev.azure.com/mseng", accessKey);
-    return new PipelineConfiguration(PipelineType.Release, 11571808, "AzureDevOps", "AzureDevOps", 133233996, 9462, true, "https://dev.azure.com/mseng", accessKey);
+    return new PipelineConfiguration(PipelineType.Release, 11974885, "AzureDevOps", "AzureDevOps", 137206709, 9538, true, "https://dev.azure.com/mseng", accessKey);
   }
 
   getMailConfiguration(): MailConfiguration {
     return new MailConfiguration("[{environmentStatus}] {passPercentage} tests passed in $(Release.EnvironmentName) environment for $(Build.BuildNumber)",
       new RecipientsConfiguration("svajjala@microsoft.com", false, false, false, false),
       new RecipientsConfiguration("svajjala@microsoft.com", false, false, false, false),
-      new SmtpConfiguration(smtpUser, smtpPassword, "smtp.live.com", false),
+      new SmtpConfiguration(smtpUser, smtpPassword, "smtp.office365.com", true),
       "microsoft.com");
   }
 

@@ -1,6 +1,7 @@
 import { TestResultsDetails, TestResultsDetailsForGroup, AggregatedResultsByOutcome, TestOutcome, TestCaseResult } from "azure-devops-node-api/interfaces/TestInterfaces";
 import { TestSummaryItemModel } from "../../model/testresults/TestSummaryItemModel";
 import { isNullOrUndefined } from "util";
+import { TimeFormatter } from "../../model/helpers/TimeFormatter";
 
 export abstract class AbstractTestResultsDetailsParser {
 
@@ -20,31 +21,27 @@ export abstract class AbstractTestResultsDetailsParser {
   /// </summary>
   protected parseBaseData(resultsForGroup: TestResultsDetailsForGroup, summaryItem: TestSummaryItemModel): void {
     let duration: number = 0;
-    // //      for(let item in TestOutcome) {
-    //         //let outcome: TestOutcome = index;
-    //         const resultsCountByOutcomeAny: any = resultsForGroup.resultsCountByOutcome;
-    //         const resultsCountByOutComeFalse = resultsCountByOutcomeAny.false;
-    //         const resultsCountByOutComeTrue = resultsCountByOutcomeAny.true;
+    for (let item in TestOutcome) {
+      if (!isNaN(Number(item))) {
+        const resultsByOutCome = resultsForGroup.resultsCountByOutcome[Number(item)];
+        if (!isNullOrUndefined(resultsByOutCome)) {
+          summaryItem.$testCountByOutcome.set(resultsByOutCome.outcome, resultsByOutCome.count);
+          duration += TimeFormatter.ConvertTimeStringToMilliSeconds(resultsByOutCome.duration);
+        }
+      }
+    }
 
-    //         if(!isNullOrUndefined(resultsCountByOutComeFalse)) {
-    //           const aggrResultsByOutCome: AggregatedResultsByOutcome = resultsCountByOutComeFalse;
-    //           summaryItem.$testCountByOutcome.set(aggrResultsByOutCome.outcome, aggrResultsByOutCome.count);
-    //           duration += aggrResultsByOutCome.duration;
-    //         }
-    //         //index++;
-    //       //}
-
-    // HACK - SHould get data directly from resultsGroup.resultsCountByOutcome - but that data is coming wrong
-    resultsForGroup.results.forEach(r => {
-      duration += isNaN(r.durationInMs) ? 0 : r.durationInMs;
-    });
+    // // HACK - SHould get data directly from resultsGroup.resultsCountByOutcome - but that data is coming wrong
+    // resultsForGroup.results.forEach(r => {
+    //   duration += isNaN(r.durationInMs) ? 0 : r.durationInMs;
+    // });
 
     summaryItem.$duration = duration;
     summaryItem.$totalTestCount = resultsForGroup.results.length;
   }
 
-  // HACK
-  private isMatch(result: TestCaseResult, outcome: TestOutcome, outcomeString: string): boolean {
-    return (!isNullOrUndefined(result.outcome) && result.outcome == outcome.toString() && outcomeString == result.outcome.toLowerCase());
-  }
+  // // HACK
+  // private isMatch(result: TestCaseResult, outcome: TestOutcome, outcomeString: string): boolean {
+  //   return (!isNullOrUndefined(result.outcome) && result.outcome == outcome.toString() && outcomeString == result.outcome.toLowerCase());
+  // }
 }
