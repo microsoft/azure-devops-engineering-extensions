@@ -19,6 +19,10 @@
     "e2e:prinsights": "node js/pullRequestInsightsExtension/pullRequestInsightsTask/tests/__e_to_e_tests__/InvokeTest.js",
     "clean": "rimraf dist *.vsix"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/microsoft/azure-devops-engineering-extensions.git"
+  },
   "author": "",
   "license": "ISC",
   "dependencies": {
@@ -46,5 +50,8 @@
     "ts-jest": "^24.0.2",
     "ts-loader": "^6.0.4",
     "typescript": "^3.5.3"
+  },
+  "optionalDependencies": {
+    "fsevents": "*"
   }
 }
