@@ -17,7 +17,7 @@ async function run(): Promise<void> {
     setEnvironmentConfigurations(environmentConfigurations, data);
     setUserInputs(data);
     data.setStatusLink(tl.getInput("checkStatusLink"));
-    console.log("pipline data: " + JSON.stringify(data));
+    console.log("pipeline data: " + JSON.stringify(data));
 
     if (!data.getPullRequestId()) {
       console.log(messages.notInPullRequestMessage);
