@@ -131,7 +131,7 @@ export class MailAddressViewModel {
 
   private getValidEmailAddress(address: string): string {
     if (!StringUtils.isNullOrWhiteSpace(address) && !this.isValidEmail(address)) {
-      console.log(`Email address {address} is not valid. Adding @microsoft.com`);
+      console.log(`Address ${address} is not a valid email address. Adding domain: ${this.defaultDomain}`);
       address = `${address}@${this.defaultDomain}`;
     }
 

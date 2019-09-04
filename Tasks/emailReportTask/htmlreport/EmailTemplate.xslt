@@ -1,9 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:msxsl="urn:schemas-microsoft-com:xslt" exclude-result-prefixes="msxsl">
+<xsl:stylesheet version="1.0"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:msxsl="urn:schemas-microsoft-com:xslt" exclude-result-prefixes="msxsl">
   <xsl:output method="html" indent="yes" />
-
   <xsl:template match="/">
     <html>
       <head>
@@ -13,7 +12,6 @@
         <title>
           <xsl:value-of select="EmailReportViewModel/Title" />
         </title>
-
         <style>                  
           .single-line {
           white-space: nowrap;
@@ -516,7 +514,6 @@
           stroke-miterlimit: 10;
           }
         </style>
-
       </head>
       <body>
         <div style="display:none;font-size: 1px;  max-height: 0px; max-width: 0px; opacity: 0; overflow: hidden;">
@@ -529,9 +526,13 @@
             <tr>
               <td style="background: #e8e8e8;"></td>
               <td width="660" style="background: #ffffff;">
-                <!--[if (gte mso 9)|(IE)]> 
-<table border="0" cellpadding="0" cellspacing="0" style="width:660px; height:0;"><tr><td style="background:#e8e8e8;"></td></tr></table> 
-<![endif]-->
+                <!--[if (gte mso 9)|(IE)]>
+                <table border="0" cellpadding="0" cellspacing="0" style="width:660px; height:0;">
+                  <tr>
+                    <td style="background:#e8e8e8;"></td>
+                  </tr>
+                </table>
+                <![endif]-->
                 <!-- INNER WRAPPER -->
                 <table border="0" cellpadding="0" cellspacing="0" style="width: 100%;">
                   <!-- TOP BANNER -->
@@ -547,7 +548,6 @@
                     </xsl:choose>
                   </tr>
                   <!-- /TOP BANNER -->
-
                   <!-- SECTION HERO fff1f0 fad8e0-->
                   <tr>
                     <td valign="middle">
@@ -586,7 +586,6 @@
                                         </td>
                                       </tr>
                                     </xsl:if>
-
                                     <tr>
                                       <td style="padding:20px 0px 0 0px">
                                         <table cellpadding="0" border="0" cellspacing="0" class="info-table">
@@ -672,6 +671,7 @@
                                                                   select="EmailReportViewModel/AllTests/Url" />
                                                               </xsl:attribute>
                                                               View all results
+                                                            
                                                             </a>
                                                           </td>
                                                           <td style="width: 8px;" class="mobile-hide"></td>
@@ -705,7 +705,6 @@
                       </tr>
                     </xsl:if>
                   </xsl:for-each>
-
                   <xsl:if test="EmailReportViewModel/HasTestResultsToShow = 'true'">
                     <xsl:choose>
                       <xsl:when test="EmailReportViewModel/TestResultsGroups/TestResultsGroupViewModel">
@@ -723,11 +722,13 @@
                                     <td
                                       style="padding:0px 30px 30px 30px;font-family: Segoe UI Semibold, Segoe UI, Helvetica, Arial, sans-serif;">
                                       Test results are truncated.
+                                      
                                       <a>
                                         <xsl:attribute name="href">
                                           <xsl:value-of select="EmailReportViewModel/TestTabLink" />
                                         </xsl:attribute>
                                         View all results
+                                      
                                       </a>
                                     </td>
                                   </tr>
@@ -762,19 +763,20 @@
                       </tr>
                     </xsl:when>
                   </xsl:choose>
-
                   <xsl:choose>
                     <xsl:when test="EmailReportViewModel/DataMissing = 'true'">
                       <tr>
                         <td
                           style="font-family: Segoe UI Semibold, Segoe UI, Helvetica, Arial, sans-serif;padding:10px 30px 20px 30px;color:red;border-bottom: 2px solid #e8e8e8;">
                           Failed to get all data for the email report. Please look at the Email Report task log under
+                          
                           <xsl:if test="EmailReportViewModel/Build != ''">
                             <a>
                               <xsl:attribute name="href">
                                 <xsl:value-of select="EmailReportViewModel/Build/Url" />
                               </xsl:attribute>
                               build logs.
+                            
                             </a>
                           </xsl:if>
                           <xsl:if test="EmailReportViewModel/Release != ''">
@@ -783,13 +785,13 @@
                                 <xsl:value-of select="EmailReportViewModel/Release/ReleaseLogsLink" />
                               </xsl:attribute>
                               release logs.
+                            
                             </a>
                           </xsl:if>
                         </td>
                       </tr>
                     </xsl:when>
                   </xsl:choose>
-
                   <!-- FOOTER -->
                   <tr>
                     <td class="mobile-center" style="padding: 0 30px; text-align: left; background:#dddddd;">
@@ -826,8 +828,7 @@
                         </tr>
                         <tr>
                           <td class="mobile-center"
-                              style="padding: 7px 0; font-size: 12px; line-height: 5px; font-family: Segoe UI, Helvetica, Arial, sans-serif;  color:#444444; text-align: left;">
-                          </td>
+                              style="padding: 7px 0; font-size: 12px; line-height: 5px; font-family: Segoe UI, Helvetica, Arial, sans-serif;  color:#444444; text-align: left;"></td>
                         </tr>
                       </table>
                     </td>
@@ -835,7 +836,6 @@
                   <!-- /FOOTER -->
                 </table>
                 <!-- /INNER WRAPPER -->
-
               </td>
               <td style="background: #e8e8e8;"></td>
             </tr>
@@ -844,7 +844,6 @@
       </body>
     </html>
   </xsl:template>
-
   <xsl:template match="EmailReportViewModel" mode="failed-banner">
     <td style="padding: 10px 30px 10px 30px; background:#DA0A00;">
       <table border="0" cellpadding="0" cellspacing="0" class="mobile-center" style="vertical-align: middle;">
@@ -868,7 +867,6 @@
       </table>
     </td>
   </xsl:template>
-
   <xsl:template match="EmailReportViewModel" mode="success-banner">
     <td style="padding: 10px 30px 10px 30px; background:#339933;">
       <table border="0" cellpadding="0" cellspacing="0" class="mobile-center" style="vertical-align: middle;">
@@ -892,7 +890,6 @@
       </table>
     </td>
   </xsl:template>
-
   <xsl:template match="TestSummaryGroupViewModel">
     <table style="text-align: left; width: 100%;">
       <tr style="background:rgb(240,249,254);">
@@ -942,7 +939,6 @@
       </xsl:for-each>
     </table>
   </xsl:template>
-
   <xsl:template match="TestResultsGroups">
     <xsl:for-each select="TestResultsGroupViewModel">
       <table style="text-align: left; width: 100%;">
@@ -962,12 +958,9 @@
             </table>
           </td>
         </tr>
-
       </table>
-
     </xsl:for-each>
   </xsl:template>
-
   <xsl:template match="TestResultViewModel">
     <tr>
       <td style="padding: 0px 0px 20px 0px">
@@ -988,7 +981,6 @@
                     </xsl:otherwise>
                   </xsl:choose>
                 </xsl:otherwise>
-
               </xsl:choose>
             </td>
             <td style="font-family: Segoe UI Semibold, Segoe UI, Helvetica, Arial, sans-serif;">
@@ -1057,7 +1049,6 @@
               </td>
               <td style="text-align: right;"></td>
             </tr>
-
           </xsl:if>
           <xsl:choose>
             <xsl:when test="ErrorMessage != ''">
@@ -1127,6 +1118,7 @@
                                         select="CreateBugLink" />
                                     </xsl:attribute>
                                     Create Bug
+                                  
                                   </a>
                                 </td>
                                 <td style="width: 8px;" class="mobile-hide"></td>
@@ -1141,13 +1133,10 @@
               </td>
             </tr>
           </xsl:if>
-
-
         </table>
       </td>
     </tr>
   </xsl:template>
-
   <xsl:template match="WorkItemViewModel">
     <table style="border-radius:0px;border-left:6px solid rgb(204, 41, 61)">
       <tr>
@@ -1181,30 +1170,32 @@
                   </xsl:when>
                 </xsl:choose>
                 ●
+              
               </td>
               <td style="padding:0px 0px 0px 5px">
                 <xsl:value-of select="State" />
               </td>
             </tr>
           </table>
-
         </td>
         <td style="padding:0px 0px 0px 10px">
           <xsl:value-of select="Title" />
         </td>
       </tr>
-      <xsl:choose>
-        <xsl:when test="AssignedTo">
-          <tr>
-            <td colspan="3" class="comment" style="padding-left:10px;">
+      <tr>
+        <td colspan="3" class="comment" style="padding-left:10px;">
+          <xsl:choose>
+            <xsl:when test=" (AssignedTo) and (AssignedTo  = '') ">
+              Unassigned
+            </xsl:when>
+            <xsl:otherwise>
               Assigned to <xsl:value-of select="AssignedTo" />
-            </td>
-          </tr>
-        </xsl:when>
-      </xsl:choose>
+            </xsl:otherwise>
+          </xsl:choose>
+        </td>
+      </tr>
     </table>
   </xsl:template>
-
   <xsl:template match="AllTests">
     <table class="mobile-center single-line overall-test-section" style="width: 100%">
       <tr class="overall-test-header">
@@ -1257,20 +1248,7 @@
                 <xsl:value-of select="FailedTests" />
               </td>
               <!--
-              <td style="padding: 0 10px 0 10px" class="overall-test-additional-data">
-                <table>
-                  <tr>
-                    <td style="padding: 0 10px 0 0px">
-                      <xsl:value-of select="FailedTests" />
-                    </td>
-                    <td style="padding: 0 0px 0 10px">New</td>
-                  </tr>
-                  <tr>
-                    <td style="padding: 0 10px 0 0px">0</td>
-                    <td style="padding: 0 0px 0 10px">Existing</td>
-                  </tr>
-                </table>
-              </td>-->
+              <td style="padding: 0 10px 0 10px" class="overall-test-additional-data"><table><tr><td style="padding: 0 10px 0 0px"><xsl:value-of select="FailedTests" /></td><td style="padding: 0 0px 0 10px">New</td></tr><tr><td style="padding: 0 10px 0 0px">0</td><td style="padding: 0 0px 0 10px">Existing</td></tr></table></td>-->
             </tr>
           </table>
         </td>
@@ -1286,29 +1264,26 @@
       </tr>
     </table>
   </xsl:template>
-
   <xsl:template match="PhaseIssuesSummary">
-      <table style="text-align: left; width: 100%;">
-        <tr style="background:rgb(240,249,254);">
-          <td
+    <table style="text-align: left; width: 100%;">
+      <tr style="background:rgb(240,249,254);">
+        <td
             style="padding: 10px 30px 10px 30px;">
-            <table style="padding:0px;width:100%">
-              <tr>
-                <td
+          <table style="padding:0px;width:100%">
+            <tr>
+              <td
                   style="padding:0px;text-align:left;font-family: Segoe UI Semibold, Segoe UI, Helvetica, Arial, sans-serif;">
-                  <xsl:value-of select="Name" />
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-        <td>
-          <xsl:apply-templates select="Tasks" />
+                <xsl:value-of select="Name" />
+              </td>
+            </tr>
+          </table>
         </td>
-      </table>
-
+      </tr>
+      <td>
+        <xsl:apply-templates select="Tasks" />
+      </td>
+    </table>
   </xsl:template>
-
   <xsl:template match="Phases">
     <xsl:for-each select="PhaseViewModel">
       <table style="text-align: left; width: 100%;">
@@ -1335,8 +1310,6 @@
       </table>
     </xsl:for-each>
   </xsl:template>
-
-
   <xsl:template match="Tasks">
     <table style="text-align: left; width: 100%;">
       <tr>
@@ -1350,24 +1323,23 @@
                       <td class="test-result-icon" style="width:25px;padding:0px;">
                         <xsl:choose>
                           <xsl:when test="HasFailed = 'true'">
-                            <div>❌</div>                            
+                            <div>❌</div>
                           </xsl:when>
                           <xsl:when test="HasSkipped = 'true'">
                             <div>⊘</div>
-                          </xsl:when>   
+                          </xsl:when>
                           <xsl:when test="NotYetRun = 'true'">
                             <div>🕓</div>
-                          </xsl:when>         
+                          </xsl:when>
                           <xsl:when test="HasPartiallySucceeded = 'true'">
                             <div>⚠</div>
-                          </xsl:when>          
+                          </xsl:when>
                           <xsl:when test="GotCancelled = 'true'">
                             <div>⏹</div>
-                          </xsl:when>                                                               
+                          </xsl:when>
                           <xsl:otherwise>
                             <div>✔</div>
                           </xsl:otherwise>
-
                         </xsl:choose>
                       </td>
                       <td style="padding:0px;font-family: Segoe UI Semibold, Segoe UI, Helvetica, Arial, sans-serif;">
@@ -1381,8 +1353,7 @@
                     <xsl:choose>
                       <xsl:when test="HasNotRunOnSomeAgents = 'true'">
                         <tr>
-                          <td class="test-result-icon" style="width:25px;padding:0px;">
-                          </td>
+                          <td class="test-result-icon" style="width:25px;padding:0px;"></td>
                           <td colspan="2" style="padding-top:10px;">
                             <xsl:value-of select="NotRunMessage" />
                           </td>
@@ -1392,8 +1363,7 @@
                         <xsl:choose>
                           <xsl:when test="IssuesSummary/ErrorCount > 0">
                             <tr>
-                              <td class="test-result-icon" style="width:25px;padding:0px;">
-                              </td>
+                              <td class="test-result-icon" style="width:25px;padding:0px;"></td>
                               <td colspan="2" style="padding-top:10px;">
                                 <xsl:value-of select="IssuesSummary/ErrorMessage" />
                               </td>
@@ -1401,8 +1371,7 @@
                           </xsl:when>
                         </xsl:choose>
                         <tr>
-                          <td class="test-result-icon" style="width:25px;padding:0px;">
-                          </td>
+                          <td class="test-result-icon" style="width:25px;padding:0px;"></td>
                           <td colspan="2" style="padding-top:10px;">
                             <a>
                               <xsl:if test="/EmailReportViewModel/Build != ''">
@@ -1425,8 +1394,7 @@
                         </tr>
                         <xsl:for-each select="IssuesSummary/Issues/TaskIssueViewModel">
                           <tr>
-                            <td class="test-result-icon" style="width:25px;padding-top:10px;vertical-align:top;">
-                            </td>
+                            <td class="test-result-icon" style="width:25px;padding-top:10px;vertical-align:top;"></td>
                             <td colspan="2" style="padding-top:10px;">
                               <table style="padding:0;width:100%">
                                 <tr>
@@ -1461,7 +1429,6 @@
       </tr>
     </table>
   </xsl:template>
-
   <xsl:template match="AssociatedChanges">
     <table style="text-align: left; width: 100%;">
       <tr style="background:rgb(240,249,254);">
@@ -1474,7 +1441,6 @@
         <tr>
           <td style="padding: 10px 30px 10px 30px">
             <table>
-
               <tr>
                 <td>
                   <a>
@@ -1501,5 +1467,4 @@
       </xsl:for-each>
     </table>
   </xsl:template>
-
 </xsl:stylesheet>

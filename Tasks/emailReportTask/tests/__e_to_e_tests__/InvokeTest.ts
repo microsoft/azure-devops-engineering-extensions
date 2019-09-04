@@ -65,25 +65,25 @@ export class ReportCreatorWrapper implements IHTMLReportCreator {
 export class MockConfigProvider implements IConfigurationProvider {
 
   getPipelineConfiguration(): PipelineConfiguration {
-    //return new PipelineConfiguration(PipelineType.Build, 10176130, "AzureDevOps", "AzureDevOps", null, null, true, "https://dev.azure.com/mseng", accessKey);
-    return new PipelineConfiguration(PipelineType.Release, 11974885, "AzureDevOps", "AzureDevOps", 137206709, 9538, true, "https://dev.azure.com/mseng", accessKey);
+    //return new PipelineConfiguration(PipelineType.Build, 12345678, "testproject", "testproject", null, null, true, "https://dev.azure.com/mseng", accessKey);
+    return new PipelineConfiguration(PipelineType.Release, 12345678, "testproject", "testproject", 9012345, 1234, true, "https://testaccount.visualstudio.com/", accessKey);
   }
 
   getMailConfiguration(): MailConfiguration {
-    return new MailConfiguration("[{environmentStatus}] {passPercentage} tests passed in $(Release.EnvironmentName) environment for $(Build.BuildNumber)",
-      new RecipientsConfiguration("svajjala@microsoft.com", false, false, false, false),
-      new RecipientsConfiguration("svajjala@microsoft.com", false, false, false, false),
-      new SmtpConfiguration(smtpUser, smtpPassword, "smtp.office365.com", true),
+    return new MailConfiguration("[{environmentStatus}] {passPercentage} tests passed",
+      new RecipientsConfiguration("", false, false, false, true),
+      new RecipientsConfiguration("", false, false, false, false),
+      new SmtpConfiguration(smtpUser, smtpPassword, "smtp.live.com", true),
       "microsoft.com");
   }
 
   getReportDataConfiguration(): ReportDataConfiguration {
     const testResultsConfig = new TestResultsConfiguration(true, false, false, false, false, GroupTestResultsBy.Run, 10);
-    return new ReportDataConfiguration(true, false, true, [GroupTestResultsBy.Run], testResultsConfig);
+    return new ReportDataConfiguration(true, false, true, [GroupTestResultsBy.Priority, GroupTestResultsBy.Run], testResultsConfig);
   }
 
   getSendMailCondition(): SendMailCondition {
-    return SendMailCondition.Always;
+    return SendMailCondition.OnFailure;
   }
 }
 

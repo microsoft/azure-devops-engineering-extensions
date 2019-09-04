@@ -2,6 +2,7 @@ import { WorkItem } from "azure-devops-node-api/interfaces/WorkItemTrackingInter
 import { PipelineConfiguration } from "../../config/pipeline/PipelineConfiguration";
 import { LinkHelper } from "../helpers/LinkHelper";
 import { StringUtils } from "../../utils/StringUtils";
+import { isNullOrUndefined } from "util";
 
 export class WorkItemViewModelWrapper {
   public WorkItemViewModel: WorkItemViewModel[];
@@ -26,8 +27,9 @@ export class WorkItemViewModel {
     // This is for display in email report only
     var assignToRef = workItem.fields["System.AssignedTo"];
     // Prefer Display name to Unique Name in report
-    this.AssignedTo = assignToRef == null ? "" :
-      (StringUtils.isNullOrWhiteSpace(assignToRef.DisplayName) ? assignToRef.UniqueName : assignToRef.DisplayName);
+    this.AssignedTo = isNullOrUndefined(assignToRef) ? "" : (StringUtils.isNullOrWhiteSpace(assignToRef.displayName) ? assignToRef.uniqueName : assignToRef.displayName);
+    // Unassigned workitem
+    this.AssignedTo = isNullOrUndefined(this.AssignedTo) ? "" : this.AssignedTo;
 
     this.State = workItem.fields["System.State"];
     this.ChangedDate = workItem.fields["System.ChangedDate"];
