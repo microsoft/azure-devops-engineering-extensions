@@ -7,7 +7,7 @@ import { isNullOrUndefined } from "util";
 const nodemailer = require("nodemailer");
 
 export class EmailSender implements IReportSender {
-  async sendReportAsync(report: Report, htmlReportMessage: string, mailConfiguration: MailConfiguration): Promise<void> {
+  public async sendReportAsync(report: Report, htmlReportMessage: string, mailConfiguration: MailConfiguration): Promise<boolean> {
 
     const mailAddressViewModel = new MailAddressViewModel(report, mailConfiguration);
 
@@ -24,7 +24,7 @@ export class EmailSender implements IReportSender {
     try {
       const result = await this.sendMailAsync(transporter, mailAddressViewModel, mailConfiguration, htmlReportMessage);
       console.log(`Mail Sent Successfully: ${result.response}`);
-      console.log("##vso[task.setvariable variable=EmailReportTask.EmailSent;]true");
+      return true;
     } catch(err) {
       throw new MailError(err);
     }

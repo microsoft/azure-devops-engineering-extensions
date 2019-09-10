@@ -98,7 +98,8 @@ export class ReleaseDataProvider implements IDataProvider {
     }
 
     console.log(`Fetching last release by completed environment id - ${pipelineConfig.$environmentId} and branch id ${branchId}`);
-    const lastRelease = await this.pipelineRestClient.getLastPipelineAsync(release.releaseDefinition.id, environment.definitionEnvironmentId, branchId);
+    const lastRelease = await this.pipelineRestClient.getLastPipelineAsync(release.releaseDefinition.id, 
+      environment.definitionEnvironmentId, branchId, null); //Bug in API - release.createdOn);
     return lastRelease as Release;
   }
 }

@@ -19,7 +19,8 @@ async function run(): Promise<void> {
       new HTMLReportCreator(),
       new EmailSender());
 
-    await reportManager.sendReportAsync(reportConfiguration);
+    const mailSent = await reportManager.sendReportAsync(reportConfiguration);
+    console.log(`##vso[task.setvariable variable=EmailReportTask.EmailSent;]${mailSent}`);
   }
   catch (err) {
     if (err instanceof ReportError) {

@@ -22,7 +22,8 @@ export class ReleaseRestClient extends AbstractClient implements IPipelineRestCl
   public async getLastPipelineAsync(
     pipelineDefId: number,
     envDefId: number,
-    sourceBranchFilter: string
+    sourceBranchFilter: string,
+    maxCreatedDate?: Date
   ): Promise<Release> {
     let lastRelease: Release = null;
     const releaseStatusFilter = ReleaseStatus.Active;
@@ -36,7 +37,7 @@ export class ReleaseRestClient extends AbstractClient implements IPipelineRestCl
       releaseStatusFilter,
       envStatusFilter,
       null,
-      null,
+      maxCreatedDate,
       ReleaseQueryOrder.Descending,
       2,
       null,
