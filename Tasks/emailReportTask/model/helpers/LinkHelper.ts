@@ -11,46 +11,24 @@ export class LinkHelper {
   private static readonly ReleaseProgressView = "_releaseProgress";
   private static readonly ReleaseDefView = "_releaseDefinition";
   private static readonly ReleaseEnvironmentExtension = "release-environment-extension";
+  private static readonly ReleaseEnvironmentLogsExtension = "release-environment-logs";
   private static readonly ReleaseLinkTestExtensionId = "ms.vss-test-web.test-result-in-release-environment-editor-tab";
 
   private static readonly WorkItemPipelineExtension = "_workitems";
   private static readonly BuildPipelineExtension = "_build";
 
-  public static getBuildDefinitionLinkByArtifact(artifact: Artifact, config: PipelineConfiguration): string {
-    const sourceRef = this.getArtifactInfo(artifact, "definition");
-    return this.getBuildDefinitionLinkById(
-      sourceRef == null ? null : sourceRef.id,
-      config);
-  }
-
   public static getBuildDefinitionLinkById(definitionId: any, config: PipelineConfiguration): string {
     var collectionUri = config.$teamUri;
     var parameters = new Map<string, string>();
     parameters.set("definitionId", definitionId.toString());
-    parameters.set("_a", "completed");
-    var uri = this.getBuildLink(config, collectionUri, parameters);
-
-    return uri;
-  }
-
-  public static getBuildSummaryLinkByArtifact(artifact: Artifact, config: PipelineConfiguration): string {
-    const sourceRef = this.getArtifactInfo(artifact, "definition");
-    return this.getBuildSummaryLinkById(
-      sourceRef == null ? null : sourceRef.id,
-      config);
-  }
-
-  public static getBuildSummaryLinkById(buildId: any, config: PipelineConfiguration): string {
-    var collectionUri = config.$teamUri;
-    var parameters = new Map<string, string>();
-    parameters.set("buildId", buildId.toString());
+    parameters.set("_a", "summary");
     var uri = this.getBuildLink(config, collectionUri, parameters);
 
     return uri;
   }
 
   private static getBuildLink(config: PipelineConfiguration, collectionUri: string, parameters: Map<string, string>): string {
-    return collectionUri + "/" + this.getBuildRelativeUrl(config.$projectName) + "/" + this.getQueryParameter(parameters);
+    return collectionUri + "/" + this.getBuildRelativeUrl(config.$projectName) + "/results" + this.getQueryParameter(parameters);
   }
 
   public static getCommitLink(changeId: string, changeUri: string, config: PipelineConfiguration): string {
@@ -93,13 +71,22 @@ export class LinkHelper {
   }
 
   public static getReleaseLogsTabLink(config: PipelineConfiguration): string {
-    return LinkHelper.getReleaseLinkTab(config.$pipelineId, config, "release-logs");
+    var collectionUri = config.$teamUri;
+    const queryParams = new Map<string, string>();
+    queryParams.set("releaseId", config.$pipelineId.toString());
+    queryParams.set("_a", LinkHelper.ReleaseEnvironmentLogsExtension);
+    queryParams.set("environmentId", config.$environmentId.toString());
+
+    return collectionUri + "/" + config.$projectName + "/" + LinkHelper.ReleaseProgressView + LinkHelper.getQueryParameter(queryParams);
   }
 
-  public static getReleaseSummaryLink(releaseId: number, config: PipelineConfiguration): string {
-    return LinkHelper.getReleaseLinkTab(releaseId, config, "release-summary");
-  }
+  public static getReleaseSummaryLink(config: PipelineConfiguration): string {
+    var collectionUri = config.$teamUri;
+    const queryParams = new Map<string, string>();
+    queryParams.set("releaseId", config.$pipelineId.toString());
 
+    return collectionUri + "/" + config.$projectName + "/" + LinkHelper.ReleaseProgressView + LinkHelper.getQueryParameter(queryParams);
+  }
 
   public static getTestResultLink(config: PipelineConfiguration, runId: string, resultId: number, queryParams?: Map<string, string>): string {
     var collectionUri = config.$teamUri;
@@ -109,7 +96,7 @@ export class LinkHelper {
     parameters.set("resultId", resultId.toString());
 
     if (queryParams != null) {
-      queryParams.forEach((value: string, key: string) => {
+      queryParams.forEach((value: string, key: string) => {6
         parameters.set(key, value);
       });
     }
@@ -118,7 +105,14 @@ export class LinkHelper {
   }
 
   public static getTestTabLinkInRelease(config: PipelineConfiguration): string {
-    return LinkHelper.getReleaseLinkTab(config.$pipelineId, config, this.ReleaseLinkTestExtensionId);
+    var collectionUri = config.$teamUri;
+    const queryParams = new Map<string, string>();
+    queryParams.set("releaseId", config.$pipelineId.toString());
+    queryParams.set("_a", LinkHelper.ReleaseEnvironmentExtension);
+    queryParams.set("environmentId", config.$environmentId.toString());
+    queryParams.set("extensionId", LinkHelper.ReleaseLinkTestExtensionId);
+
+    return collectionUri + "/" + config.$projectName + "/" + LinkHelper.ReleaseProgressView + LinkHelper.getQueryParameter(queryParams);
   }
 
   public static getWorkItemLink(config: PipelineConfiguration, workItemId: number): string {
@@ -126,15 +120,6 @@ export class LinkHelper {
     queryParams.set("id", workItemId.toString());
 
     return config.$teamUri + "/" + LinkHelper.getWorkItemRelativeUrl(config.$projectName) + "/" + LinkHelper.getQueryParameter(queryParams);
-  }
-
-  private static getArtifactInfo(artifact: Artifact, key: string): ArtifactSourceReference {
-    const sourceRef = artifact.definitionReference[key];
-    if (!isNullOrUndefined(sourceRef)) {
-      return sourceRef;
-    }
-
-    return null;
   }
 
   private static getBuildRelativeUrl(projectName: string): string {
@@ -146,22 +131,11 @@ export class LinkHelper {
     var parameters = new Map<string, string>(
       [
         ["buildId", config.$pipelineId.toString()],
-        ["_a", "summary"],
-        ["tab", "ms.vss-test-web.test-result-details"]
+        ["view", "ms.vss-test-web.build-test-results-tab"]
       ]);
 
     var uri = this.getBuildLink(config, collectionUri, parameters);
     return uri;
-  }
-
-  private static getReleaseLinkTab(releaseId: number, config: PipelineConfiguration, tab: string): string {
-    var collectionUri = config.$teamUri;
-    const queryParams = new Map<string, string>();
-    queryParams.set("releaseId", releaseId.toString());
-    queryParams.set("extensionId", tab);
-    queryParams.set("_a", LinkHelper.ReleaseEnvironmentExtension);
-
-    return collectionUri + "/" + config.$projectName + "/" + LinkHelper.ReleaseProgressView + LinkHelper.getQueryParameter(queryParams);
   }
 
   private static getTcmRelativeUrl(projectName: string): string {

@@ -1,6 +1,7 @@
 import { PipelineConfiguration } from "../../config/pipeline/PipelineConfiguration";
 import { BuildReference, Build } from "azure-devops-node-api/interfaces/BuildInterfaces";
 import { LinkHelper } from "../helpers/LinkHelper";
+import { isNullOrUndefined } from "util";
 
 export class BuildReferenceViewModel {
   public Id: string;
@@ -14,12 +15,16 @@ export class BuildReferenceViewModel {
     if(buildReference != null) {
       this.Id = buildReference.id.toString();
       this.Number = buildReference.buildNumber;
-      this.Url = LinkHelper.getBuildSummaryLinkById(buildReference.id, config);
+      if(!isNullOrUndefined(buildReference._links) && !isNullOrUndefined(buildReference._links.web) && !isNullOrUndefined(buildReference._links.web.href)) {
+        this.Url = buildReference._links.web.href;
+      }
     } else if (build != null) {
       this.Id = build.id.toString();
       this.Number = build.buildNumber;
       this.Branch = build.sourceBranch;
-      this.Url = LinkHelper.getBuildSummaryLinkById(build.id, config);
+      if(!isNullOrUndefined(build._links) && !isNullOrUndefined(build._links.web) && !isNullOrUndefined(build._links.web.href)) {
+        this.Url = build._links.web.href;
+      }
       this.DefinitionUrl = LinkHelper.getBuildDefinitionLinkById(build.definition.id, config);
       this.DefinitionName = build.definition.name;
     }
