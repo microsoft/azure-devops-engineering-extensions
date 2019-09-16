@@ -16,8 +16,8 @@ import { HTMLReportCreator } from "../../htmlreport/HTMLReportCreator";
 import { IHTMLReportCreator } from "../../htmlreport/IHTMLReportCreator";
 import { Report } from "../../model/Report";
 import { EmailReportViewModel } from "../../model/viewmodel/EmailReportViewModel";
-import { EmailSender } from "../../EmailSender";
 import { isNullOrUndefined } from "util";
+import { EmailSender } from "../../EmailSender";
 
 const fs = require("fs");
 const js2xmlparser = require("js2xmlparser");
@@ -51,14 +51,12 @@ export class ReportCreatorWrapper implements IHTMLReportCreator {
     const actualCreator = new HTMLReportCreator();
     return actualCreator.createHtmlReport(report, reportConfiguration);
   }
-
-
 }
 
 export class MockConfigProvider implements IConfigurationProvider {
 
   getPipelineConfiguration(): PipelineConfiguration {
-    return new PipelineConfiguration(PipelineType.Release, 12345678, "testaccount", "testaccount", 56789012, 1234, true, "https://testaccount.visualstudio.com/", accessKey);
+    return new PipelineConfiguration(PipelineType.Release, 12345678, "projectid", "projectname", 98765432, 1234, false, "https://testaccount.azure.com/project/", accessKey);
   }
 
   getMailConfiguration(): MailConfiguration {
@@ -91,8 +89,8 @@ async function run(): Promise<void> {
 }
 
 
-if(isNullOrUndefined(accessKey) || isNullOrUndefined(smtpUser) || isNullOrUndefined(smtpPassword)) {
-  console.error("Set Environment Vars for AccessKey, SMTPUSER, SMTPPASSWORD to test E2E.");
+if(isNullOrUndefined(accessKey)) {
+  console.error("Set Environment Vars for AccessKey.");
 } else {
   run();
 }

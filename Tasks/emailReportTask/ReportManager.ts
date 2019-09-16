@@ -4,6 +4,7 @@ import { ReportError } from "./exceptions/ReportError";
 import { IReportSender } from "./IReportSender";
 import { IHTMLReportCreator } from "./htmlreport/IHTMLReportCreator";
 import { MissingDataError } from "./exceptions/MissingDataError";
+import { EnumUtils } from "./utils/EnumUtils";
 
 export class ReportManager {
 
@@ -32,7 +33,7 @@ export class ReportManager {
         const htmlMessage = this.htmlReportCreator.createHtmlReport(report, reportConfig);
         mailSent = await this.reportSender.sendReportAsync(report, htmlMessage, reportConfig.$mailConfiguration);
       } else {
-        console.log(`Not sending mail, as the user send mail condition - '${reportConfig.$sendMailCondition}' is not satisfied.`);
+        console.log(`Not sending mail, as the user send mail condition - '${EnumUtils.GetMailConditionString(reportConfig.$sendMailCondition)}' is not satisfied.`);
       }
     } catch (err) {
       // Exit Task with Error to fail the task
