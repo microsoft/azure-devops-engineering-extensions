@@ -10,6 +10,6 @@ export class ReleaseReferenceViewModel {
   constructor(config: PipelineConfiguration, releaseReference: ReleaseReference) {
     this.Id = releaseReference.id;
     this.Name = releaseReference.name;
-    this.Url = LinkHelper.getReleaseSummaryLink(this.Id, config);
+    this.Url = LinkHelper.getReleaseSummaryLink(config);
   }
 }

@@ -1,10 +1,9 @@
-import { Release, Change, EnvironmentStatus, ReleaseStatus, ReleaseExpands, ReleaseQueryOrder } from "azure-devops-node-api/interfaces/ReleaseInterfaces";
-import tl = require("azure-pipelines-task-lib/task");
+import { Release, EnvironmentStatus, ReleaseStatus, ReleaseExpands, ReleaseQueryOrder } from "azure-devops-node-api/interfaces/ReleaseInterfaces";
 import { AbstractClient } from "./AbstractClient";
-import { release } from "os";
 import { IPipelineRestClient } from "./IPipelineRestClient";
 import { PipelineConfiguration } from "../../config/pipeline/PipelineConfiguration";
 import { ChangeModel } from "../../model/ChangeModel";
+import { isNullOrUndefined } from "util";
 
 export class ReleaseRestClient extends AbstractClient implements IPipelineRestClient {
 
@@ -22,7 +21,8 @@ export class ReleaseRestClient extends AbstractClient implements IPipelineRestCl
   public async getLastPipelineAsync(
     pipelineDefId: number,
     envDefId: number,
-    sourceBranchFilter: string
+    sourceBranchFilter: string,
+    maxCreatedDate?: Date
   ): Promise<Release> {
     let lastRelease: Release = null;
     const releaseStatusFilter = ReleaseStatus.Active;
@@ -36,9 +36,9 @@ export class ReleaseRestClient extends AbstractClient implements IPipelineRestCl
       releaseStatusFilter,
       envStatusFilter,
       null,
-      null,
+      maxCreatedDate,
       ReleaseQueryOrder.Descending,
-      2,
+      null,
       null,
       ReleaseExpands.Environments,
       null,
@@ -47,15 +47,19 @@ export class ReleaseRestClient extends AbstractClient implements IPipelineRestCl
       sourceBranchFilter
     );
 
-    if (releases != null && releases.length < 1) {
-      console.log(`Unable to fetch last completed release for release definition:${pipelineDefId} and environmentid: ${envDefId}`);
-    }
-    else {      
+    if (!isNullOrUndefined(releases) && releases.length > 0) {    
       // Ideally, first one should be last completed one. Unless someone's running the report after the release has completed for some reason. 
-      lastRelease = releases[0];
-      if(lastRelease.id == this.pipelineConfig.$pipelineId && releases.length > 1) {
-        lastRelease = releases[1];
+      console.log(`Considering one of [${releases.map(r => r.id).join(",")}] as previous completed release for ${this.pipelineConfig.$pipelineId}`);
+      for(let i = 0; i < releases.length; i++) {
+        if(releases[i].id < this.pipelineConfig.$pipelineId) {
+          lastRelease = releases[i];
+          break;
+        }  
       }
+    }
+
+    if (isNullOrUndefined(lastRelease)) {
+      console.log(`Unable to fetch last completed release for release definition:${pipelineDefId} and environmentid: ${envDefId}`);
     }
 
     return lastRelease;

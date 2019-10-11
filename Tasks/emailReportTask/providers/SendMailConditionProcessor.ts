@@ -70,6 +70,10 @@ export class SendMailConditionProcessor implements IPostProcessor {
 
     if (hasTestFailures) {
       var prevConfig = report.getPrevConfig(config);
+      if(isNullOrUndefined(prevConfig)) {
+        // we don't know anything about prev pipeline failures if we have no info - assume they are not same
+        return false;
+      }
       var lastCompletedTestResultSummary = await this.testResultsClient.queryTestResultsReportAsync(prevConfig);
 
       var failedInCurrent = this.getFailureCountFromSummary(report.testResultSummary);

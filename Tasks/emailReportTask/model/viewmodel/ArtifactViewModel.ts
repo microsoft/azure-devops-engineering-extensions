@@ -20,8 +20,18 @@ export class ArtifactViewModel {
     this.BranchName = this.getArtifactInfo(artifact, "branch");
     this.Name = artifact.alias;
     this.IsPrimary = artifact.isPrimary;
-    this.BuildSummaryUrl = LinkHelper.getBuildSummaryLinkByArtifact(artifact, config);
-    this.ArtifactDefinitionUrl = LinkHelper.getBuildDefinitionLinkByArtifact(artifact, config);
+
+    if (!isNullOrUndefined(artifact.definitionReference)) {
+      if (!isNullOrUndefined(artifact.definitionReference.artifactSourceDefinitionUrl) &&
+        !isNullOrUndefined(artifact.definitionReference.artifactSourceDefinitionUrl.id)) {
+        this.ArtifactDefinitionUrl = artifact.definitionReference.artifactSourceDefinitionUrl.id;
+      }
+
+      if (!isNullOrUndefined(artifact.definitionReference.artifactSourceVersionUrl) &&
+        !isNullOrUndefined(artifact.definitionReference.artifactSourceVersionUrl.id)) {
+        this.BuildSummaryUrl = artifact.definitionReference.artifactSourceVersionUrl.id;
+      }
+    }
   }
 
   private getArtifactInfo(artifact: Artifact, key: string): string {

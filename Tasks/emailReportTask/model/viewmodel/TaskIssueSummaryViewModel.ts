@@ -5,9 +5,9 @@ import { TaskModel } from "../TaskModel";
 
 export class TaskIssueSummaryViewModel {
   public Issues: TaskIssueViewModelWrapper;
-  public ErrorMessage: string;
-  public ErrorCount: number;
-  public WarningCount: number;
+  public ErrorMessage: string = "";
+  public ErrorCount: number = 0;
+  public WarningCount: number = 0;
 
   constructor(tasks: TaskModel[]) {
     var allIssues: TaskIssueViewModel[] = [];

@@ -51,7 +51,7 @@ export class MailAddressViewModel {
     }
 
     if(!isNullOrUndefined(recipientsConfiguration.$defaultRecipients)) {
-      recipientsConfiguration.$defaultRecipients.split(",").forEach(a => addressHashSet.add(a));
+      recipientsConfiguration.$defaultRecipients.split(";").forEach(a => addressHashSet.add(a));
     }
     return this.filterValidMailAddresses(addressHashSet);
   }

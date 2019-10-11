@@ -18,14 +18,14 @@ export class BuildRestClient extends AbstractClient implements IPipelineRestClie
     return await (await this.buildApi).getBuild(this.pipelineConfig.$projectId, this.pipelineConfig.$pipelineId);
   }
 
-  public async getLastPipelineAsync(pipelineDefId: number, envDefId: number, sourceBranchFilter: string): Promise<Build> {
+  public async getLastPipelineAsync(pipelineDefId: number, envDefId: number, sourceBranchFilter: string, maxCreatedDate?: Date): Promise<Build> {
     const builds = await (await this.buildApi).getBuilds(
       this.pipelineConfig.$projectId,
       [pipelineDefId],
       null,
       null,
       null,
-      null,
+      maxCreatedDate,
       null,
       null,
       null,

@@ -13,12 +13,11 @@ import { PipelineType } from "../../config/pipeline/PipelineType";
 import { ReportProvider } from "../../providers/ReportProvider";
 import { DataProviderFactory } from "../../providers/DataProviderFactory";
 import { HTMLReportCreator } from "../../htmlreport/HTMLReportCreator";
-import { IReportSender } from "../../IReportSender";
 import { IHTMLReportCreator } from "../../htmlreport/IHTMLReportCreator";
 import { Report } from "../../model/Report";
 import { EmailReportViewModel } from "../../model/viewmodel/EmailReportViewModel";
-import { EmailSender } from "../../EmailSender";
 import { isNullOrUndefined } from "util";
+import { EmailSender } from "../../EmailSender";
 
 const fs = require("fs");
 const js2xmlparser = require("js2xmlparser");
@@ -44,12 +43,6 @@ export class FileWriter {
   }
 }
 
-export class FileSender implements IReportSender {
-  async sendReportAsync(report: Report, htmlReportMessage: string, mailConfiguration: MailConfiguration): Promise<void> {
-    FileWriter.writeToFile(htmlReportMessage, "emailMessage.html");
-  }
-}
-
 export class ReportCreatorWrapper implements IHTMLReportCreator {
   createHtmlReport(report: Report, reportConfiguration: ReportConfiguration): string {
     // Serialize gathered data into xml 
@@ -58,23 +51,19 @@ export class ReportCreatorWrapper implements IHTMLReportCreator {
     const actualCreator = new HTMLReportCreator();
     return actualCreator.createHtmlReport(report, reportConfiguration);
   }
-
-
 }
 
 export class MockConfigProvider implements IConfigurationProvider {
 
   getPipelineConfiguration(): PipelineConfiguration {
-    //return new PipelineConfiguration(PipelineType.Build, 12345678, "testproject", "testproject", null, null, true, "https://dev.azure.com/mseng", accessKey);
-    return new PipelineConfiguration(PipelineType.Release, 12345678, "testproject", "testproject", 9012345, 1234, true, "https://testaccount.visualstudio.com/", accessKey);
+    return new PipelineConfiguration(PipelineType.Release, 12345678, "projectid", "projectname", 98765432, 1234, false, "https://testaccount.azure.com/project/", accessKey);
   }
 
   getMailConfiguration(): MailConfiguration {
     return new MailConfiguration("[{environmentStatus}] {passPercentage} tests passed",
-      new RecipientsConfiguration("", false, false, false, true),
+      new RecipientsConfiguration("xyz@test.com", false, false, false, false),
       new RecipientsConfiguration("", false, false, false, false),
-      new SmtpConfiguration(smtpUser, smtpPassword, "smtp.live.com", true),
-      "microsoft.com");
+      new SmtpConfiguration(smtpUser, smtpPassword, "smtp.live.com", true), "test.com");
   }
 
   getReportDataConfiguration(): ReportDataConfiguration {
@@ -83,7 +72,7 @@ export class MockConfigProvider implements IConfigurationProvider {
   }
 
   getSendMailCondition(): SendMailCondition {
-    return SendMailCondition.OnFailure;
+    return SendMailCondition.OnNewFailuresOnly;
   }
 }
 
@@ -100,8 +89,8 @@ async function run(): Promise<void> {
 }
 
 
-if(isNullOrUndefined(accessKey) || isNullOrUndefined(smtpUser) || isNullOrUndefined(smtpPassword)) {
-  console.error("Set Environment Vars for AccessKey, SMTPUSER, SMTPPASSWORD to test E2E.");
+if(isNullOrUndefined(accessKey)) {
+  console.error("Set Environment Vars for AccessKey.");
 } else {
   run();
 }

@@ -2,6 +2,7 @@ import { ReleaseEnvironment } from "azure-devops-node-api/interfaces/ReleaseInte
 import { PipelineConfiguration } from "../../config/pipeline/PipelineConfiguration";
 import { LinkHelper } from "../helpers/LinkHelper";
 import { ReleaseEnvironmentViewModel } from "./ReleaseEnvironmentViewModel";
+import { isNullOrUndefined } from "util";
 
 export class ReleaseViewModel {
   public CurrentEnvironment: ReleaseEnvironmentViewModel;
@@ -26,7 +27,9 @@ export class ReleaseViewModel {
     }
 
     this.ReleaseId = releaseConfig.$pipelineId;
-    this.ReleaseSummaryUrl = LinkHelper.getReleaseSummaryLink(releaseConfig.$pipelineId, releaseConfig);
+    if(!isNullOrUndefined(currentEnvironment.release) && !isNullOrUndefined(currentEnvironment.release._links) && !isNullOrUndefined(currentEnvironment.release._links.web)) {
+      this.ReleaseSummaryUrl = currentEnvironment.release._links.web.href;
+    }
     this.ReleaseLogsLink = LinkHelper.getReleaseLogsTabLink(releaseConfig);
   }
 }

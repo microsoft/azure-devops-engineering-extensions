@@ -4,6 +4,7 @@ import { ReportError } from "./exceptions/ReportError";
 import { IReportSender } from "./IReportSender";
 import { IHTMLReportCreator } from "./htmlreport/IHTMLReportCreator";
 import { MissingDataError } from "./exceptions/MissingDataError";
+import { EnumUtils } from "./utils/EnumUtils";
 
 export class ReportManager {
 
@@ -17,7 +18,8 @@ export class ReportManager {
     this.htmlReportCreator = htmlReportCreator;
   }
 
-  public async sendReportAsync(reportConfig: ReportConfiguration): Promise<void> {
+  public async sendReportAsync(reportConfig: ReportConfiguration): Promise<boolean> {
+    let mailSent = false;
     try {
       console.log("Fetching data for email report");
       const report = await this.reportProvider.createReportAsync(reportConfig);
@@ -29,13 +31,15 @@ export class ReportManager {
       else if (report.$sendMailConditionSatisfied && this.reportSender != null) {
         console.log("Creating report message");
         const htmlMessage = this.htmlReportCreator.createHtmlReport(report, reportConfig);
-        await this.reportSender.sendReportAsync(report, htmlMessage, reportConfig.$mailConfiguration);
+        mailSent = await this.reportSender.sendReportAsync(report, htmlMessage, reportConfig.$mailConfiguration);
       } else {
-        console.log(`Not sending mail, as the user send mail condition - '${reportConfig.$sendMailCondition}' is not satisfied.`);
+        console.log(`Not sending mail, as the user send mail condition - '${EnumUtils.GetMailConditionString(reportConfig.$sendMailCondition)}' is not satisfied.`);
       }
     } catch (err) {
       // Exit Task with Error to fail the task
       ReportError.HandleError(err, true);
     }
+
+    return mailSent;
   }
 }

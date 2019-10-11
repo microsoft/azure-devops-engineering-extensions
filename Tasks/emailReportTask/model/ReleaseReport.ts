@@ -6,6 +6,7 @@ import { PipelineConfiguration } from "../config/pipeline/PipelineConfiguration"
 import { JobModel } from "./JobModel";
 import { ArtifactViewModel } from "./viewmodel/ArtifactViewModel";
 import { ReleaseViewModel } from "./viewmodel/ReleaseViewModel";
+import { isNullOrUndefined } from "util";
 
 export class ReleaseReport extends Report {
 
@@ -123,6 +124,9 @@ export class ReleaseReport extends Report {
   }
 
   public getPrevConfig(config: PipelineConfiguration): PipelineConfiguration {
+    if(isNullOrUndefined(this.lastCompletedRelease) || isNullOrUndefined(this.lastCompletedEnvironment)) {
+      return null;
+    }
     var prevConfig = new PipelineConfiguration(
       config.$pipelineType, 
       this.lastCompletedRelease.id,
