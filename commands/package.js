@@ -46,15 +46,17 @@ if (fs.existsSync(imagesDir)) {
 
 // Package extension only for prod
 if (common.ReleaseType.toLowerCase() == "prod") {
-  var command = `tfx extension create --rev-version --root ${common.ExtensionOutDir} --output-path dist/ --manifest-globs ${extJsonFile} --extension-id ${extensionId} --no-prompt`;
-  console.log(`Running: ${command}`);
-  exec(command, function (error) {
-    if (error) {
-      console.log(`Package create error: ${error}`);
-    } else {
-      console.log("Package created");
-    }
-  });
+  console.log(`Run command in ${common.ExtensionOutDir}: tfx extension create --root . --extension-id ${extensionId} --no-prompt`);
+  // process.chdir(common.ExtensionOutDir);
+  // var command = `tfx extension create --root . --extension-id ${extensionId} --no-prompt`;
+  // console.log(`Running: ${command}`);
+  // exec(command, function (error) {
+  //   if (error) {
+  //     console.log(`Package create error: ${error}`);
+  //   } else {
+  //     console.log("Package created");
+  //   }
+  // });
 } else {
   console.log(`Navigate to ${common.TaskOutDir} and run the tfx upload command on the desired azure devops account to upload task directly. Command: 'tfx login && tfx build tasks upload --task-path .'`);
 }

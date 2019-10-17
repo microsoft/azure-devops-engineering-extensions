@@ -56,7 +56,7 @@ export class ReportCreatorWrapper implements IHTMLReportCreator {
 export class MockConfigProvider implements IConfigurationProvider {
 
   getPipelineConfiguration(): PipelineConfiguration {
-    return new PipelineConfiguration(PipelineType.Release, 12345678, "projectid", "projectname", 98765432, 1234, false, "https://testaccount.azure.com/project/", accessKey);
+    return new PipelineConfiguration(PipelineType.Release, 12668760, "AzureDevOps", "AzureDevOps", 144851349, 2155, false, "https://dev.azure.com/mseng/", accessKey);
   }
 
   getMailConfiguration(): MailConfiguration {

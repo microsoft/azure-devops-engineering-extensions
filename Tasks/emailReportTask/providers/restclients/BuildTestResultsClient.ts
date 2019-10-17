@@ -9,7 +9,7 @@ export class BuildTestResultsClient extends AbstractTestResultsClient implements
     super(pipelineConfig);
   }
 
-  public async queryTestResultsReportForPipelineAsync(includeFailures: boolean, config: PipelineConfiguration): Promise<TestResultSummary> {
+  public async queryTestResultsReportForPipelineAsync(config: PipelineConfiguration, includeFailures?: boolean): Promise<TestResultSummary> {
     return await (await this.testApiPromise).queryTestResultsReportForBuild(
       config.$projectName,
       config.$pipelineId,
@@ -17,7 +17,7 @@ export class BuildTestResultsClient extends AbstractTestResultsClient implements
       includeFailures);
   }
 
-  public async getTestResultsDetailsForPipelineAsync(groupBy: string, filter: string, config: PipelineConfiguration): Promise<TestResultsDetails> {
+  public async getTestResultsDetailsForPipelineAsync(config: PipelineConfiguration, groupBy?: string, filter?: string): Promise<TestResultsDetails> {
     return await (await this.testApiPromise).getTestResultDetailsForBuild(
       config.$projectName,
       config.$pipelineId,
