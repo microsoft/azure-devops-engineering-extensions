@@ -18,7 +18,7 @@ export abstract class AbstractTestResultsClient extends AbstractClient implement
 
   public async queryTestResultBugs(automatedTestName: string, resultId: number): Promise<WorkItemReference[]> {
     const testApi = await this.testApiPromise;
-    return await RetryablePromise.RetryAsync(testApi.queryTestResultWorkItems(
+    return await RetryablePromise.RetryAsync(async () => testApi.queryTestResultWorkItems(
       this.pipelineConfig.$projectName,
       "Microsoft.BugCategory",
       automatedTestName,
@@ -28,12 +28,12 @@ export abstract class AbstractTestResultsClient extends AbstractClient implement
 
   public async getTestResultById(testRunId: number, resultId: number): Promise<TestCaseResult> {
     const testApi = await this.testApiPromise;
-    return await RetryablePromise.RetryAsync(testApi.getTestResultById(this.pipelineConfig.$projectName, testRunId, resultId));
+    return await RetryablePromise.RetryAsync(async () => testApi.getTestResultById(this.pipelineConfig.$projectName, testRunId, resultId));
   }
 
   public async queryTestResultsReportAsync(parameterConfig: PipelineConfiguration = null): Promise<TestResultSummary> {
     const config = parameterConfig != null ? parameterConfig : this.pipelineConfig;
-    return await RetryablePromise.RetryAsync(this.queryTestResultsReportForPipelineAsync(config));
+    return await RetryablePromise.RetryAsync(async () => this.queryTestResultsReportForPipelineAsync(config));
   }
   
   public async getTestResultOwnersAsync(resultsToFetch: TestCaseResult[]): Promise<IdentityRef[]> {
@@ -45,7 +45,7 @@ export abstract class AbstractTestResultsClient extends AbstractClient implement
     for (let i = 0, j = resultsToFetch.length; i < j; i += this.MaxItemsSupported) {
       const tempArray = resultsToFetch.slice(i, i + this.MaxItemsSupported);
       query.results = tempArray;
-      tasks.push(RetryablePromise.RetryAsync(testApi.getTestResultsByQuery(query, this.pipelineConfig.$projectName)));
+      tasks.push(RetryablePromise.RetryAsync(async () => testApi.getTestResultsByQuery(query, this.pipelineConfig.$projectName)));
     }
 
     await Promise.all(tasks);
@@ -71,12 +71,12 @@ export abstract class AbstractTestResultsClient extends AbstractClient implement
   public async getTestResultsDetailsAsync(groupBy: string, outcomeFilters?: TestOutcome[], parameterConfig: PipelineConfiguration = null): Promise<TestResultsDetails> {
     const filter = this.getOutcomeFilter(outcomeFilters);
     const config = parameterConfig != null ? parameterConfig : this.pipelineConfig;
-    return await RetryablePromise.RetryAsync(this.getTestResultsDetailsForPipelineAsync(config, groupBy, filter));
+    return await RetryablePromise.RetryAsync(async () => this.getTestResultsDetailsForPipelineAsync(config, groupBy, filter));
   }
   
   public async getTestResultSummaryAsync(includeFailures: boolean, parameterConfig: PipelineConfiguration = null): Promise<TestResultSummary> {
     const config = parameterConfig != null ? parameterConfig : this.pipelineConfig;
-    return await RetryablePromise.RetryAsync(this.queryTestResultsReportForPipelineAsync(config, includeFailures));
+    return await RetryablePromise.RetryAsync(async () => this.queryTestResultsReportForPipelineAsync(config, includeFailures));
   }
 
   public async getTestResultsByQueryAsync(query: TestResultsQuery): Promise<TestResultsQuery> {

@@ -32,11 +32,11 @@ export class BuildDataProvider implements IDataProvider {
       throw new PipelineNotFoundError(`ProjectId: ${pipelineConfig.$projectId}, ${pipelineConfig.$pipelineId}`);
     }
 
-    const timeline = await RetryablePromise.RetryAsync(this.pipelineRestClient.getPipelineTimelineAsync(build.id));
-    const changes = await RetryablePromise.RetryAsync(this.pipelineRestClient.getPipelineChangesAsync(build.id));
+    const timeline = await RetryablePromise.RetryAsync(async () => this.pipelineRestClient.getPipelineTimelineAsync(build.id));
+    const changes = await RetryablePromise.RetryAsync(async () => this.pipelineRestClient.getPipelineChangesAsync(build.id));
     const phases = this.getPhases(timeline);
     const lastCompletedBuild = await this.pipelineRestClient.getLastPipelineAsync(build.definition.id, null, build.sourceBranch) as Build;
-    const lastCompletedTimeline = lastCompletedBuild != null ? await RetryablePromise.RetryAsync(this.pipelineRestClient.getPipelineTimelineAsync(lastCompletedBuild.id)) : null;
+    const lastCompletedTimeline = lastCompletedBuild != null ? await RetryablePromise.RetryAsync(async () => this.pipelineRestClient.getPipelineTimelineAsync(lastCompletedBuild.id)) : null;
 
     console.log("Fetched release data");
     report.setBuildData(build, timeline, lastCompletedBuild, lastCompletedTimeline, phases, changes);
@@ -45,7 +45,7 @@ export class BuildDataProvider implements IDataProvider {
   }
 
   private async getBuildAsync(pipelineConfig: PipelineConfiguration): Promise<Build> {
-    var build = await RetryablePromise.RetryAsync(this.pipelineRestClient.getPipelineAsync());
+    var build = await RetryablePromise.RetryAsync(async () => this.pipelineRestClient.getPipelineAsync());
     if(isNullOrUndefined(build)) {
       throw new DataProviderError(`Unable to find build with id: ${pipelineConfig.$pipelineId}`);
     }

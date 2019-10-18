@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "EmailReportExtension",
   "name": "Email Report Extension",
-  "version": "0.0.1",
+  "version": "1.0.6",
   "publisher": "epsteam",
   "targets": [
     {
