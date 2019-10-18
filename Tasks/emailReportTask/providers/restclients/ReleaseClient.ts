@@ -4,7 +4,6 @@ import { IPipelineRestClient } from "./IPipelineRestClient";
 import { PipelineConfiguration } from "../../config/pipeline/PipelineConfiguration";
 import { ChangeModel } from "../../model/ChangeModel";
 import { isNullOrUndefined } from "util";
-import { RetryHelper } from "./RetryHelper";
 
 export class ReleaseRestClient extends AbstractClient implements IPipelineRestClient {
 

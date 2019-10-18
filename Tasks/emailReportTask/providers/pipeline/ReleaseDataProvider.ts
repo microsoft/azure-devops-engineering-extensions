@@ -14,7 +14,7 @@ import { ChangeModel } from "../../model/ChangeModel";
 import { ReleaseReport } from "../../model/ReleaseReport";
 import { ReportDataConfiguration } from "../../config/report/ReportDataConfiguration";
 import { ReportFactory } from "../../model/ReportFactory";
-import { RetryHelper } from "../restclients/RetryHelper";
+import { RetryablePromise } from "../restclients/RetryablePromise";
 import { isNullOrUndefined } from "util";
 
 export class ReleaseDataProvider implements IDataProvider {
@@ -40,7 +40,7 @@ export class ReleaseDataProvider implements IDataProvider {
     // check if last completed one isn't latter one, then changes don't make sense
     if (lastCompletedRelease != null && lastCompletedRelease.id < release.id) {
       console.log(`Getting changes between releases ${release.id} & ${lastCompletedRelease.id}`);
-      changes = await RetryHelper.RetryAsync(() => this.pipelineRestClient.getPipelineChangesAsync(lastCompletedRelease.id));
+      changes = await RetryablePromise.RetryAsync(this.pipelineRestClient.getPipelineChangesAsync(lastCompletedRelease.id));
     }
     else {
       console.log("Unable to find any last completed release");
@@ -53,7 +53,7 @@ export class ReleaseDataProvider implements IDataProvider {
   }
 
   private async getReleaseAsync(pipelineConfig: PipelineConfiguration): Promise<Release> {
-    var release = await RetryHelper.RetryAsync(this.pipelineRestClient.getPipelineAsync);
+    var release = await RetryablePromise.RetryAsync(this.pipelineRestClient.getPipelineAsync());
     if(isNullOrUndefined(release)) {
       throw new DataProviderError(`Unable to find release with release id: ${pipelineConfig.$pipelineId}`);
     }
@@ -108,7 +108,7 @@ export class ReleaseDataProvider implements IDataProvider {
     }
 
     console.log(`Fetching last release by completed environment id - ${pipelineConfig.$environmentId} and branch id ${branchId}`);
-    const lastRelease = RetryHelper.RetryAsync(() => this.pipelineRestClient.getLastPipelineAsync(release.releaseDefinition.id, 
+    const lastRelease = await RetryablePromise.RetryAsync(this.pipelineRestClient.getLastPipelineAsync(release.releaseDefinition.id, 
       environment.definitionEnvironmentId, branchId, null)); //Bug in API - release.createdOn);
     return lastRelease as Release;
   }

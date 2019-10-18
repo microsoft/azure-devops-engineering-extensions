@@ -3,8 +3,8 @@ import { Build, Timeline } from "azure-devops-node-api/interfaces/BuildInterface
 import { ChangeModel } from "../../model/ChangeModel";
 
 export interface IPipelineRestClient {
-  getPipelineAsync(): Promise<Release> | Promise<Build>;
-  getLastPipelineAsync(pipelineDefId: number, envDefId: number, sourceBranchFilter: string, maxCreatedDate?: Date): Promise<Release> | Promise<Build>;
+  getPipelineAsync(): Promise<any>;
+  getLastPipelineAsync(pipelineDefId: number, envDefId: number, sourceBranchFilter: string, maxCreatedDate?: Date): Promise<any>;
   getPipelineChangesAsync(prevPipelineId: number): Promise<ChangeModel[]>;
   getPipelineTimelineAsync(pipelineId: number): Promise<Timeline>;
 }
