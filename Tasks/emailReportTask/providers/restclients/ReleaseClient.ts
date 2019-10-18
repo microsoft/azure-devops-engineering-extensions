@@ -24,10 +24,11 @@ export class ReleaseRestClient extends AbstractClient implements IPipelineRestCl
     sourceBranchFilter: string,
     maxCreatedDate?: Date
   ): Promise<Release> {
+    const releaseApi = await this.connection.getReleaseApi();
     let lastRelease: Release = null;
     const releaseStatusFilter = ReleaseStatus.Active;
     const envStatusFilter = EnvironmentStatus.Succeeded | EnvironmentStatus.PartiallySucceeded | EnvironmentStatus.Rejected | EnvironmentStatus.Canceled;
-    const releases = await (await this.connection.getReleaseApi()).getReleases(
+    const releases = await releaseApi.getReleases(
       this.pipelineConfig.$projectId,
       pipelineDefId,
       envDefId,
@@ -60,6 +61,11 @@ export class ReleaseRestClient extends AbstractClient implements IPipelineRestCl
 
     if (isNullOrUndefined(lastRelease)) {
       console.log(`Unable to fetch last completed release for release definition:${pipelineDefId} and environmentid: ${envDefId}`);
+    } else if(lastRelease.id < this.pipelineConfig.$pipelineId) {
+      return await releaseApi.getRelease(
+        this.pipelineConfig.$projectId,
+        lastRelease.id
+      );
     }
 
     return lastRelease;
