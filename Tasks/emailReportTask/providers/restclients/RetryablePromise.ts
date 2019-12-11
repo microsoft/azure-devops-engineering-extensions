@@ -7,7 +7,11 @@ export class RetryablePromise {
         let lastError: Error;
         do {
             try {
-                return await executor();
+                let returnVal = await executor();
+                if(attemptNumber > 1) {
+                    console.log(`Completed on Retry attempt: ${attemptNumber}`);
+                }
+                return returnVal;
             }
             catch (err) {
                 lastError = err;

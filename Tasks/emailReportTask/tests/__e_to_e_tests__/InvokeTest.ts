@@ -18,6 +18,7 @@ import { Report } from "../../model/Report";
 import { EmailReportViewModel } from "../../model/viewmodel/EmailReportViewModel";
 import { isNullOrUndefined } from "util";
 import { EmailSender } from "../../EmailSender";
+import { RetryablePromise } from "../../providers/restclients/RetryablePromise";
 
 const fs = require("fs");
 const js2xmlparser = require("js2xmlparser");
@@ -26,7 +27,7 @@ const accessKey = process.env.AccessKey;
 const smtpUser = process.env.SMTPUSER;
 const smtpPassword = process.env.SMTPPASSWORD;
 
- 
+
 export class FileWriter {
 
   static writeToFile(content: string, fileName: string): void {
@@ -78,6 +79,7 @@ export class MockConfigProvider implements IConfigurationProvider {
 
 async function run(): Promise<void> {
 
+  console.log(x);
   const configProvider = new MockConfigProvider();
   const reportConfiguration = new ReportConfiguration(configProvider);
   const reportManager = new ReportManager(
@@ -88,8 +90,7 @@ async function run(): Promise<void> {
   reportManager.sendReportAsync(reportConfiguration);
 }
 
-
-if(isNullOrUndefined(accessKey)) {
+if (isNullOrUndefined(accessKey)) {
   console.error("Set Environment Vars for AccessKey.");
 } else {
   run();

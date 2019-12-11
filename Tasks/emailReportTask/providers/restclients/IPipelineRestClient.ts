@@ -1,5 +1,4 @@
-import { Release } from "azure-devops-node-api/interfaces/ReleaseInterfaces";
-import { Build, Timeline } from "azure-devops-node-api/interfaces/BuildInterfaces";
+import { Timeline } from "azure-devops-node-api/interfaces/BuildInterfaces";
 import { ChangeModel } from "../../model/ChangeModel";
 
 export interface IPipelineRestClient {
