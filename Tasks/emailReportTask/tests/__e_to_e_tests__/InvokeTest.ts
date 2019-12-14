@@ -18,7 +18,6 @@ import { Report } from "../../model/Report";
 import { EmailReportViewModel } from "../../model/viewmodel/EmailReportViewModel";
 import { isNullOrUndefined } from "util";
 import { EmailSender } from "../../EmailSender";
-import { RetryablePromise } from "../../providers/restclients/RetryablePromise";
 
 const fs = require("fs");
 const js2xmlparser = require("js2xmlparser");
@@ -57,7 +56,7 @@ export class ReportCreatorWrapper implements IHTMLReportCreator {
 export class MockConfigProvider implements IConfigurationProvider {
 
   getPipelineConfiguration(): PipelineConfiguration {
-    return new PipelineConfiguration(PipelineType.Release, 12668760, "AzureDevOps", "AzureDevOps", 144851349, 2155, false, "https://dev.azure.com/mseng/", accessKey);
+    return new PipelineConfiguration(PipelineType.Release, 13138547, "AzureDevOps", "AzureDevOps", 150011327, 6074, false, "https://dev.azure.com/mseng/", accessKey);
   }
 
   getMailConfiguration(): MailConfiguration {
@@ -79,7 +78,6 @@ export class MockConfigProvider implements IConfigurationProvider {
 
 async function run(): Promise<void> {
 
-  console.log(x);
   const configProvider = new MockConfigProvider();
   const reportConfiguration = new ReportConfiguration(configProvider);
   const reportManager = new ReportManager(

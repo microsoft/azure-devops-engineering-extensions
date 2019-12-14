@@ -2,6 +2,7 @@ var exec = require("child_process").exec;
 const path = require('path');
 const common = require("./common");
 var process = require('process');
+const fs = require("fs");
 
 // // *.json
 const extJsonFile = common.CopyFile(common.TaskSrcDir, "vss-extension.json", common.ExtensionOutDir);
@@ -24,10 +25,23 @@ exec(npmInstallCommand, function (error) {
     console.log(`NPM Install Error: ${error}`);
   } else {
     console.log("NPM Install Done");
+
+    console.log("Patching azure-devops-node-api node_modules..[REMOVE THIS AFTER 9.0.2 release]");
+    const serializationJsFilePath = path.resolve(`${common.TaskOutDir}/node_modules/azure-devops-node-api/serialization.js`);
+    let dataToWrite = "";
+    fs.readFile(serializationJsFilePath, 'utf8', function(err, data) {
+        if (err) throw err;
+        const lines = data.split("\r\n");
+        if(lines.length > 216) {
+          lines[215] = "break;"
+          dataToWrite = lines.join("\r\n");
+          fs.writeFileSync(serializationJsFilePath, dataToWrite);
+          fs.writeFileSync(path.resolve(`${__dirname}/../node_modules/azure-devops-node-api/serialization.js`), dataToWrite);
+        }
+      });
   }
 });
 
-const fs = require("fs");
 var imagesDir = path.resolve(common.TaskSrcDir, "images");
 if (fs.existsSync(imagesDir)) {
   var files = fs.readdirSync(imagesDir);
