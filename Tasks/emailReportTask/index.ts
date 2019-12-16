@@ -22,7 +22,7 @@ async function run(): Promise<void> {
     const mailSent = await reportManager.sendReportAsync(reportConfiguration);
     console.log("Email Task processing complete. Setting EmailReportTask.EmailSent Variable value.");   
     // Wait for 10 sec and timeout
-    let val = await Promise.race([sleep(10000), setEmailSentVariable()]);
+    let val = await Promise.race([sleep(10000), setEmailSentVariable(mailSent)]);
     if(!val) {
       console.log("Unable to set variable value in 10 sec. Exiting task.");
     }
@@ -40,8 +40,8 @@ function sleep(ms: number): Promise<boolean> {
   return new Promise(resolve => setTimeout(resolve, ms, false));
 }
 
-async function setEmailSentVariable() : Promise<boolean> {
-  console.log(`##vso[task.setvariable variable=EmailReportTask.EmailSent;]false`);
+async function setEmailSentVariable(mailSent: boolean) : Promise<boolean> {
+  console.log(`##vso[task.setvariable variable=EmailReportTask.EmailSent;]${mailSent}`);
   return true;
 }
 
