@@ -65,15 +65,20 @@ export class TestResultsDataProvider implements IDataProvider {
     const bugsRefs: WorkItemReference[] = [];
     const results = await this.getTestResultsWithBugRefs(resultsForGroup, bugsRefs);
 
-    const workItemDictionary = await this.getWorkItemsAsync(bugsRefs);
-
-    results.forEach(result => {
-      if (result.associatedBugRefs != null && result.associatedBugRefs.length > 0) {
-        result.associatedBugRefs.forEach(workItemReference => {
-          result.associatedBugs.push(workItemDictionary.get(Number.parseInt(workItemReference.id)));
-        });
-      }
-    });
+    try {
+      const workItemDictionary = await this.getWorkItemsAsync(bugsRefs);
+      results.forEach(result => {
+        if (result.associatedBugRefs != null && result.associatedBugRefs.length > 0) {
+          result.associatedBugRefs.forEach(workItemReference => {
+            result.associatedBugs.push(workItemDictionary.get(Number.parseInt(workItemReference.id)));
+          });
+        }
+      });
+    }
+    catch(ex) {
+      // ignore
+      console.warn(`Error while fetching workitems for bugrefs: ${bugsRefs.map(b => b.id)}`);
+    }
 
     results.forEach(result => {
       if (result.testResult.outcome != null) {

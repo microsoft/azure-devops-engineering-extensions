@@ -59,7 +59,7 @@ export class SendMailConditionProcessor implements IPostProcessor {
     hasFailedTasks: boolean): Promise<boolean> {
 
     var hasPrevGotSameFailures = report.hasPrevGotSameFailures();
-    if (hasPrevGotSameFailures) {
+    if (!isNullOrUndefined(hasPrevGotSameFailures) && hasPrevGotSameFailures) {
       return hasPrevGotSameFailures;
     }
 

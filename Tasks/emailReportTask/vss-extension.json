@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "EmailReportExtension",
   "name": "Email Report Extension",
-  "version": "0.0.1",
+  "version": "1.0.6",
   "publisher": "epsteam",
   "targets": [
     {
@@ -13,12 +13,18 @@
   "categories": [
     "Azure Pipelines"
   ],
-  "icons": { "default": "images/outlook.png" },
+  "icons": {
+    "default": "images/icon.png"
+  },
   "tags": [],
   "scopes": [],
   "files": [
     {
       "path": "emailReportTask"
+    },
+    {
+      "path": "images",
+      "addressable": true
     }
   ],
   "content": {

@@ -14,6 +14,8 @@ import { IPipelineRestClient } from "../restclients/IPipelineRestClient";
 import { Build, TaskResult, TimelineRecord, IssueType } from "azure-devops-node-api/interfaces/BuildInterfaces";
 import { Timeline } from "azure-devops-node-api/interfaces/TaskAgentInterfaces";
 import { isNullOrUndefined } from "util";
+import { RetryablePromise } from "../restclients/RetryablePromise";
+import { DataProviderError } from "../../exceptions/DataProviderError";
 
 export class BuildDataProvider implements IDataProvider {
 
@@ -25,21 +27,29 @@ export class BuildDataProvider implements IDataProvider {
 
   public async getReportDataAsync(pipelineConfig: PipelineConfiguration, reportDataConfiguration: ReportDataConfiguration): Promise<Report> {
     const report = ReportFactory.createNewReport(pipelineConfig) as BuildReport;
-    const build = await this.pipelineRestClient.getPipelineAsync() as Build;
+    const build = await this.getBuildAsync(pipelineConfig);
     if (build == null) {
       throw new PipelineNotFoundError(`ProjectId: ${pipelineConfig.$projectId}, ${pipelineConfig.$pipelineId}`);
     }
 
-    const timeline = await this.pipelineRestClient.getPipelineTimelineAsync(build.id);
-    const changes = await this.pipelineRestClient.getPipelineChangesAsync(build.id);
+    const timeline = await RetryablePromise.RetryAsync(async () => this.pipelineRestClient.getPipelineTimelineAsync(build.id));
+    const changes = await RetryablePromise.RetryAsync(async () => this.pipelineRestClient.getPipelineChangesAsync(build.id));
     const phases = this.getPhases(timeline);
     const lastCompletedBuild = await this.pipelineRestClient.getLastPipelineAsync(build.definition.id, null, build.sourceBranch) as Build;
-    const lastCompletedTimeline = lastCompletedBuild != null ? await this.pipelineRestClient.getPipelineTimelineAsync(lastCompletedBuild.id) : null;
+    const lastCompletedTimeline = lastCompletedBuild != null ? await RetryablePromise.RetryAsync(async () => this.pipelineRestClient.getPipelineTimelineAsync(lastCompletedBuild.id)) : null;
 
     console.log("Fetched release data");
     report.setBuildData(build, timeline, lastCompletedBuild, lastCompletedTimeline, phases, changes);
 
     return report;
+  }
+
+  private async getBuildAsync(pipelineConfig: PipelineConfiguration): Promise<Build> {
+    var build = await RetryablePromise.RetryAsync(async () => this.pipelineRestClient.getPipelineAsync());
+    if(isNullOrUndefined(build)) {
+      throw new DataProviderError(`Unable to find build with id: ${pipelineConfig.$pipelineId}`);
+    }
+    return build as Build;
   }
 
   private getPhases(timeline: Timeline): PhaseModel[] {

@@ -94,7 +94,7 @@ export class ReleaseReport extends Report {
       return true;
     }
 
-    return false;
+    return null;
   }
 
   public hasFailedTasks(): boolean {

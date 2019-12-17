@@ -26,7 +26,7 @@ const accessKey = process.env.AccessKey;
 const smtpUser = process.env.SMTPUSER;
 const smtpPassword = process.env.SMTPPASSWORD;
 
- 
+
 export class FileWriter {
 
   static writeToFile(content: string, fileName: string): void {
@@ -56,7 +56,7 @@ export class ReportCreatorWrapper implements IHTMLReportCreator {
 export class MockConfigProvider implements IConfigurationProvider {
 
   getPipelineConfiguration(): PipelineConfiguration {
-    return new PipelineConfiguration(PipelineType.Release, 12345678, "projectid", "projectname", 98765432, 1234, false, "https://testaccount.azure.com/project/", accessKey);
+    return new PipelineConfiguration(PipelineType.Release, 13138547, "AzureDevOps", "AzureDevOps", 150011327, 6074, false, "https://dev.azure.com/mseng/", accessKey);
   }
 
   getMailConfiguration(): MailConfiguration {
@@ -88,8 +88,7 @@ async function run(): Promise<void> {
   reportManager.sendReportAsync(reportConfiguration);
 }
 
-
-if(isNullOrUndefined(accessKey)) {
+if (isNullOrUndefined(accessKey)) {
   console.error("Set Environment Vars for AccessKey.");
 } else {
   run();

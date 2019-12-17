@@ -3,7 +3,7 @@
   "name": "EmailReportPPE",
   "friendlyName": "Email Report PPE (Testing Purposes)",
   "description": "Send rich email report for test results and for tasks in this stage",
-  "helpMarkDown": "Sets 'EmailReportTask.EmailSent' variable to true if it sent email successfully.",
+  "helpMarkDown": "Sets 'EmailReportTask.EmailSent' variable to true if it sent email successfully. https://marketplace.visualstudio.com/items?itemName=epsteam.EmailReportExtension",
   "category": "Utility",
   "visibility": [
     "Build",
@@ -13,7 +13,7 @@
   "version": {
     "Major": 1,
     "Minor": 2,
-    "Patch": 106
+    "Patch": 108
   },
   "groups": [
     {

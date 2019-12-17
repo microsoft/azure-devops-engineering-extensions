@@ -9,7 +9,7 @@ export class ReleaseTestResultsClient extends AbstractTestResultsClient implemen
     super(pipelineConfig);
   }
 
-  public async queryTestResultsReportForPipelineAsync(includeFailures: boolean, config: PipelineConfiguration): Promise<TestResultSummary> {
+  public async queryTestResultsReportForPipelineAsync(config: PipelineConfiguration, includeFailures?: boolean): Promise<TestResultSummary> {
     return await (await this.testApiPromise).queryTestResultsReportForRelease(
       config.$projectName,
       config.$pipelineId,
@@ -18,7 +18,7 @@ export class ReleaseTestResultsClient extends AbstractTestResultsClient implemen
       includeFailures);
   }
 
-  public async getTestResultsDetailsForPipelineAsync(groupBy: string, filter: string, config: PipelineConfiguration): Promise<TestResultsDetails> {
+  public async getTestResultsDetailsForPipelineAsync(config: PipelineConfiguration, groupBy?: string, filter?: string,): Promise<TestResultsDetails> {
     return await (await this.testApiPromise).getTestResultDetailsForRelease(
       config.$projectName,
       config.$pipelineId,
