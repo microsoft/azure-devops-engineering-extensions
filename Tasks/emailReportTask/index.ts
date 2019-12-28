@@ -7,12 +7,16 @@ import { DataProviderFactory } from "./providers/DataProviderFactory";
 import { HTMLReportCreator } from "./htmlreport/HTMLReportCreator";
 import { EmailSender } from "./EmailSender";
 import { ReportError } from "./exceptions/ReportError";
+import { TelemetryLogger } from "./telemetry/TelemetryLogger";
 
 async function run(): Promise<void> {
   try {
     const configProvider = new ConfigurationProvider();
     const reportConfiguration = new ReportConfiguration(configProvider);
     const reportProvider = new ReportProvider(new DataProviderFactory(configProvider.getPipelineConfiguration()));
+
+    // Log telemetry: Task Inputs and Configuration
+    TelemetryLogger.LogTaskConfig(reportConfiguration);
 
     const reportManager = new ReportManager(
       reportProvider,
@@ -27,14 +31,18 @@ async function run(): Promise<void> {
         console.log("Unable to set variable value in 10 sec. Exiting task.");
       }
     }
-    console.log("Task Processing Complete.");
   }
   catch (err) {
     if (err instanceof ReportError) {
       console.log(err.getMessage());
+    } else {
+      console.log(err);
     }
     // Fail task
     throw err;
+  }
+  finally {
+    console.log("Task Processing Complete.");
   }
 }
 
