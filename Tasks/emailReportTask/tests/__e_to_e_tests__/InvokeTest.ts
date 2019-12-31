@@ -18,6 +18,7 @@ import { Report } from "../../model/Report";
 import { EmailReportViewModel } from "../../model/viewmodel/EmailReportViewModel";
 import { isNullOrUndefined } from "util";
 import { EmailSender } from "../../EmailSender";
+import { TelemetryLogger } from "../../telemetry/TelemetryLogger";
 
 const fs = require("fs");
 const js2xmlparser = require("js2xmlparser");
@@ -56,7 +57,7 @@ export class ReportCreatorWrapper implements IHTMLReportCreator {
 export class MockConfigProvider implements IConfigurationProvider {
 
   getPipelineConfiguration(): PipelineConfiguration {
-    return new PipelineConfiguration(PipelineType.Release, 13138547, "AzureDevOps", "AzureDevOps", 150011327, 6074, false, "https://dev.azure.com/mseng/", accessKey);
+    return new PipelineConfiguration(PipelineType.Release, 13587876, "AzureDevOps", "AzureDevOps", 156109317, 9462, false, "https://dev.azure.com/mseng/", accessKey);
   }
 
   getMailConfiguration(): MailConfiguration {
@@ -80,6 +81,7 @@ async function run(): Promise<void> {
 
   const configProvider = new MockConfigProvider();
   const reportConfiguration = new ReportConfiguration(configProvider);
+  TelemetryLogger.LogTaskConfig(reportConfiguration);
   const reportManager = new ReportManager(
     new ReportProvider(new DataProviderFactory(configProvider.getPipelineConfiguration())),
     new ReportCreatorWrapper(),

@@ -1,4 +1,5 @@
 import { TelemetryLogger } from "../../telemetry/TelemetryLogger";
+const { performance } = require('perf_hooks');
 
 export class RetryablePromise {
 

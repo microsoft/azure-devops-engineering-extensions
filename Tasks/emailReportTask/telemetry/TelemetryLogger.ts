@@ -1,6 +1,7 @@
 import { ReportConfiguration } from "../config/ReportConfiguration";
 import { PipelineType } from "../config/pipeline/PipelineType";
 import { EnumUtils } from "../utils/EnumUtils";
+const { performance } = require('perf_hooks');
 
 export class TelemetryLogger {
   public static readonly TELEMETRY_LINE =
@@ -48,7 +49,6 @@ export class TelemetryLogger {
         includeOthersInTotal: reportDataConfig.$includeOthersInTotal,
         groupTestSummaryBy: groupTestSummaryString,
         testResultsConfiguration: {
-          includeCommits: reportDataConfig.$testResultsConfig.$groupTestResultsBy,
           includeFailedTests: reportDataConfig.$testResultsConfig.$includeFailedTests,
           includeInconclusiveTests: reportDataConfig.$testResultsConfig.$includeInconclusiveTests,
           includeNotExecutedTests: reportDataConfig.$testResultsConfig.$includeNotExecutedTests,
@@ -60,19 +60,20 @@ export class TelemetryLogger {
     });
   }
 
-  public static LogModulePerf(moduleName: string, timeTaken: number) {
-    this.logTelemetry({
-      "ModuleName": `${moduleName}`,
-      "PERF": `${timeTaken}`
-    });
-  }
-
-  public static LogModuleRetryPerf(moduleName: string, timeTaken: number, numRetries: Number) {
-    this.logTelemetry({
-      "ModuleName": `${moduleName}`,
-      "PERF": `${timeTaken}`,
-      "Retries": `${numRetries}`
-    });
+  public static LogModulePerf(moduleName: string, timeTaken: number, numRetries: Number = 0) {
+    const timeTakenString = timeTaken.toFixed(2);
+    if (numRetries < 1) {
+      this.logTelemetry({
+        "ModuleName": `${moduleName}`,
+        "PERF": `${timeTakenString}`
+      });
+    } else {
+      this.logTelemetry({
+        "ModuleName": `${moduleName}`,
+        "PERF": `${timeTakenString}`,
+        "Retries": `${numRetries}`
+      });
+    }
   }
 
   /**
