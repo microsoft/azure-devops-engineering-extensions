@@ -1,7 +1,7 @@
 import { ReportConfiguration } from "../config/ReportConfiguration";
 import { PipelineType } from "../config/pipeline/PipelineType";
 import { EnumUtils } from "../utils/EnumUtils";
-const { performance } = require('perf_hooks');
+const now = require("performance-now")
 
 export class TelemetryLogger {
   public static readonly TELEMETRY_LINE =
@@ -87,14 +87,14 @@ export class TelemetryLogger {
   }
 
   public static async InvokeWithPerfLogger<T>(executor: () => Promise<T>, executorName: string): Promise<T> {
-    const perfStart = performance.now();
+    const perfStart = now();
     let returnVal: T;
     try {
       returnVal = await executor();
     }
     finally {
       // Log time taken by the dataprovider
-      TelemetryLogger.LogModulePerf(executorName, performance.now() - perfStart);
+      TelemetryLogger.LogModulePerf(executorName, now() - perfStart);
     }
     return returnVal;
   }

@@ -11,8 +11,8 @@
     "azure-pipelines-task-lib": "^2.8.0",
     "js2xmlparser": "^4.0.0",
     "nodemailer": "^6.3.0",
-    "perf_hooks": "0.0.1",
+    "performance-now": "^2.1.0",
     "reflect-metadata": "^0.1.13",
     "xslt-processor": "^0.11.5"
   }
-}
+}d
