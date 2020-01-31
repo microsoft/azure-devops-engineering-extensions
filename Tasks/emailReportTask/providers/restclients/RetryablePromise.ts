@@ -1,12 +1,12 @@
 import { TelemetryLogger } from "../../telemetry/TelemetryLogger";
-const { performance } = require('perf_hooks');
+const now = require('performance-now');
 
 export class RetryablePromise {
 
     private static defaultRetryCount: number = 3;
 
     public static async RetryAsync<T>(executor: () => Promise<T>, executorName: string, times: number = this.defaultRetryCount): Promise<T> {
-        const perfStart = performance.now();
+        const perfStart = now();
         let attemptNumber = 1;
         let lastError: Error;
         try {
@@ -31,7 +31,7 @@ export class RetryablePromise {
         finally {
             if (attemptNumber > 1) {
                 // Log time taken after all retries
-                TelemetryLogger.LogModulePerf(executorName, performance.now() - perfStart);
+                TelemetryLogger.LogModulePerf(executorName, now() - perfStart);
             }
         }
     }
