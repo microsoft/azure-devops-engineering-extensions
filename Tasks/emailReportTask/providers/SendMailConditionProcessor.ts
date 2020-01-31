@@ -18,7 +18,7 @@ export class SendMailConditionProcessor implements IPostProcessor {
     this.testResultsClient = testResultsClient;
   }
 
-  public async processReportAsync(reportConfig: ReportConfiguration, report: Report): Promise<void> {
+  public async processReportAsync(reportConfig: ReportConfiguration, report: Report): Promise<boolean> {
     var shouldSendMail = false;
     if (!report.$dataMissing) {
       const sendMailCondition = reportConfig.$sendMailCondition;
@@ -50,6 +50,7 @@ export class SendMailConditionProcessor implements IPostProcessor {
     }
 
     report.$sendMailConditionSatisfied = shouldSendMail;
+    return shouldSendMail;
   }
 
   public async hasPreviousReleaseGotSameFailuresAsync(

@@ -40,7 +40,7 @@ export class ReleaseDataProvider implements IDataProvider {
     // check if last completed one isn't latter one, then changes don't make sense
     if (lastCompletedRelease != null && lastCompletedRelease.id < release.id) {
       console.log(`Getting changes between releases ${release.id} & ${lastCompletedRelease.id}`);
-      changes = await RetryablePromise.RetryAsync(async () => this.pipelineRestClient.getPipelineChangesAsync(lastCompletedRelease.id));
+      changes = await RetryablePromise.RetryAsync(async () => this.pipelineRestClient.getPipelineChangesAsync(lastCompletedRelease.id), "GetPipelineChanges");
     }
     else {
       console.log("Unable to find any last completed release");
@@ -53,7 +53,7 @@ export class ReleaseDataProvider implements IDataProvider {
   }
 
   private async getReleaseAsync(pipelineConfig: PipelineConfiguration): Promise<Release> {
-    var release = await RetryablePromise.RetryAsync(async () => this.pipelineRestClient.getPipelineAsync());
+    var release = await RetryablePromise.RetryAsync(async () => this.pipelineRestClient.getPipelineAsync(), "GetPipeline");
     if(isNullOrUndefined(release)) {
       throw new DataProviderError(`Unable to find release with release id: ${pipelineConfig.$pipelineId}`);
     }
@@ -109,7 +109,7 @@ export class ReleaseDataProvider implements IDataProvider {
 
     console.log(`Fetching last release by completed environment id - ${pipelineConfig.$environmentId} and branch id ${branchId}`);
     const lastRelease = await RetryablePromise.RetryAsync(async () => this.pipelineRestClient.getLastPipelineAsync(release.releaseDefinition.id, 
-      environment.definitionEnvironmentId, branchId, null)); //Bug in API - release.createdOn);
+      environment.definitionEnvironmentId, branchId, null), "GetLastCompletedPipeline"); //Bug in API - release.createdOn);
 
     return lastRelease as Release;
   }

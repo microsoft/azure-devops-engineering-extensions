@@ -22,4 +22,24 @@ export class EnumUtils {
 
     return null;
   }
+
+  public static GetGroupTestResultsByString(condition: GroupTestResultsBy): string {
+    let index = 0;
+    for(let val in GroupTestResultsBy) {
+      if(!isNaN(Number(val)) && condition == Number(val)) {
+        break;
+      }
+      index++;
+    }
+
+    let index2 = 0;
+    for(let val in GroupTestResultsBy) {
+      if(isNaN(Number(val))) {
+        if(index2 == index) return val;
+        index2++;
+      }
+    }
+
+    return null;
+  }
 }

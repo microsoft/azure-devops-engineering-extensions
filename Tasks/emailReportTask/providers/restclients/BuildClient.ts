@@ -30,7 +30,7 @@ export class BuildRestClient extends AbstractClient implements IPipelineRestClie
       null,
       null,
       BuildResult.Succeeded | BuildResult.PartiallySucceeded | BuildResult.Failed | BuildResult.Canceled,
-      null,
+      null, 
       null,
       1,
       null,

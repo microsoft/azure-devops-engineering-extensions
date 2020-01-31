@@ -23,17 +23,17 @@ export abstract class AbstractTestResultsClient extends AbstractClient implement
       "Microsoft.BugCategory",
       automatedTestName,
       resultId
-    ));
+    ), "QueryTestResultBugs");
   }
 
   public async getTestResultById(testRunId: number, resultId: number): Promise<TestCaseResult> {
     const testApi = await this.testApiPromise;
-    return await RetryablePromise.RetryAsync(async () => testApi.getTestResultById(this.pipelineConfig.$projectName, testRunId, resultId));
+    return await RetryablePromise.RetryAsync(async () => testApi.getTestResultById(this.pipelineConfig.$projectName, testRunId, resultId), "GetTestResultById");
   }
 
   public async queryTestResultsReportAsync(parameterConfig: PipelineConfiguration = null): Promise<TestResultSummary> {
     const config = parameterConfig != null ? parameterConfig : this.pipelineConfig;
-    return await RetryablePromise.RetryAsync(async () => this.queryTestResultsReportForPipelineAsync(config));
+    return await RetryablePromise.RetryAsync(async () => this.queryTestResultsReportForPipelineAsync(config), "QueryTestResultsReport");
   }
   
   public async getTestResultOwnersAsync(resultsToFetch: TestCaseResult[]): Promise<IdentityRef[]> {
@@ -45,7 +45,7 @@ export abstract class AbstractTestResultsClient extends AbstractClient implement
     for (let i = 0, j = resultsToFetch.length; i < j; i += this.MaxItemsSupported) {
       const tempArray = resultsToFetch.slice(i, i + this.MaxItemsSupported);
       query.results = tempArray;
-      tasks.push(RetryablePromise.RetryAsync(async () => testApi.getTestResultsByQuery(query, this.pipelineConfig.$projectName)));
+      tasks.push(RetryablePromise.RetryAsync(async () => testApi.getTestResultsByQuery(query, this.pipelineConfig.$projectName), "GetTestResultOwners"));
     }
 
     await Promise.all(tasks);
@@ -71,12 +71,12 @@ export abstract class AbstractTestResultsClient extends AbstractClient implement
   public async getTestResultsDetailsAsync(groupBy: string, outcomeFilters?: TestOutcome[], parameterConfig: PipelineConfiguration = null): Promise<TestResultsDetails> {
     const filter = this.getOutcomeFilter(outcomeFilters);
     const config = parameterConfig != null ? parameterConfig : this.pipelineConfig;
-    return await RetryablePromise.RetryAsync(async () => this.getTestResultsDetailsForPipelineAsync(config, groupBy, filter));
+    return await RetryablePromise.RetryAsync(async () => this.getTestResultsDetailsForPipelineAsync(config, groupBy, filter), "GetTestResultsDetails");
   }
   
   public async getTestResultSummaryAsync(includeFailures: boolean, parameterConfig: PipelineConfiguration = null): Promise<TestResultSummary> {
     const config = parameterConfig != null ? parameterConfig : this.pipelineConfig;
-    return await RetryablePromise.RetryAsync(async () => this.queryTestResultsReportForPipelineAsync(config, includeFailures));
+    return await RetryablePromise.RetryAsync(async () => this.queryTestResultsReportForPipelineAsync(config, includeFailures), "GetTestResultSummary");
   }
 
   public async getTestResultsByQueryAsync(query: TestResultsQuery): Promise<TestResultsQuery> {
