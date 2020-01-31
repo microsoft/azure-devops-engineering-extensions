@@ -12,6 +12,7 @@ import { GroupTestResultsBy } from "./report/GroupTestResultsBy";
 import { PipelineConfiguration } from "./pipeline/PipelineConfiguration";
 import { PipelineType } from "./pipeline/PipelineType";
 import { StringUtils } from "../utils/StringUtils";
+import { isNullOrUndefined } from "util";
 
 export class ConfigurationProvider implements IConfigurationProvider {
   private pipelineConfiguration: PipelineConfiguration;
@@ -115,12 +116,12 @@ export class ConfigurationProvider implements IConfigurationProvider {
     const groupTestSummaryByStr = tl.getInput(TaskConstants.GROUPTESTSUMMARYBY_INPUTKEY, false);
 
     const groupTestSummaryBy: Array<GroupTestResultsBy> = new Array();
-    if (groupTestSummaryByStr != null) {
-      groupTestSummaryByStr.split(",").forEach(element => { groupTestSummaryBy.push(this.getGroupTestResultsByEnumFromString(element)) });
+    if (!isNullOrUndefined(groupTestSummaryByStr)) {
+      (groupTestSummaryByStr as string).split(",").forEach(element => { groupTestSummaryBy.push(this.getGroupTestResultsByEnumFromString(element)) });
     }
 
     // derived input values
-    const includeResultsConfig = includeResultsStr == null ? includeResultsStr.split(",") : [];
+    const includeResultsConfig = isNullOrUndefined(includeResultsStr) ? [] : includeResultsStr.split(",");
     const includeFailedTests = includeResultsConfig.includes("1");
     const includeOtherTests = includeResultsConfig.includes("2");
     const includePassedTests = includeResultsConfig.includes("3");

@@ -23,7 +23,6 @@ console.log(`Running: ${npmInstallCommand}`);
 exec(npmInstallCommand, function (error) {
   if (error) {
     console.log(`NPM Install Error: ${error}`);
-    exit(1);
   } else {
     console.log("NPM Install Done");
   }
@@ -55,11 +54,10 @@ if (common.ReleaseType.toLowerCase() == "prod") {
     if (error) {
       console.log(`Package create error: ${error}`);
     } else {
-      console.log("Package created");
+      console.log("Package created. Upload the VSIX to Visual Studio Marketplace if you wish to publish the extension.");
     }
   });
-} else {
-  console.log(`Navigate to ${common.TaskOutDir} and run the tfx upload command on the desired azure devops account to upload task directly. Command: 'tfx login && tfx build tasks upload --task-path .'`);
 }
+console.log(`If you want to upload to AzureDevOps account directly, then Navigate to ${common.TaskOutDir} and run the tfx upload command on the desired azure devops account to upload task directly. Command: 'tfx login && tfx build tasks upload --task-path .'`);
 
 process.chdir(cwd);
