@@ -23,22 +23,9 @@ console.log(`Running: ${npmInstallCommand}`);
 exec(npmInstallCommand, function (error) {
   if (error) {
     console.log(`NPM Install Error: ${error}`);
+    exit(1);
   } else {
     console.log("NPM Install Done");
-
-    console.log("Patching azure-devops-node-api node_modules..[REMOVE THIS AFTER 9.0.2 release]");
-    const serializationJsFilePath = path.resolve(`${common.TaskOutDir}/node_modules/azure-devops-node-api/serialization.js`);
-    let dataToWrite = "";
-    fs.readFile(serializationJsFilePath, 'utf8', function(err, data) {
-        if (err) throw err;
-        const lines = data.split("\r\n");
-        if(lines.length > 216) {
-          lines[215] = "break;"
-          dataToWrite = lines.join("\r\n");
-          fs.writeFileSync(serializationJsFilePath, dataToWrite);
-          fs.writeFileSync(path.resolve(`${__dirname}/../node_modules/azure-devops-node-api/serialization.js`), dataToWrite);
-        }
-      });
   }
 });
 
@@ -61,16 +48,16 @@ if (fs.existsSync(imagesDir)) {
 // Package extension only for prod
 if (common.ReleaseType.toLowerCase() == "prod") {
   console.log(`Run command in ${common.ExtensionOutDir}: tfx extension create --root . --extension-id ${extensionId} --no-prompt`);
-  // process.chdir(common.ExtensionOutDir);
-  // var command = `tfx extension create --root . --extension-id ${extensionId} --no-prompt`;
-  // console.log(`Running: ${command}`);
-  // exec(command, function (error) {
-  //   if (error) {
-  //     console.log(`Package create error: ${error}`);
-  //   } else {
-  //     console.log("Package created");
-  //   }
-  // });
+  process.chdir(common.ExtensionOutDir);
+  var command = `tfx extension create --root . --extension-id ${extensionId} --no-prompt`;
+  console.log(`Running: ${command}`);
+  exec(command, function (error) {
+    if (error) {
+      console.log(`Package create error: ${error}`);
+    } else {
+      console.log("Package created");
+    }
+  });
 } else {
   console.log(`Navigate to ${common.TaskOutDir} and run the tfx upload command on the desired azure devops account to upload task directly. Command: 'tfx login && tfx build tasks upload --task-path .'`);
 }
