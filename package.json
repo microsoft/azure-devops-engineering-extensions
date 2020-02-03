@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "test": "npm run jest",
-    "build": "npm install && npm run build:t1 && npm run build:t2",
+    "build": "npm install --no-optional && npm run build:t1 && npm run build:t2",
     "build:t1": "npm run build:emailreport",
     "build:t2": "npm run build:prinsights",
     "pack:t1": "npm run clean && npm run build:t1 && npm run pack:emailreport",
