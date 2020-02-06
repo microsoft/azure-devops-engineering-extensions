@@ -37,7 +37,7 @@
   },
   "contributions": [
     {
-      "id": "c4ffd380-3a3b-4fa6-b02a-00ee18afe1f4",
+      "id": "emailReportTask",
       "type": "ms.vss-distributed-task.task",
       "targets": [
         "ms.vss-distributed-task.tasks"
