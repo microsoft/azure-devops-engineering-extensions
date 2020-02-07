@@ -62,9 +62,9 @@ export class MockConfigProvider implements IConfigurationProvider {
 
   getMailConfiguration(): MailConfiguration {
     return new MailConfiguration("[{environmentStatus}] {passPercentage} tests passed",
-      new RecipientsConfiguration("xyz@email.com", false, false, false, false),
+      new RecipientsConfiguration("xyz@test.com", false, false, false, false),
       new RecipientsConfiguration("", false, false, false, false),
-      new SmtpConfiguration(smtpUser, smtpPassword, "smtp.live.com", true), "test.com");
+      new SmtpConfiguration(smtpUser, smtpPassword, "smtp.live.com", true), "test.m");
   }
 
   getReportDataConfiguration(): ReportDataConfiguration {
@@ -77,14 +77,9 @@ export class MockConfigProvider implements IConfigurationProvider {
   }
 }
 
-const tls = require("tls");
-
 async function run(): Promise<void> {
 
   console.log('Node Version: ' + process.version);
-  console.log(`Minimum TLS Version: ${tls.DEFAULT_MIN_VERSION}`);
-  tls.DEFAULT_MIN_VERSION = "TLSv1.2";
-  console.log(`Minimum TLS Version: ${tls.DEFAULT_MIN_VERSION}`);
   const configProvider = new MockConfigProvider();
   const reportConfiguration = new ReportConfiguration(configProvider);
   TelemetryLogger.LogTaskConfig(reportConfiguration);

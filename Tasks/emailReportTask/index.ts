@@ -8,15 +8,11 @@ import { HTMLReportCreator } from "./htmlreport/HTMLReportCreator";
 import { EmailSender } from "./EmailSender";
 import { ReportError } from "./exceptions/ReportError";
 import { TelemetryLogger } from "./telemetry/TelemetryLogger";
-const tls = require("tls");
 
 async function run(): Promise<void> {
   try {
 
     console.log('Node Version: ' + process.version);
-    console.log(`Minimum TLS Version: ${tls.DEFAULT_MIN_VERSION}`);
-    tls.DEFAULT_MIN_VERSION = "TLSv1.2";
-    console.log(`Minimum TLS Version: ${tls.DEFAULT_MIN_VERSION}`);
 
     const configProvider = new ConfigurationProvider();
     const reportConfiguration = new ReportConfiguration(configProvider);

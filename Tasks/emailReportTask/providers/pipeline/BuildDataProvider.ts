@@ -74,7 +74,7 @@ export class BuildDataProvider implements IDataProvider {
           return new PhaseModel(
             phase.name, 
             jobModels,
-            phase.result.toString(),            
+            isNullOrUndefined(phase.result) ? "Unknown" : phase.result.toString(),            
             this.getOrder(phase));
         });
         return phaseModels;
