@@ -4,9 +4,10 @@
   "description": "",
   "scripts": {
     "test": "npm run jest",
-    "build": "npm install --no-optional && npm run build:t1 && npm run build:t2",
-    "build:t1": "npm run build:emailreport",
-    "build:t2": "npm run build:prinsights",
+    "prebuild": "npm install --no-optional",
+    "build": "npm run prebuild && npm run build:emailreport && npm run build:prinsights",
+    "build:t1": "npm run prebuild && npm run build:emailreport",
+    "build:t2": "npm run prebuild && npm run build:prinsights",
     "pack:t1": "npm run clean && npm run build:t1 && npm run pack:emailreport",
     "pack:t2": "npm run clean && npm run build:t2 && npm run pack:prinsights",
     "e2e:t1": "npm run e2e:emailreport",
@@ -17,7 +18,7 @@
     "pack:prinsights": "node ./commands/package.js pullRequestInsights",
     "e2e:emailreport": "node js/emailReportExtension/emailReportTask/tests/__e_to_e_tests__/InvokeTest.js",
     "e2e:prinsights": "node js/pullRequestInsightsExtension/pullRequestInsightsTask/tests/__e_to_e_tests__/InvokeTest.js",
-    "clean": "rimraf dist && rimraf node_modules"
+    "clean": "rimraf dist"
   },
   "repository": {
     "type": "git",

@@ -57,14 +57,14 @@ export class ReportCreatorWrapper implements IHTMLReportCreator {
 export class MockConfigProvider implements IConfigurationProvider {
 
   getPipelineConfiguration(): PipelineConfiguration {
-    return new PipelineConfiguration(PipelineType.Release, 13587876, "AzureDevOps", "AzureDevOps", 156109317, 9462, false, "https://dev.azure.com/mseng/", accessKey);
+    return new PipelineConfiguration(PipelineType.Release, 13942411, "AzureDevOps", "AzureDevOps", 160977787, 9462, false, "https://dev.azure.com/{account}/", accessKey);
   }
 
   getMailConfiguration(): MailConfiguration {
     return new MailConfiguration("[{environmentStatus}] {passPercentage} tests passed",
       new RecipientsConfiguration("xyz@test.com", false, false, false, false),
       new RecipientsConfiguration("", false, false, false, false),
-      new SmtpConfiguration(smtpUser, smtpPassword, "smtp.live.com", true), "test.com");
+      new SmtpConfiguration(smtpUser, smtpPassword, "smtp.live.com", true), "test.m");
   }
 
   getReportDataConfiguration(): ReportDataConfiguration {
@@ -73,12 +73,13 @@ export class MockConfigProvider implements IConfigurationProvider {
   }
 
   getSendMailCondition(): SendMailCondition {
-    return SendMailCondition.OnNewFailuresOnly;
+    return SendMailCondition.Always;
   }
 }
 
 async function run(): Promise<void> {
 
+  console.log('Node Version: ' + process.version);
   const configProvider = new MockConfigProvider();
   const reportConfiguration = new ReportConfiguration(configProvider);
   TelemetryLogger.LogTaskConfig(reportConfiguration);

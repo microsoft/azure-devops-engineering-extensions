@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "EmailReportExtension",
   "name": "Email Report Extension",
-  "version": "1.0.6",
+  "version": "1.1.0",
   "publisher": "epsteam",
   "targets": [
     {
@@ -37,7 +37,7 @@
   },
   "contributions": [
     {
-      "id": "c4ffd380-3a3b-4fa6-b02a-00ee18afe1f4",
+      "id": "EmailReport",
       "type": "ms.vss-distributed-task.task",
       "targets": [
         "ms.vss-distributed-task.tasks"

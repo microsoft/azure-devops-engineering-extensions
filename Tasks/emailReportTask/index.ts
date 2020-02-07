@@ -11,6 +11,9 @@ import { TelemetryLogger } from "./telemetry/TelemetryLogger";
 
 async function run(): Promise<void> {
   try {
+
+    console.log('Node Version: ' + process.version);
+
     const configProvider = new ConfigurationProvider();
     const reportConfiguration = new ReportConfiguration(configProvider);
     const reportProvider = new ReportProvider(new DataProviderFactory(configProvider.getPipelineConfiguration()));

@@ -8,18 +8,35 @@ const nodemailer = require("nodemailer");
 
 export class EmailSender implements IReportSender {
   public async sendReportAsync(report: Report, htmlReportMessage: string, mailConfiguration: MailConfiguration): Promise<boolean> {
-
     const mailAddressViewModel = new MailAddressViewModel(report, mailConfiguration);
 
-    let transporter = nodemailer.createTransport({
-      host: mailConfiguration.$smtpConfig.$smtpHost,
-      port: 587,
-      tls:  mailConfiguration.$smtpConfig.$enableTLS,
-      auth: {
-        user: mailConfiguration.$smtpConfig.$userName,
-        pass: mailConfiguration.$smtpConfig.$password
-      }
-    });
+    let transporter: any;
+    if(mailConfiguration.$smtpConfig.$enableTLS) {
+      transporter = nodemailer.createTransport({
+        host: mailConfiguration.$smtpConfig.$smtpHost,
+        port: 587,
+        tls: {
+          maxVersion: 'TLSv1.2',
+          minVersion: 'TLSv1.2',
+          rejectUnauthorized: false
+        },
+        requireTLS: true,
+        auth: {
+          user: mailConfiguration.$smtpConfig.$userName,
+          pass: mailConfiguration.$smtpConfig.$password
+        }
+      });
+    }
+    else {
+      transporter = nodemailer.createTransport({
+        host: mailConfiguration.$smtpConfig.$smtpHost,
+        port: 587,
+        auth: {
+          user: mailConfiguration.$smtpConfig.$userName,
+          pass: mailConfiguration.$smtpConfig.$password
+        }
+      });
+    }
 
     try {
       const result = await this.sendMailAsync(transporter, mailAddressViewModel, mailConfiguration, htmlReportMessage);
