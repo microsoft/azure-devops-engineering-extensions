@@ -15,12 +15,10 @@ export class EmailSender implements IReportSender {
       transporter = nodemailer.createTransport({
         host: mailConfiguration.$smtpConfig.$smtpHost,
         port: 587,
-        //secure: true,
         tls: {
           maxVersion: 'TLSv1.2',
           minVersion: 'TLSv1.2',
           rejectUnauthorized: false
-          //ciphers: 'TLS_AES_128_GCM_SHA256'
         },
         requireTLS: true,
         auth: {
