@@ -11,16 +11,22 @@ export class EmailSender implements IReportSender {
   public async sendReportAsync(report: Report, htmlReportMessage: string, mailConfiguration: MailConfiguration): Promise<boolean> {
     const mailAddressViewModel = new MailAddressViewModel(report, mailConfiguration);
 
-    let smtpUrl = url.parse(mailConfiguration.$smtpConfig.$smtpHost, true);
-    if(isNullOrUndefined(smtpUrl.protocol)) {
-      // Protocol not provided in url 
-      // Add protocol so that url.parse can work as it requires protocol in url to be able to parse
-      smtpUrl = url.parse("smtp://" + mailConfiguration.$smtpConfig.$smtpHost, true);
-    }
+    let smtpUrlProvided = mailConfiguration.$smtpConfig.$smtpHost;
+    console.log(`Using SmtpHost URL: ${smtpUrlProvided}`);
+    smtpUrlProvided = smtpUrlProvided.includes("://") ? smtpUrlProvided : "smtp://" + smtpUrlProvided;
+    console.log(`Parsed Url: ${smtpUrlProvided}`);
+    let smtpUrl = url.parse(smtpUrlProvided, true);
+
+    console.log(`Host: ${smtpUrl.host}`);
+    console.log(`HostName: ${smtpUrl.hostname}`);
+    console.log(`Port: ${smtpUrl.port}`);
+    console.log(`Protocol: ${smtpUrl.protocol}`);
 
     const smtpHost = smtpUrl.hostname;
     let smtpPort = smtpUrl.port;
     smtpPort = isNullOrUndefined(smtpUrl.port) ? 587 : smtpUrl.port;
+
+    console.log(`Using HostName: ${smtpHost} and port: ${smtpPort}`);
 
     let transporter: any;
     if(mailConfiguration.$smtpConfig.$enableTLS) {      
