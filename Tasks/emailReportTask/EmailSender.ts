@@ -5,16 +5,28 @@ import { Report } from "./model/Report";
 import { MailError } from "./exceptions/MailError";
 import { isNullOrUndefined } from "util";
 const nodemailer = require("nodemailer");
+const url = require("url");
 
 export class EmailSender implements IReportSender {
   public async sendReportAsync(report: Report, htmlReportMessage: string, mailConfiguration: MailConfiguration): Promise<boolean> {
     const mailAddressViewModel = new MailAddressViewModel(report, mailConfiguration);
 
+    let smtpUrl = url.parse(mailConfiguration.$smtpConfig.$smtpHost, true);
+    if(isNullOrUndefined(smtpUrl.protocol)) {
+      // Protocol not provided in url 
+      // Add protocol so that url.parse can work as it requires protocol in url to be able to parse
+      smtpUrl = url.parse("smtp://" + mailConfiguration.$smtpConfig.$smtpHost, true);
+    }
+
+    const smtpHost = smtpUrl.hostname;
+    let smtpPort = smtpUrl.port;
+    smtpPort = isNullOrUndefined(smtpUrl.port) ? 587 : smtpUrl.port;
+
     let transporter: any;
-    if(mailConfiguration.$smtpConfig.$enableTLS) {
+    if(mailConfiguration.$smtpConfig.$enableTLS) {      
       transporter = nodemailer.createTransport({
-        host: mailConfiguration.$smtpConfig.$smtpHost,
-        port: 587,
+        host: smtpHost,
+        port: smtpPort,
         tls: {
           maxVersion: 'TLSv1.2',
           minVersion: 'TLSv1.2',
@@ -29,8 +41,8 @@ export class EmailSender implements IReportSender {
     }
     else {
       transporter = nodemailer.createTransport({
-        host: mailConfiguration.$smtpConfig.$smtpHost,
-        port: 587,
+        host: smtpHost,
+        port: smtpPort,
         auth: {
           user: mailConfiguration.$smtpConfig.$userName,
           pass: mailConfiguration.$smtpConfig.$password
