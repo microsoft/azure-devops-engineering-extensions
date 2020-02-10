@@ -25,7 +25,7 @@ exec(npmInstallCommand, function (error) {
     console.log(`NPM Install Error: ${error}`);
   } else {
     console.log("NPM Install Done");
-    
+
     var imagesDir = path.resolve(common.TaskSrcDir, "images");
     if (fs.existsSync(imagesDir)) {
       var files = fs.readdirSync(imagesDir);
@@ -37,7 +37,7 @@ exec(npmInstallCommand, function (error) {
         }
       });
 
-      if(fs.existsSync(path.resolve(imagesDir, "icon.png"))) {
+      if (fs.existsSync(path.resolve(imagesDir, "icon.png"))) {
         common.CopyFile(imagesDir, "icon.png", `${common.TaskOutDir}`);
       }
     }
@@ -52,10 +52,12 @@ exec(npmInstallCommand, function (error) {
           console.log(`Package create error: ${error}`);
         } else {
           console.log("Package created. Upload the VSIX to Visual Studio Marketplace if you wish to publish the extension.");
-          console.log(`If you want to upload to AzureDevOps account directly, then Navigate to ${common.TaskOutDir} and run the tfx upload command on the desired azure devops account to upload task directly. Command: 'tfx login && tfx build tasks upload --task-path .'`);
-          process.chdir(cwd);      
+          console.log(`If you want to upload to an AzureDevOps account directly, then Navigate to: \r\n${common.TaskOutDir}\r\n and run the following command: \r\n'tfx login && tfx build tasks upload --task-path .'\r\n`);
+          process.chdir(cwd);
         }
       });
+    } else {
+      console.log(`\r\nIf you want to upload to an AzureDevOps account directly, then Navigate to: \r\n${common.TaskOutDir}\r\n and run the following command: \r\n'tfx login && tfx build tasks upload --task-path .'\r\n`);
     }
   }
 });
