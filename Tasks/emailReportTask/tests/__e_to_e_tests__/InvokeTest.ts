@@ -57,14 +57,14 @@ export class ReportCreatorWrapper implements IHTMLReportCreator {
 export class MockConfigProvider implements IConfigurationProvider {
 
   getPipelineConfiguration(): PipelineConfiguration {
-    return new PipelineConfiguration(PipelineType.Release, 13942411, "AzureDevOps", "AzureDevOps", 160977787, 9462, false, "https://dev.azure.com/{account}/", accessKey);
+    return new PipelineConfiguration(PipelineType.Release, 13942411, "ProjectId", "ProjectName", 160977787, 9462, false, "https://dev.azure.com/{account}/", accessKey);
   }
 
   getMailConfiguration(): MailConfiguration {
     return new MailConfiguration("[{environmentStatus}] {passPercentage} tests passed",
-      new RecipientsConfiguration("xyz@test.com", false, false, false, false),
+      new RecipientsConfiguration("xyz@email.com", false, false, false, false),
       new RecipientsConfiguration("", false, false, false, false),
-      new SmtpConfiguration(smtpUser, smtpPassword, "smtp.live.com", true), "test.m");
+      new SmtpConfiguration(smtpUser, smtpPassword, "smtp.live.com", true), "test.com");
   }
 
   getReportDataConfiguration(): ReportDataConfiguration {

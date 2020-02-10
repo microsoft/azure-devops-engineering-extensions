@@ -5,16 +5,34 @@ import { Report } from "./model/Report";
 import { MailError } from "./exceptions/MailError";
 import { isNullOrUndefined } from "util";
 const nodemailer = require("nodemailer");
+const url = require("url");
 
 export class EmailSender implements IReportSender {
   public async sendReportAsync(report: Report, htmlReportMessage: string, mailConfiguration: MailConfiguration): Promise<boolean> {
     const mailAddressViewModel = new MailAddressViewModel(report, mailConfiguration);
 
+    let smtpUrlProvided = mailConfiguration.$smtpConfig.$smtpHost;
+    console.log(`Using SmtpHost URL: ${smtpUrlProvided}`);
+    smtpUrlProvided = smtpUrlProvided.includes("://") ? smtpUrlProvided : "smtp://" + smtpUrlProvided;
+    console.log(`Parsed Url: ${smtpUrlProvided}`);
+    let smtpUrl = url.parse(smtpUrlProvided, true);
+
+    console.log(`Host: ${smtpUrl.host}`);
+    console.log(`HostName: ${smtpUrl.hostname}`);
+    console.log(`Port: ${smtpUrl.port}`);
+    console.log(`Protocol: ${smtpUrl.protocol}`);
+
+    const smtpHost = smtpUrl.hostname;
+    let smtpPort = smtpUrl.port;
+    smtpPort = isNullOrUndefined(smtpUrl.port) ? 587 : smtpUrl.port;
+
+    console.log(`Using HostName: ${smtpHost} and port: ${smtpPort}`);
+
     let transporter: any;
-    if(mailConfiguration.$smtpConfig.$enableTLS) {
+    if(mailConfiguration.$smtpConfig.$enableTLS) {      
       transporter = nodemailer.createTransport({
-        host: mailConfiguration.$smtpConfig.$smtpHost,
-        port: 587,
+        host: smtpHost,
+        port: smtpPort,
         tls: {
           maxVersion: 'TLSv1.2',
           minVersion: 'TLSv1.2',
@@ -29,8 +47,8 @@ export class EmailSender implements IReportSender {
     }
     else {
       transporter = nodemailer.createTransport({
-        host: mailConfiguration.$smtpConfig.$smtpHost,
-        port: 587,
+        host: smtpHost,
+        port: smtpPort,
         auth: {
           user: mailConfiguration.$smtpConfig.$userName,
           pass: mailConfiguration.$smtpConfig.$password
