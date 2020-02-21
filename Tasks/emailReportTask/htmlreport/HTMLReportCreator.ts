@@ -3,7 +3,7 @@ import { IHTMLReportCreator } from './IHTMLReportCreator';
 import { Report } from '../model/Report';
 import { ReportConfiguration } from '../config/ReportConfiguration';
 const fs = require("fs");
-const js2xmlparser = require("js2xmlparser");
+const o2x = require('object-to-xml');
 const xsltProcessor = require("xslt-processor");
 const { xmlParse, xsltProcess } = xsltProcessor;
 
@@ -17,9 +17,8 @@ export class HTMLReportCreator implements IHTMLReportCreator {
 
     // Create a view model object before serialize to xml
     const reportViewModel = new EmailReportViewModel(report, reportConfiguration);
-
     // Serialize gathered data into xml 
-    const xmlString: string = js2xmlparser.parse("EmailReportViewModel", reportViewModel);
+    const xmlString: string = "<EmailReportViewModel>" + o2x(reportViewModel) + "</EmailReportViewModel>";
     // Read XSLT email template 
     const buffer = fs.readFileSync(xsltTemplatePath);
     // Parse the xml string as XmlDocument/Node
@@ -28,8 +27,8 @@ export class HTMLReportCreator implements IHTMLReportCreator {
     const xsltDoc = xmlParse(buffer.toString(), "application/xml");
     // Fill the XSLT document template with the xml doc data
     let outXmlString = xsltProcess(xmlDoc, xsltDoc);
-    // HACK - For some reason, xml parser is not reading <br/> correctly. Do string replace to fix the jankiness
-    outXmlString = outXmlString.split("&amp;lt;br/&gt;").join("<br/>");
+    // For some reason, HTML produced has <br/> not read correctly if they are part of xml nodevalues. Do string replace to fix the jankiness
+    outXmlString = outXmlString.split("&amp;lt;br/&amp;gt;").join("<br/>");
     return outXmlString;
   }
 }

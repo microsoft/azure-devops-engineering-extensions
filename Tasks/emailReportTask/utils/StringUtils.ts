@@ -26,7 +26,7 @@ export class StringUtils {
       return null;
     }
 
-    const lines = this.getNonEmptyLines(content);
+    const lines = this.getNonEmptyLines(content);    
     return lines.join("<br/>");
   }
 
