@@ -27,7 +27,9 @@ export class HTMLReportCreator implements IHTMLReportCreator {
     // Parse XSLT as XMLDocument
     const xsltDoc = xmlParse(buffer.toString(), "application/xml");
     // Fill the XSLT document template with the xml doc data
-    const outXmlString = xsltProcess(xmlDoc, xsltDoc);
+    let outXmlString = xsltProcess(xmlDoc, xsltDoc);
+    // HACK - For some reason, xml parser is not reading <br/> correctly. Do string replace to fix the jankiness
+    outXmlString = outXmlString.split("&amp;lt;br/&gt;").join("<br/>");
     return outXmlString;
   }
 }
