@@ -40,7 +40,12 @@ export class ReleaseDataProvider implements IDataProvider {
     // check if last completed one isn't latter one, then changes don't make sense
     if (lastCompletedRelease != null && lastCompletedRelease.id < release.id) {
       console.log(`Getting changes between releases ${release.id} & ${lastCompletedRelease.id}`);
-      changes = await RetryablePromise.RetryAsync(async () => this.pipelineRestClient.getPipelineChangesAsync(lastCompletedRelease.id), "GetPipelineChanges");
+      try {
+        changes = await RetryablePromise.RetryAsync(async () => this.pipelineRestClient.getPipelineChangesAsync(lastCompletedRelease.id), "GetPipelineChanges");
+      } catch(err) {
+        // Changes happened in current release w.r.t previous one isn't strictly required to send mail - ignoring any errors
+        console.warn(`Error while comparing current release - '${release.id}' with previous one - '${lastCompletedRelease.id}': ${err}`);
+      }
     }
     else {
       console.log("Unable to find any last completed release");
