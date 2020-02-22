@@ -27,8 +27,8 @@ export class HTMLReportCreator implements IHTMLReportCreator {
     const xsltDoc = xmlParse(buffer.toString(), "application/xml");
     // Fill the XSLT document template with the xml doc data
     let outXmlString = xsltProcess(xmlDoc, xsltDoc);
-    // For some reason, HTML produced has <br/> not read correctly if they are part of xml nodevalues. Do string replace to fix the jankiness
-    outXmlString = outXmlString.split("&amp;lt;br/&amp;gt;").join("<br/>");
+    // XML parsing changes <br/> to special chars if they are part of xml nodevalues. Do string replace to fix the jankiness for HTML.
+    outXmlString = outXmlString.split("&lt;br/&gt;").join("<br/>");
     return outXmlString;
   }
 }

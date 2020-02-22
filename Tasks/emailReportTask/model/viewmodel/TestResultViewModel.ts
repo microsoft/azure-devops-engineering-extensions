@@ -35,10 +35,10 @@ export class TestResultViewModel {
     const result = testResultModel.testResult;
     this.Id = result.id;
     this.TestCaseTitle = result.testCaseTitle;
-    this.ErrorMessage = StringUtils.ReplaceNewlineWithBrTag(result.errorMessage);
+    this.ErrorMessage = "<![CDATA[" + StringUtils.ReplaceNewlineWithBrTag(result.errorMessage) + "]]>";
     this.TestOutcome = result.outcome;
-    this.StackTrace = StringUtils.ReplaceNewlineWithBrTag(
-      StringUtils.getFirstNLines(result.stackTrace, this.StackTraceLineCount));
+    this.StackTrace = "<![CDATA[" + StringUtils.ReplaceNewlineWithBrTag(
+      StringUtils.getFirstNLines(result.stackTrace, this.StackTraceLineCount)) + "]]>";
 
     if (result.priority != 255) {
       this.Priority = DisplayNameHelper.getPriorityDisplayName(result.priority == null ? "" : result.priority.toString());
