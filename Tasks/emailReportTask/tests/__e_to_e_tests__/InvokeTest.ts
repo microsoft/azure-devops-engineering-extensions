@@ -13,16 +13,11 @@ import { PipelineType } from "../../config/pipeline/PipelineType";
 import { ReportProvider } from "../../providers/ReportProvider";
 import { DataProviderFactory } from "../../providers/DataProviderFactory";
 import { HTMLReportCreator } from "../../htmlreport/HTMLReportCreator";
-import { IHTMLReportCreator } from "../../htmlreport/IHTMLReportCreator";
-import { Report } from "../../model/Report";
-import { EmailReportViewModel } from "../../model/viewmodel/EmailReportViewModel";
 import { isNullOrUndefined } from "util";
 import { EmailSender } from "../../EmailSender";
 import { TelemetryLogger } from "../../telemetry/TelemetryLogger";
 
 const fs = require("fs");
-const js2xmlparser = require("js2xmlparser");
-
 const accessKey = process.env.AccessKey;
 const smtpUser = process.env.SMTPUSER;
 const smtpPassword = process.env.SMTPPASSWORD;
@@ -41,16 +36,6 @@ export class FileWriter {
       console.log("File saved successfully!")
     }
     );
-  }
-}
-
-export class ReportCreatorWrapper implements IHTMLReportCreator {
-  createHtmlReport(report: Report, reportConfiguration: ReportConfiguration): string {
-    // Serialize gathered data into xml 
-    const xmlString: string = js2xmlparser.parse("EmailReportViewModel", new EmailReportViewModel(report, reportConfiguration));
-    FileWriter.writeToFile(xmlString, "reportViewModel.xml");
-    const actualCreator = new HTMLReportCreator();
-    return actualCreator.createHtmlReport(report, reportConfiguration);
   }
 }
 
@@ -85,7 +70,7 @@ async function run(): Promise<void> {
   TelemetryLogger.LogTaskConfig(reportConfiguration);
   const reportManager = new ReportManager(
     new ReportProvider(new DataProviderFactory(configProvider.getPipelineConfiguration())),
-    new ReportCreatorWrapper(),
+    new HTMLReportCreator(),
     new EmailSender());
 
   reportManager.sendReportAsync(reportConfiguration);
