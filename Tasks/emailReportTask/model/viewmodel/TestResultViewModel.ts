@@ -9,6 +9,7 @@ import { DisplayNameHelper } from "../../utils/DisplayNameHelper";
 import { ReleaseReferenceViewModel } from "./ReleaseReferenceViewModel";
 import { PipelineType } from "../../config/pipeline/PipelineType";
 import { BuildReferenceViewModel } from "./BuildReferenceViewModel";
+import { isNullOrUndefined } from "util";
 
 export class TestResultViewModelWrapper {
   public TestResultViewModel: TestResultViewModel[];
@@ -65,6 +66,16 @@ export class TestResultViewModel {
       }
     }
 
+    if(isNullOrUndefined(result.durationInMs)) {
+      if(!isNullOrUndefined(result.startedDate) && !isNullOrUndefined(result.completedDate)) {
+        result.durationInMs = result.completedDate.getTime() - result.startedDate.getTime();
+      }
+
+      if(isNullOrUndefined(result.durationInMs) || result.durationInMs < 0) {
+        // unknown duration - assume test didn't run instead of displaying "Undefined/NaN" in email
+        result.durationInMs = 0;
+      }
+    }
     this.Duration = TimeFormatter.FormatDuration(result.durationInMs);
     this.CreateBugLink = LinkHelper.getCreateBugLinkForTest(config, testResultModel.testResult);
   }

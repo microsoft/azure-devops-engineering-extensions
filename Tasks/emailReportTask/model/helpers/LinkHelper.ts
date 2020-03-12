@@ -126,7 +126,7 @@ export class LinkHelper {
     return projectName + "/" + LinkHelper.BuildPipelineExtension;
   }
 
-  private static getTestTabLinkInBuild(config: PipelineConfiguration) {
+  public static getTestTabLinkInBuild(config: PipelineConfiguration) {
     var collectionUri = config.$teamUri;
     var parameters = new Map<string, string>(
       [
