@@ -61,7 +61,7 @@ export class MailAddressViewModel {
     if (!isNullOrUndefined(report.$failedTestOwners)) {
       report.$failedTestOwners.forEach(identity => {
         var mailAddress = this.getMailAddressFromIdentityRef(identity);
-        if (StringUtils.isNullOrWhiteSpace(mailAddress)) {
+        if (!StringUtils.isNullOrWhiteSpace(mailAddress)) {
           mailAddresses.push(mailAddress);
         }
       });

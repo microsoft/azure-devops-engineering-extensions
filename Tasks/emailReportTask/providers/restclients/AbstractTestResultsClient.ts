@@ -40,18 +40,14 @@ export abstract class AbstractTestResultsClient extends AbstractClient implement
     var query = new TestResultsQueryImpl();
     query.fields = ["Owner"];
 
-    const tasks: Promise<TestResultsQuery>[] = [];
+    const results: TestCaseResult[] = [];
     const testApi = await this.testApiPromise;
     for (let i = 0, j = resultsToFetch.length; i < j; i += this.MaxItemsSupported) {
       const tempArray = resultsToFetch.slice(i, i + this.MaxItemsSupported);
       query.results = tempArray;
-      tasks.push(RetryablePromise.RetryAsync(async () => testApi.getTestResultsByQuery(query, this.pipelineConfig.$projectName), "GetTestResultOwners"));
+      let queryResult: TestResultsQuery = await RetryablePromise.RetryAsync(async () => testApi.getTestResultsByQuery(query, this.pipelineConfig.$projectName), "GetTestResultOwners");
+      results.push(...queryResult.results);
     }
-
-    await Promise.all(tasks);
-
-    const results: TestCaseResult[] = [];
-    tasks.forEach(async t => results.push(...(await t).results));
 
     const ownerMap = new Map<string, IdentityRef>();
     results.forEach(r => {

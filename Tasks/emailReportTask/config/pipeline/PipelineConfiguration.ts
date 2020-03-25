@@ -109,8 +109,10 @@ export class PipelineConfiguration {
     if (this.testTabLink == null) {
       if (this.pipelineType == PipelineType.Release) {
         this.testTabLink = LinkHelper.getTestTabLinkInRelease(this);
+      } else if (this.pipelineType == PipelineType.Build) {
+        this.testTabLink = LinkHelper.getTestTabLinkInBuild(this);
       }
-    }
+    } 
     return this.testTabLink;
   }
 }
