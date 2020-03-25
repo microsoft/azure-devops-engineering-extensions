@@ -206,6 +206,9 @@
     },
     {
       "name": "enableSSLOnSmtpConnection",
+      "aliases": [
+        "enableTLS"
+      ],
       "type": "boolean",
       "label": "Enable TLS",
       "required": false,

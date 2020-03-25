@@ -12,8 +12,7 @@ export class TaskConstants {
   public static readonly INCLUDEINTO_INPUTKEY = "includeInToSectionStr";
   public static readonly INCLUDEINCC_INPUTKEY = "includeInCcSectionStr";
   public static readonly SMTPCONNECTION_INPUTKEY = "smtpConnectionEndpoint";
-  // TODO - Rename the variable name as this is enabling TLS and not SSL - without breaking the task for others
-  public static readonly ENABLETLS_INPUTKEY = "enableSSLOnSmtpConnection";
+  public static readonly ENABLETLS_INPUTKEY = "enableTLS";
   public static readonly USEPREVENV_INPUTKEY = "usePreviousEnvironment";
   public static readonly DEFAULTDOMAIN_INPUTKEY = "defaultDomain";
 
