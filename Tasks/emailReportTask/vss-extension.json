@@ -2,9 +2,9 @@
   "manifestVersion": 1,
   "id": "EmailReportExtension",
   "name": "Email Report Extension",
-  "version": "1.1.8",
+  "version": "1.1.9",
   "publisher": "epsteam",
-  "public": "true",
+  "public": true,
   "targets": [
     {
       "id": "Microsoft.VisualStudio.Services"
