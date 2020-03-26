@@ -20,7 +20,7 @@ export class RetryablePromise {
                 }
                 catch (err) {
                     lastError = err;
-                    console.log(`Retry: ${attemptNumber} : ${err}`);
+                    console.log(`Retry <${executorName}>: ${attemptNumber} : ${err}`);
                 }
                 attemptNumber++;
             } while (attemptNumber <= times);

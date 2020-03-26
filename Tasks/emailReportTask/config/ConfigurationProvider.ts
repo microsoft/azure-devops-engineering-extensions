@@ -78,7 +78,7 @@ export class ConfigurationProvider implements IConfigurationProvider {
     const smtpHost = tl.getEndpointUrl(smtpConnectionId, true).replace(/(^\w+:|^)\/\//, '').replace(/\/$/, '');
     const userName = tl.getEndpointAuthorizationParameter(smtpConnectionId, "UserName", true);
     const password = tl.getEndpointAuthorizationParameter(smtpConnectionId, "Password", true);
-    const enableTLS = tl.getBoolInput(TaskConstants.ENABLESSL_INPUTKEY, true);
+    const enableTLS = tl.getBoolInput(TaskConstants.ENABLETLS_INPUTKEY, true);
 
     const smtpConfig = new SmtpConfiguration(userName, password, smtpHost, enableTLS);
 
