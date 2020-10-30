@@ -89,6 +89,10 @@ export class ConfigurationProvider implements IConfigurationProvider {
       throw new InputError("Email subject not set");
     }
 
+      // From Address
+      const fromAddress = tl.getInput(TaskConstants.FROMADDRESS_INPUTKEY, true);
+
+
     // Optional inputs
     const toAddresses = tl.getInput(TaskConstants.TOADDRESS_INPUTKEY, false);
     const ccAddresses = tl.getInput(TaskConstants.CCADDRESS_INPUTKEY, false);
@@ -101,7 +105,7 @@ export class ConfigurationProvider implements IConfigurationProvider {
 
     const defaultDomain = tl.getInput(TaskConstants.DEFAULTDOMAIN_INPUTKEY, true);
 
-    this.mailConfiguration = new MailConfiguration(mailSubject, toRecipientsConfiguration, ccRecipientsConfiguration, smtpConfig, defaultDomain);
+    this.mailConfiguration = new MailConfiguration(fromAddress, mailSubject, toRecipientsConfiguration, ccRecipientsConfiguration, smtpConfig, defaultDomain);
   }
 
   private initReportDataConfiguration(): void {

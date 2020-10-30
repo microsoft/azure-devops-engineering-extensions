@@ -46,7 +46,7 @@ export class MockConfigProvider implements IConfigurationProvider {
   }
 
   getMailConfiguration(): MailConfiguration {
-    return new MailConfiguration("[{environmentStatus}] {passPercentage} tests passed",
+    return new MailConfiguration("from@email.com", "[{environmentStatus}] {passPercentage} tests passed",
       new RecipientsConfiguration("xyz@email.com", false, false, false, false),
       new RecipientsConfiguration("", false, false, false, false),
       new SmtpConfiguration(smtpUser, smtpPassword, "smtp.live.com", true), "test.com");

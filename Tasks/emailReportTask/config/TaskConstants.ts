@@ -7,6 +7,7 @@ export class TaskConstants {
   public static readonly MAXTESTFAILURESTOSHOW_INPUTKEY = "maxTestFailuresToShow";
   public static readonly GROUPTESTSUMMARYBY_INPUTKEY = "groupTestSummaryByStr";
   public static readonly INCLUDERESULTS_INPUTKEY = "includeResultsStr";
+  public static readonly FROMADDRESS_INPUTKEY = "fromAddress";
   public static readonly TOADDRESS_INPUTKEY = "toAddress";
   public static readonly CCADDRESS_INPUTKEY = "ccAddress";
   public static readonly INCLUDEINTO_INPUTKEY = "includeInToSectionStr";
