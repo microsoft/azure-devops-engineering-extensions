@@ -75,6 +75,15 @@
         "DisableManageLink": "True"
       },
       "groupName": "emailConfiguration"
+    },    
+    {
+      "name": "fromAddress",
+      "type": "string",
+      "label": "From",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "Sender email address.",
+      "groupName": "emailConfiguration"
     },
     {
       "name": "toAddress",

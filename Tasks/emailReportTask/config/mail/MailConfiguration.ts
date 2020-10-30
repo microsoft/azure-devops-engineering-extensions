@@ -3,13 +3,15 @@ import { SmtpConfiguration } from "./SmtpConfiguration";
 
 export class MailConfiguration {
 
+  private fromAddress: string;
   private mailSubject: string;
   private toRecipientsConfig: RecipientsConfiguration;
   private ccRecipientsConfig: RecipientsConfiguration;
   private smtpConfig: SmtpConfiguration;
   private defaultDomain: string;
 
-  constructor($mailSubject: string, $toRecipientsConfig: RecipientsConfiguration, $ccRecipientsConfig: RecipientsConfiguration, $smtpConfig: SmtpConfiguration, $defaultDomain: string) {
+  constructor($fromAddress: string, $mailSubject: string, $toRecipientsConfig: RecipientsConfiguration, $ccRecipientsConfig: RecipientsConfiguration, $smtpConfig: SmtpConfiguration, $defaultDomain: string) {
+    this.fromAddress = $fromAddress;
     this.mailSubject = $mailSubject;
     this.toRecipientsConfig = $toRecipientsConfig;
     this.ccRecipientsConfig = $ccRecipientsConfig;
@@ -23,6 +25,14 @@ export class MailConfiguration {
    */
   public get $defaultDomain(): string {
     return this.defaultDomain;
+  }
+
+  /**
+      * Getter $fromAddress
+      * @return {string}
+      */
+  public get $fromAddress(): string {
+    return this.fromAddress;
   }
 
   /**
