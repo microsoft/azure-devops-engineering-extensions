@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "test": "npm run jest",
+    "test": "ts-jest",
     "prebuild": "npm install --no-optional",
     "build": "npm run prebuild && npm run build:emailreport && npm run build:prinsights",
     "build:t1": "npm run prebuild && npm run build:emailreport",
@@ -19,6 +19,9 @@
     "e2e:emailreport": "node js/emailReportExtension/emailReportTask/tests/__e_to_e_tests__/InvokeTest.js",
     "e2e:prinsights": "node js/pullRequestInsightsExtension/pullRequestInsightsTask/tests/__e_to_e_tests__/InvokeTest.js",
     "clean": "rimraf dist"
+  },
+  "jest": {
+    "preset": "ts-jest"
   },
   "repository": {
     "type": "git",
