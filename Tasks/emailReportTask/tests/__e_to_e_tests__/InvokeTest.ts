@@ -28,7 +28,7 @@ export class FileWriter {
   static writeToFile(content: string, fileName: string): void {
     const currDir = __dirname;
     console.log(`CurrentDir: ${currDir}`);
-    var msgPath = `${currDir}\\${fileName}`;
+    var msgPath = `${currDir}/${fileName}`;
     fs.writeFile(msgPath, content, (err: string) => {
       if (err) {
         return console.log(err);
