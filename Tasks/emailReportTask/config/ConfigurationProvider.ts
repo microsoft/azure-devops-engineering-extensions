@@ -89,9 +89,8 @@ export class ConfigurationProvider implements IConfigurationProvider {
       throw new InputError("Email subject not set");
     }
 
-      // From Address
-      const fromAddress = tl.getInput(TaskConstants.FROMADDRESS_INPUTKEY, true);
-
+    // From Address
+    const fromAddress = tl.getInput(TaskConstants.FROMADDRESS_INPUTKEY, true);
 
     // Optional inputs
     const toAddresses = tl.getInput(TaskConstants.TOADDRESS_INPUTKEY, false);
