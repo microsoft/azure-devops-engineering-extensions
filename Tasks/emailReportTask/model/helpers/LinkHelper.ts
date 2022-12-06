@@ -101,7 +101,7 @@ export class LinkHelper {
       });
     }
 
-    return collectionUri + "\\" + LinkHelper.getTcmRelativeUrl(config.$projectName) + "\\" + LinkHelper.getQueryParameter(parameters);
+    return collectionUri + "/" + LinkHelper.getTcmRelativeUrl(config.$projectName) + "/" + LinkHelper.getQueryParameter(parameters);
   }
 
   public static getTestTabLinkInRelease(config: PipelineConfiguration): string {

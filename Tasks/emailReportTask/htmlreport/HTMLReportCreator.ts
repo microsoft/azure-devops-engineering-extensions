@@ -12,7 +12,7 @@ export class HTMLReportCreator implements IHTMLReportCreator {
   createHtmlReport(report: Report, reportConfiguration: ReportConfiguration): string {
     const currDir = __dirname;
     console.log(`CurrentDir: ${currDir}`);
-    var xsltTemplatePath = `${currDir}\\EmailTemplate.xslt`;
+    var xsltTemplatePath = `${currDir}/EmailTemplate.xslt`;
     console.log("Loading Email Template: " + xsltTemplatePath);
 
     // Create a view model object before serialize to xml
