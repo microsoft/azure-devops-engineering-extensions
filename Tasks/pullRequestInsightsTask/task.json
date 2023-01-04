@@ -12,6 +12,7 @@
         "Patch": 18
     },
     "instanceNameFormat": "PR Insights",
+    "minimumAgentVersion": "2.144.0",
     "inputs": [
         {
             "name": "enableLongRunningValidationAnalysis",
@@ -60,6 +61,12 @@
     ],
     "execution": {
         "Node": {
+            "target": "Index.js"
+        },
+        "Node10": {
+            "target": "Index.js"
+        },
+        "Node16": {
             "target": "Index.js"
         }
     }
