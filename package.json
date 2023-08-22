@@ -13,12 +13,23 @@
     "e2e:t1": "npm run e2e:emailreport",
     "e2e:t2": "npm run e2e:prinsights",
     "build:prinsights": "tsc -p Tasks/pullRequestInsightsTask/tsconfig.json",
+
+    "build:test": "nom run prebuild && np run deps:npm:tasks && npm run deps:prune:tasks",
     "build:emailreport": "tsc -p Tasks/emailReportTask/tsconfig.json && node ./commands/postbuild.js emailReport",
     "pack:emailreport": "node ./commands/package.js emailreport",
+    "deps:npm:tasks": "glob-exec --parallel --foreach \"Tasks/emailReportTask/*/tsconfig.json\" -- \"cd {{file.dir}} && npm install --no-update-notifier --no-progress\"",
+    "deps:prune:tasks": "glob-exec --parallel --foreach \"Tasks/TerraformTask/*/tsconfig.json\" -- \"cd {{file.dir}} && npm prune --production --no-update-notifier --no-progress\"",
+    
     "pack:prinsights": "node ./commands/package.js pullRequestInsights",
+    
     "e2e:emailreport": "node js/emailReportExtension/emailReportTask/tests/__e_to_e_tests__/InvokeTest.js",
+    
     "e2e:prinsights": "node js/pullRequestInsightsExtension/pullRequestInsightsTask/tests/__e_to_e_tests__/InvokeTest.js",
     "clean": "rimraf dist"
+
+
+
+
   },
   "repository": {
     "type": "git",
@@ -48,10 +59,14 @@
     "rimraf": "^2.6.3",
     "sinon": "^7.3.2",
     "source-map-loader": "^0.2.3",
-    "tfx-cli": "^0.7.8",
+    "tfx-cli": "^0.12.0",
     "ts-jest": "^24.0.2",
     "ts-loader": "^6.0.4",
-    "typescript": "^3.5.3"
+    "typescript": "^3.5.3",
+    "webpack": "^4.46.0",
+    "webpack-cli": "^4.9.2",
+    "glob-parent": ">=6.0.2",
+    "glob-exec": "^0.1.1"
   },
   "optionalDependencies": {
     "fsevents": "*"
