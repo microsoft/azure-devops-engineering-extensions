@@ -1,6 +1,6 @@
 {
   "id": "59a02370-5b4b-4236-95bd-673180e2cbf2",
-  "name": "EmailReportPPE",
+  "name": "EmailReportPPEV2",
   "friendlyName": "Email Report PPE (Testing Purposes)",
   "description": "Send rich email report for test results and for tasks in this stage",
   "helpMarkDown": "Sets 'EmailReportTask.EmailSent' variable to true if it sent email successfully. https://marketplace.visualstudio.com/items?itemName=epsteam.EmailReportExtension",
