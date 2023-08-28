@@ -1,8 +1,8 @@
-import tl = require("azure-pipelines-task-lib/task");
+import tl = require("azure-pipelines-task-lib");
 import {
   WebApi,
   getPersonalAccessTokenHandler
-} from "azure-devops-node-api/WebApi";
+} from "azure-devops-node-api";
 import { PipelineConfiguration } from "../../config/pipeline/PipelineConfiguration";
 
 export abstract class AbstractClient {

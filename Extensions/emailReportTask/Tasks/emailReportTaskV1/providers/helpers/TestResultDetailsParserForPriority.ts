@@ -37,7 +37,7 @@ export class TestResultDetailsParserForPriority extends AbstractTestResultsDetai
 
   private getPriority(groupByValue: any): number {
     let priority: number = Number.parseInt(groupByValue as string);
-    if (priority == null || priority == NaN) {
+    if (priority == null || Number.isNaN(priority)) {
       throw new InvalidTestResultDataError(`Expected priority value to be integer in ${groupByValue}`);
     }
     return priority;
@@ -55,7 +55,7 @@ export class TestResultDetailsParserForPriority extends AbstractTestResultsDetai
         }
 
         const testRunId = Number.parseInt(result.testRun.id);
-        if (testRunId == null || testRunId == NaN) {
+        if (testRunId == null || Number.isNaN(testRunId)) {
           throw new InvalidTestResultDataError(`Unable to parse test run id to integer in ${result.testRun.id}`);
         }
 

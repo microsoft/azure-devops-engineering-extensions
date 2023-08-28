@@ -1,4 +1,4 @@
-import tl = require("azure-pipelines-task-lib/task");
+import tl = require("azure-pipelines-task-lib");
 import { ReportConfiguration } from "./config/ReportConfiguration";
 import { ConfigurationProvider } from "./config/ConfigurationProvider";
 import { ReportManager } from "./ReportManager";

@@ -21,7 +21,7 @@
   "scopes": [],
   "files": [
     {
-      "path": "emailReportTask"
+      "path": "Tasks/emailReportTask"
     },
     {
       "path": "images",

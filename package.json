@@ -5,30 +5,26 @@
   "scripts": {
     "test": "npm run jest",
     "prebuild": "npm install --no-optional",
-    "build": "npm run prebuild && npm run build:emailreport && npm run build:prinsights",
-    "build:t1": "npm run prebuild && npm run build:emailreport",
+
+    "build:release": "npm run clean && npm run prebuild && npm run deps:npm:tasks && npm run compile && npm run deps:prune:tasks && webpack",
+    "deps:npm:tasks": "glob-exec --parallel --foreach \"Extensions/emailReportTask/Tasks/*/tsconfig.json\" -- \"cd {{file.dir}} && npm install --no-update-notifier --no-progress\"",
+    "deps:prune:tasks": "glob-exec --parallel --foreach \"Extensions/emailReportTask/Tasks/*/tsconfig.json\" -- \"cd {{file.dir}} && npm prune --production --no-update-notifier --no-progress\"",
+    "webpack": "webpack --config webpack.config.js --progress",
+    "compile": "npm run compile:tasks",
+    "compile:tasks": "glob-exec \"Extensions/emailReportTask/Tasks/*/tsconfig.json\" -- \"tsc -b {{files.join(' ')}}\"",
+    "package:dev": "tfx extension create --rev-version --manifest-globs azure-devops-extension.json task.json --overrides-file ./configs/dev.json --root ./dist", 
+    "package:release": "",
+    
+    "build": "npm run prebuild && npm run build:prinsights",
     "build:t2": "npm run prebuild && npm run build:prinsights",
-    "pack:t1": "npm run clean && npm run build:t1 && npm run pack:emailreport",
     "pack:t2": "npm run clean && npm run build:t2 && npm run pack:prinsights",
     "e2e:t1": "npm run e2e:emailreport",
     "e2e:t2": "npm run e2e:prinsights",
     "build:prinsights": "tsc -p Tasks/pullRequestInsightsTask/tsconfig.json",
-
-    "build:test": "nom run prebuild && np run deps:npm:tasks && npm run deps:prune:tasks",
-    "build:emailreport": "tsc -p Tasks/emailReportTask/tsconfig.json && node ./commands/postbuild.js emailReport",
-    "pack:emailreport": "node ./commands/package.js emailreport",
-    "deps:npm:tasks": "glob-exec --parallel --foreach \"Tasks/emailReportTask/*/tsconfig.json\" -- \"cd {{file.dir}} && npm install --no-update-notifier --no-progress\"",
-    "deps:prune:tasks": "glob-exec --parallel --foreach \"Tasks/TerraformTask/*/tsconfig.json\" -- \"cd {{file.dir}} && npm prune --production --no-update-notifier --no-progress\"",
-    
     "pack:prinsights": "node ./commands/package.js pullRequestInsights",
-    
     "e2e:emailreport": "node js/emailReportExtension/emailReportTask/tests/__e_to_e_tests__/InvokeTest.js",
-    
     "e2e:prinsights": "node js/pullRequestInsightsExtension/pullRequestInsightsTask/tests/__e_to_e_tests__/InvokeTest.js",
     "clean": "rimraf dist"
-
-
-
 
   },
   "repository": {
@@ -59,10 +55,11 @@
     "rimraf": "^2.6.3",
     "sinon": "^7.3.2",
     "source-map-loader": "^0.2.3",
-    "tfx-cli": "^0.12.0",
+    "tfx-cli": "^0.16.0",
     "ts-jest": "^24.0.2",
     "ts-loader": "^6.0.4",
     "typescript": "^3.5.3",
+    "copy-webpack-plugin": "^6.3.2",
     "webpack": "^4.46.0",
     "webpack-cli": "^4.9.2",
     "glob-parent": ">=6.0.2",
