@@ -7,11 +7,11 @@
     "prebuild": "npm install --no-optional",
 
     "build:release": "npm run clean && npm run prebuild && npm run deps:npm:tasks && npm run compile && npm run deps:prune:tasks && webpack",
-    "deps:npm:tasks": "glob-exec --parallel --foreach \"Extensions/emailReportTask/Tasks/*/tsconfig.json\" -- \"cd {{file.dir}} && npm install --no-update-notifier --no-progress\"",
-    "deps:prune:tasks": "glob-exec --parallel --foreach \"Extensions/emailReportTask/Tasks/*/tsconfig.json\" -- \"cd {{file.dir}} && npm prune --production --no-update-notifier --no-progress\"",
+    "deps:npm:tasks": "glob-exec --parallel --foreach \"Extensions/emailReportTask/Tasks/emailReportTask/*/tsconfig.json\" -- \"cd {{file.dir}} && npm install --no-update-notifier --no-progress\"",
+    "deps:prune:tasks": "glob-exec --parallel --foreach \"Extensions/emailReportTask/Tasks/emailReportTask/*/tsconfig.json\" -- \"cd {{file.dir}} && npm prune --production --no-update-notifier --no-progress\"",
     "webpack": "webpack --config webpack.config.js --progress",
     "compile": "npm run compile:tasks",
-    "compile:tasks": "glob-exec \"Extensions/emailReportTask/Tasks/*/tsconfig.json\" -- \"tsc -b {{files.join(' ')}}\"",
+    "compile:tasks": "glob-exec \"Extensions/emailReportTask/Tasks/emailReportTask/*/tsconfig.json\" -- \"tsc -b {{files.join(' ')}}\"",
     "package:dev": "tfx extension create --rev-version --manifest-globs azure-devops-extension.json task.json --overrides-file ./configs/dev.json --root ./dist", 
     "package:release": "",
     

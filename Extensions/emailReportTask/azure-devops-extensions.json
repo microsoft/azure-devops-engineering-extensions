@@ -48,7 +48,7 @@
         "ms.vss-distributed-task.tasks"
       ],
       "properties": {
-        "name": "emailReportTask"
+        "name": "Tasks/emailReportTask"
       }
     }
   ]

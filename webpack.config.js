@@ -18,7 +18,7 @@ module.exports = {
                 { from: "./LICENSE", to: "." },
                 { from: "./Extensions/emailReportTask/azure-devops-extensions.json", to: "azure-devops-extension.json" },
                 {
-                    from: "./Extensions/dist/Tasks",
+                    from: "./Extensions/emailReportTask/Tasks",
                     globOptions: {
                         dot: true,
                         gitignore: false,
