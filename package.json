@@ -13,15 +13,11 @@
     "compile": "npm run compile:tasks",
     "compile:tasks": "glob-exec \"Extensions/emailReportTask/Tasks/emailReportTask/*/tsconfig.json\" -- \"tsc -b {{files.join(' ')}}\"",
     "package:dev": "tfx extension create --rev-version --manifest-globs azure-devops-extension.json task.json --overrides-file ./configs/dev.json --root ./dist", 
-    "package:release": "",
+    "package:release": "tfx extension create --rev-version --manifest-globs azure-devops-extension.json task.json --overrides-file ./configs/release.json --root ./dist", 
+    "build": "npm run prebuild && npm run deps:npm:tasks && npm run compile",
     
-    "build": "npm run prebuild && npm run build:prinsights",
-    "build:t2": "npm run prebuild && npm run build:prinsights",
-    "pack:t2": "npm run clean && npm run build:t2 && npm run pack:prinsights",
     "e2e:t1": "npm run e2e:emailreport",
     "e2e:t2": "npm run e2e:prinsights",
-    "build:prinsights": "tsc -p Tasks/pullRequestInsightsTask/tsconfig.json",
-    "pack:prinsights": "node ./commands/package.js pullRequestInsights",
     "e2e:emailreport": "node js/emailReportExtension/emailReportTask/tests/__e_to_e_tests__/InvokeTest.js",
     "e2e:prinsights": "node js/pullRequestInsightsExtension/pullRequestInsightsTask/tests/__e_to_e_tests__/InvokeTest.js",
     "clean": "rimraf dist"
