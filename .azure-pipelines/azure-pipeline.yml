@@ -34,7 +34,7 @@ stages:
 - stage: "Build"
   jobs:
     - job: "BuildPack"
-      displayname: "Build and package"
+      displayName: "Build and package"
       pool:
         vmImage: "ubuntu-latest"
       steps:
@@ -45,8 +45,8 @@ stages:
         - template: build.yml@pipeline-templates
         - template: package.yml@pipeline-templates
           parameters:
-          extensionName: $(extensionName)
-          outputPath: "out"
+            extensionName: $(extensionName)
+            outputPath: "out"
 
 - stage: "DeployDev"
   displayName: "Deploy to Dev"
