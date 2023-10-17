@@ -16,7 +16,7 @@ module.exports = {
                 { from: "./Extensions/emailReportTask/images", to: "images", context: "." },
                 { from: "./README.md", to: "README.md" },
                 { from: "./LICENSE", to: "." },
-                { from: "./Extensions/emailReportTask/azure-devops-extensions.json", to: "azure-devops-extension.json" },
+                { from: "./Extensions/emailReportTask/azure-devops-extension.json", to: "azure-devops-extension.json" },
                 {
                     from: "./Extensions/emailReportTask/Tasks",
                     globOptions: {
