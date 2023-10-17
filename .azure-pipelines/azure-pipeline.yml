@@ -1,0 +1,92 @@
+variables:
+  - name: major
+    value: "1"
+  - name: minor
+    value: "1"
+  - name: extensionName
+    value: "EmailReportExtension"
+  - name: marketplaceServiceConnection
+    value: "marketplaceServiceConnection"
+  - name: publisherId
+    value: "ms-devlabs"
+  - name: publicExtensionName
+    value: "Email Report Extension"
+  - name: extensionId
+    value: "EmailReportExtension"
+
+name: $(major).$(minor)$(rev:.r)
+
+trigger:
+  branches:
+    include:
+      - master
+
+pr: none
+
+resources:
+  repositories:
+    - repository: pipeline-templates
+      type: git
+      name: Sage/pipeline-template
+      ref: main
+
+stages:
+  - stage: "Build"
+    jobs:
+      - job: "BuildPack"
+        displayname: "Build and package"
+        pool:
+          vmImage: "ubuntu-latest"
+        steps:
+          - task: NodeTool@0
+            inputs:
+              versionSpec: "16.x"
+            displayName: "Install Node.js"
+          - template: build.yml@pipeline-templates
+          - template: package.yml@pipeline-templates
+            parameters:
+            extensionName: $(extensionName)
+            outputPath: "out"
+
+  - stage: "DeployDev"
+    displayName: "Deploy to Dev"
+    dependsOn: "Build"
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    jobs:
+      - template: deploy.yml@pipeline-templates
+        parameters:
+          environment: "dev"
+          extensionName: $(extensionName)
+          marketplaceServiceConnection: $(marketplaceServiceConnection)
+          publisherId: $(publisherId)
+          publicExtensionName: $(publicExtensionName)
+  - stage: "DeployTest"
+    displayName: "Deploy to Test"
+    dependsOn: "DeployDev"
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    jobs:
+      - template: deploy.yml@pipeline-templates
+        parameters:
+          environment: "test"
+          extensionName: $(extensionName)
+          marketplaceServiceConnection: $(marketplaceServiceConnection)
+          publisherId: $(publisherId)
+          publicExtensionName: $(publicExtensionName)
+          updateTaskVersion: true
+          extensionId: $(extensionId)
+
+  - stage: "DeployRelease"
+    displayName: "Deploy to Public"
+    dependsOn: "DeployTest"
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    jobs:
+      - template: deploy.yml@pipeline-templates
+        parameters:
+          environment: "public"
+          extensionName: $(extensionName)
+          marketplaceServiceConnection: $(marketplaceServiceConnection)
+          publisherId: $(publisherId)
+          publicExtensionName: $(publicExtensionName)
+          extensionVisibility: "public"
+          updateTaskVersion: true
+          extensionId: $(extensionId)

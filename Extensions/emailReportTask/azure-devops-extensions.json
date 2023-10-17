@@ -1,0 +1,55 @@
+{
+  "manifestVersion": 1,
+  "id": "EmailReportExtension",
+  "name": "Email Report Extension",
+  "version": "1.1.9",
+  "publisher": "epsteam",
+  "public": true,
+  "targets": [
+    {
+      "id": "Microsoft.VisualStudio.Services"
+    }
+  ],
+  "description": "Sends Detailed email report for a build or release pipeline",
+  "categories": [
+    "Azure Pipelines"
+  ],
+  "icons": {
+    "default": "images/icon.png"
+  },
+  "tags": [],
+  "scopes": [],
+  "files": [
+    {
+      "path": "Tasks/emailReportTask"
+    },
+    {
+      "path": "images",
+      "addressable": true
+    }
+  ],
+  "content": {
+    "details": {
+      "path": "README.md"
+    },
+    "license": {
+      "path": "LICENSE"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "uri": "https://github.com/microsoft/azure-devops-engineering-extensions"
+  },
+  "contributions": [
+    {
+      "id": "EmailReport",
+      "type": "ms.vss-distributed-task.task",
+      "targets": [
+        "ms.vss-distributed-task.tasks"
+      ],
+      "properties": {
+        "name": "Tasks/emailReportTask"
+      }
+    }
+  ]
+}

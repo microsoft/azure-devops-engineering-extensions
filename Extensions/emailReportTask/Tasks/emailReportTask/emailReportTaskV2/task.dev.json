@@ -1,0 +1,238 @@
+{
+  "id": "59a02370-5b4b-4236-95bd-673180e2cbf2",
+  "name": "EmailReportPPEV2",
+  "friendlyName": "Email Report PPE (Testing Purposes)",
+  "description": "Send rich email report for test results and for tasks in this stage",
+  "helpMarkDown": "Sets 'EmailReportTask.EmailSent' variable to true if it sent email successfully. https://marketplace.visualstudio.com/items?itemName=epsteam.EmailReportExtension",
+  "category": "Utility",
+  "visibility": [
+    "Build",
+    "Release"
+  ],
+  "author": "Microsoft Corporation",
+  "version": {
+    "Major": 1,
+    "Minor": 2,
+    "Patch": 208
+  },
+  "groups": [
+    {
+      "name": "emailConfiguration",
+      "displayName": "Email Configuration",
+      "isExpanded": true
+    },
+    {
+      "name": "emailContent",
+      "displayName": "Email Content",
+      "isExpanded": true
+    },
+    {
+      "name": "advanced",
+      "displayName": "Advanced",
+      "isExpanded": false
+    }
+  ],
+  "inputs": [
+    {
+      "name": "sendMailConditionConfig",
+      "type": "pickList",
+      "label": "Send Email",
+      "defaultValue": "Always",
+      "required": true,
+      "helpMarkDown": "Sends email if the selected criteria is met.",
+      "options": {
+        "Always": "Always",
+        "On Failure": "On Failure",
+        "On Success": "On Success",
+        "On New Failures Only": "On New Failures Only"
+      },
+      "groupName": "emailConfiguration"
+    },
+    {
+      "name": "subject",
+      "type": "string",
+      "label": "Email Subject",
+      "defaultValue": "[{environmentStatus}] {passPercentage} tests passed in $(Release.EnvironmentName) stage for $(Build.BuildNumber) ",
+      "required": true,
+      "helpMarkDown": "Email Subject.",
+      "groupName": "emailConfiguration"
+    },
+    {
+      "name": "includeInToSectionStr",
+      "type": "pickList",
+      "label": "Include in To Section",
+      "defaultValue": "1",
+      "required": false,
+      "helpMarkDown": "Adds the selected users in To section.",
+      "options": {
+        "1": "Include Commit Owners",
+        "2": "Include Failed Test Owners",
+        "3": "Include Active Bug Owners",
+        "4": "Include Created By"
+      },
+      "properties": {
+        "MultiSelectFlatList": "True",
+        "DisableManageLink": "True"
+      },
+      "groupName": "emailConfiguration"
+    },
+    {
+      "name": "toAddress",
+      "type": "string",
+      "label": "To",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "Recipients email addresses separated by semicolon(;).",
+      "groupName": "emailConfiguration"
+    },
+    {
+      "name": "includeInCcSectionStr",
+      "type": "pickList",
+      "label": "Include in Cc Section",
+      "required": false,
+      "helpMarkDown": "Adds the selected users in Cc section.",
+      "options": {
+        "1": "Include Commit owners",
+        "2": "Include Failure Test Owners",
+        "3": "Include Active Bug Owners",
+        "4": "Include Created By"
+      },
+      "properties": {
+        "MultiSelectFlatList": "True",
+        "DisableManageLink": "True"
+      },
+      "groupName": "emailConfiguration"
+    },
+    {
+      "name": "ccAddress",
+      "type": "string",
+      "label": "Cc",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "Recipients email addresses separated by semicolon(;).",
+      "groupName": "emailConfiguration"
+    },
+    {
+      "name": "defaultDomain",
+      "type": "string",
+      "label": "Default Domain for Addresses",
+      "defaultValue": "microsoft.com",
+      "required": true,
+      "helpMarkDown": "Address Domains like microsoft.com. Will be used to resolve mail addresses. testOwner@domain for example.",
+      "groupName": "emailConfiguration"
+    },
+    {
+      "name": "groupTestSummaryByStr",
+      "type": "pickList",
+      "label": "Group Test Summary",
+      "defaultValue": "1",
+      "required": false,
+      "helpMarkDown": "Adds test summary groups for the selected configurations.",
+      "options": {
+        "0": "Priority",
+        "1": "Run"
+      },
+      "properties": {
+        "MultiSelectFlatList": "True",
+        "DisableManageLink": "True"
+      },
+      "groupName": "emailContent"
+    },
+    {
+      "name": "includeResultsStr",
+      "type": "pickList",
+      "label": "Include Test Results",
+      "required": false,
+      "defaultValue": "1",
+      "helpMarkDown": "Include test result details for the selected types.",
+      "options": {
+        "1": "Failed Tests",
+        "2": "Other Tests"
+      },
+      "properties": {
+        "MultiSelectFlatList": "True",
+        "DisableManageLink": "True"
+      },
+      "groupName": "emailContent"
+    },
+    {
+      "name": "groupTestResultsBy",
+      "type": "radio",
+      "label": "Group Test Results",
+      "required": true,
+      "defaultValue": "run",
+      "helpMarkDown": "Group test results by the selected criteria.",
+      "options": {
+        "run": "Run",
+        "Priority": "Priority"
+      },
+      "groupName": "emailContent"
+    },
+    {
+      "name": "includeCommits",
+      "type": "boolean",
+      "label": "Include Commits",
+      "required": true,
+      "defaultValue": "true",
+      "helpMarkDown": "Includes new commits since last completed release.",
+      "groupName": "emailContent"
+    },
+    {
+      "name": "maxTestFailuresToShow",
+      "type": "string",
+      "label": "Maximum Test Results to show",
+      "required": true,
+      "defaultValue": "15",
+      "helpMarkDown": "Maximum test failures to show in the report. Additional tests will be truncated.",
+      "groupName": "advanced"
+    },
+    {
+      "name": "includeOthersInTotal",
+      "type": "boolean",
+      "label": "Include Others in Total count",
+      "required": true,
+      "defaultValue": "false",
+      "helpMarkDown": "If set, Total count will include others and pass percentage will be calculated accordingly.",
+      "groupName": "advanced"
+    },
+    {
+      "name": "usePreviousEnvironment",
+      "type": "boolean",
+      "label": "Use Previous Stage",
+      "required": true,
+      "defaultValue": "false",
+      "helpMarkDown": "If set, email content will be generated for the previous stage in the current release.",
+      "groupName": "advanced"
+    },
+    {
+      "name": "enableSSLOnSmtpConnection",
+      "aliases": [
+        "enableTLS"
+      ],
+      "type": "boolean",
+      "label": "Enable TLS",
+      "required": false,
+      "defaultValue": "false",
+      "helpMarkDown": "Enables TLS on SMTP Connection for sending email.",
+      "groupName": "advanced"
+    },
+    {
+      "name": "smtpConnectionEndpoint",
+      "type": "connectedService:Generic",
+      "label": "SMTP credentials",
+      "required": true,
+      "helpMarkDown": "SMTP credentials to be used to send email report",
+      "groupName": "advanced"
+    }
+  ],
+  "instanceNameFormat": "Send Email Report $(sendMailConditionConfig)",
+  "execution": {
+    "Node": {
+      "target": "Index.js"
+    },
+    "Node16": {
+      "target": "Index.js",
+      "argumentFormat": ""
+    }
+  }
+}
