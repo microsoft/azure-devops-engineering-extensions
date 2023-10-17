@@ -48,6 +48,8 @@ stages:
       parameters:
         extensionName: $(extensionName)
         outputPath: "out"
+        rootPath: './dist'
+
 
 - stage: "DeployDev"
   displayName: "Deploy to Dev"
