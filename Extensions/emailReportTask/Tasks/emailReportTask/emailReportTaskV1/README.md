@@ -54,3 +54,7 @@ Create a "Generic" Service Connection in 'AzureDevOps' Service Connections with 
 Try to use public SMTP servers - for example - “smtp.live.com” (Hotmail/Outlook.com).
 SMTP credentials generic endpoint can be configured as below for example:
 ![GenericEndPoint.JPG](images/GenericEndPoint.png)
+
+### Note
+
+Supports only Node 10.x 

@@ -5,7 +5,8 @@ AzureDevOps Marketplace Extensions to do various engineering tasks.
 ## Email Report Task
 Generates a Report with the information from the pipeline and sends it as email. Goal is to provide all the relevant info happened in the pipeline, in a concise and neat manner. 
 
-Read more [here](Tasks/emailReportTask/README.md).
+Read more about V1 [here](Extensions/emailReportTask/Tasks/emailReportTask/emailReportTaskV1/README.md).
+Read more about V2 [here](Extensions/emailReportTask/Tasks/emailReportTask/emailReportTaskV2/README.md).
 
 ## Pull Request Insights Task
 PullRequestInsightsTask provides insights into pipelines. This extension has two main functions:
@@ -13,7 +14,7 @@ PullRequestInsightsTask provides insights into pipelines. This extension has two
 1. Investigating pull request validation failures
 2. Alerting pull request owners to the introduction of long running tasks.
 
-Read more [here](Tasks/pullRequestInsightsTask/README.md).
+Read more [here](Extensions/pullRequestInsights/README.md).
 
 # Contributing
 
