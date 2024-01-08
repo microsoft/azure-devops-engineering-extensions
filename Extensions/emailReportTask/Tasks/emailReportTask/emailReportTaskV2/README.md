@@ -1,4 +1,4 @@
-# Email Report Extension for Azure DevOps Marketplace
+# Email Report Extension V2 for Azure DevOps Marketplace
 
 Generates a Report with the information from the pipeline and sends it as email. Goal is to provide all the relevant info happened in the pipeline, in a concise and neat manner. 
 
@@ -54,3 +54,7 @@ Create a "Generic" Service Connection in 'AzureDevOps' Service Connections with 
 Try to use public SMTP servers - for example - “smtp.live.com” (Hotmail/Outlook.com).
 SMTP credentials generic endpoint can be configured as below for example:
 ![GenericEndPoint.JPG](images/GenericEndPoint.png)
+
+### Updates
+
+Supports Node 10.x - 16.x
