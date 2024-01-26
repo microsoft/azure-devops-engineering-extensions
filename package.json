@@ -5,23 +5,20 @@
   "scripts": {
     "test": "npm run jest",
     "prebuild": "npm install --no-optional",
-
     "build:release": "npm run clean && npm run prebuild && npm run deps:npm:tasks && npm run compile && npm run deps:prune:tasks && webpack",
     "deps:npm:tasks": "glob-exec --parallel --foreach \"Extensions/emailReportTask/Tasks/emailReportTask/*/tsconfig.json\" -- \"cd {{file.dir}} && npm install --no-update-notifier --no-progress\"",
     "deps:prune:tasks": "glob-exec --parallel --foreach \"Extensions/emailReportTask/Tasks/emailReportTask/*/tsconfig.json\" -- \"cd {{file.dir}} && npm prune --production --no-update-notifier --no-progress\"",
     "webpack": "webpack --config webpack.config.js --progress",
     "compile": "npm run compile:tasks",
     "compile:tasks": "glob-exec \"Extensions/emailReportTask/Tasks/emailReportTask/*/tsconfig.json\" -- \"tsc -b {{files.join(' ')}}\"",
-    "package:dev": "tfx extension create --rev-version --manifest-globs azure-devops-extension.json task.json --overrides-file ./configs/dev.json --root ./dist", 
-    "package:release": "tfx extension create --rev-version --manifest-globs azure-devops-extension.json task.json --overrides-file ./configs/release.json --root ./dist", 
+    "package:dev": "tfx extension create --rev-version --manifest-globs azure-devops-extension.json task.json --overrides-file ./configs/dev.json --root ./dist",
+    "package:release": "tfx extension create --rev-version --manifest-globs azure-devops-extension.json task.json --overrides-file ./configs/release.json --root ./dist",
     "build": "npm run prebuild && npm run deps:npm:tasks && npm run compile",
-    
     "e2e:t1": "npm run e2e:emailreport",
     "e2e:t2": "npm run e2e:prinsights",
     "e2e:emailreport": "node js/emailReportExtension/emailReportTask/tests/__e_to_e_tests__/InvokeTest.js",
     "e2e:prinsights": "node js/pullRequestInsightsExtension/pullRequestInsightsTask/tests/__e_to_e_tests__/InvokeTest.js",
     "clean": "rimraf dist"
-
   },
   "repository": {
     "type": "git",
