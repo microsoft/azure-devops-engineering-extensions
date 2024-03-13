@@ -13,7 +13,7 @@
   "version": {
     "Major": 1,
     "Minor": 2,
-    "Patch": 208
+    "Patch": 209
   },
   "groups": [
     {
@@ -212,7 +212,7 @@
       "type": "boolean",
       "label": "Enable TLS",
       "required": false,
-      "defaultValue": "false",
+      "defaultValue": "true",
       "helpMarkDown": "Enables TLS on SMTP Connection for sending email.",
       "groupName": "advanced"
     },
