@@ -28,7 +28,7 @@ Note: "On New Failures" is an experimental option to reduce spam in case of a co
 
 **To/Cc** - You can add a fixed list of people who wants to recieve the email when the send mail condition is satisfied.
 
-![TaskConfig.png](images/TaskConfig.png)
+![TaskConfig.png](../../../images/TaskConfig.png)
 
 ### Configuring Email content
 
@@ -40,7 +40,7 @@ Note: "On New Failures" is an experimental option to reduce spam in case of a co
 
 **Include Commits** - Check this field to receive the commits information that are tested in the current release environment.
 
-![TaskConfig2.png](images/TaskConfig2.png)
+![TaskConfig2.png](../../../images/TaskConfig2.png)
 
 ### Advanced Section
 
@@ -50,10 +50,10 @@ Note: "On New Failures" is an experimental option to reduce spam in case of a co
 
 ### SMTP Connection 
 
-Create a "Generic" Service Connection in 'AzureDevOps' Service Connections with a Username, password and SMTP Server. Select the created endpoint from the dropdown menu in the task. 
+Create a "Generic" Service Connection in 'AzureDevOps' Service Connections with a Username, password and SMTP Server. Select the created endpoint from the dropdown menu in the task. SSL will be enabled by default.
 Try to use public SMTP servers - for example - “smtp.live.com” (Hotmail/Outlook.com).
 SMTP credentials generic endpoint can be configured as below for example:
-![GenericEndPoint.JPG](images/GenericEndPoint.png)
+![GenericEndPoint.JPG](../../../images/GenericEndPoint.png)
 
 ### Updates
 
