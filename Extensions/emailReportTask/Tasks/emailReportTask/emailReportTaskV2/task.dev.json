@@ -233,6 +233,10 @@
     "Node16": {
       "target": "Index.js",
       "argumentFormat": ""
+    },
+    "Node20": {
+      "target": "Index.js",
+      "argumentFormat": ""
     }
   }
 }
