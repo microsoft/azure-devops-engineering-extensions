@@ -54,7 +54,7 @@ stages:
 - stage: "DeployDev"
   displayName: "Deploy to Dev"
   dependsOn: "Build"
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  condition: succeeded()
   jobs:
   - template: deploy.yml@pipeline-templates
     parameters:
@@ -67,7 +67,7 @@ stages:
 - stage: "DeployTest"
   displayName: "Deploy to Test"
   dependsOn: "DeployDev"
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  condition: succeeded()
   jobs:
   - template: deploy.yml@pipeline-templates
     parameters:
