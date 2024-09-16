@@ -235,7 +235,7 @@ export class TaskInsights {
       String(this.data.getDurationPercentile()),
       String(TaskInsights.NUMBER_PIPELINES_FOR_HEALTH),
       this.data.getFeedbackLine()
-      );
+    );
     if (secondTableType) {
       serviceComment.formatNewData(
         secondTableType,
