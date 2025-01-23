@@ -68,17 +68,21 @@ export class TaskInsights {
       await this.setTargetBranchPipelines(
         TaskInsights.MINIMUM_PIPELINES_TO_FETCH_FOR_HEALTH
       );
-      let tableType: string = TableFactory.FAILURE;
+      let firstTableType: string = TableFactory.FAILURE;
+      let secondTableType: string | undefined = undefined;
       this.telemetry.setWasFailureFound(this.currentPipeline.isFailure());
       if (!this.currentPipeline.isFailure()) {
-        tableType = TableFactory.LONG_RUNNING_VALIDATIONS;
+        firstTableType = TableFactory.LONG_RUNNING_VALIDATIONS;
         await this.findAllLongRunningValidations();
       }
       this.telemetry.setWasRegressionFound(
         this.longRunningValidations.length > 0
       );
+      if (this.longRunningValidations.length > 0) {
+        secondTableType = TableFactory.LONG_RUNNING_VALIDATIONS;
+      }
       if (this.shouldPRInsightsCommentOccur()) {
-        this.manageComments(tableType);
+        this.manageComments(firstTableType, secondTableType);
       }
       this.telemetry.logTaskResults();
     } else {
@@ -212,7 +216,7 @@ export class TaskInsights {
    * Upon posting new comment, calls for old PR Insights comments to be deleted
    * @param tableType Type of information table to create/add to
    */
-  private async manageComments(tableType: string): Promise<void> {
+  private async manageComments(tableType: string, secondTableType?: string): Promise<void> {
     const serviceThreads: azureGitInterfaces.GitPullRequestCommentThread[] = await this.pullRequest.getCurrentServiceCommentThreads(
       this.azureApi
     );
@@ -232,6 +236,21 @@ export class TaskInsights {
       String(TaskInsights.NUMBER_PIPELINES_FOR_HEALTH),
       this.data.getFeedbackLine()
     );
+    if (secondTableType) {
+      serviceComment.formatNewData(
+        secondTableType,
+        this.currentPipeline,
+        await this.checkStatusLink(
+          this.data.getStatusLink(),
+          this.data.getProjectName()
+        ),
+        this.targetBranch,
+        this.longRunningValidations,
+        String(this.data.getDurationPercentile()),
+        String(TaskInsights.NUMBER_PIPELINES_FOR_HEALTH),
+        this.data.getFeedbackLine()
+      );
+    }
     if (this.pullRequest.hasServiceThreadForExistingIteration(serviceThreads)) {
       this.pullRequest.editServiceComment(this.azureApi, serviceComment);
     } else {
