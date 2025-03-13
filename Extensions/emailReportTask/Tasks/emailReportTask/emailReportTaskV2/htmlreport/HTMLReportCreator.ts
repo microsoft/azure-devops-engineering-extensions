@@ -3,6 +3,7 @@ import { IHTMLReportCreator } from './IHTMLReportCreator';
 import { Report } from '../model/Report';
 import { ReportConfiguration } from '../config/ReportConfiguration';
 const fs = require("fs");
+const path = require("path");
 const o2x = require('object-to-xml');
 const xsltProcessor = require("xslt-processor");
 const { xmlParse, xsltProcess } = xsltProcessor;
@@ -12,7 +13,8 @@ export class HTMLReportCreator implements IHTMLReportCreator {
   createHtmlReport(report: Report, reportConfiguration: ReportConfiguration): string {
     const currDir = __dirname;
     console.log(`CurrentDir: ${currDir}`);
-    var xsltTemplatePath = `${currDir}\\EmailTemplate.xslt`;
+    // var xsltTemplatePath = `${currDir}\\EmailTemplate.xslt`;
+    var xsltTemplatePath = path.join(currDir, "EmailTemplate.xslt");
     console.log("Loading Email Template: " + xsltTemplatePath);
 
     // Create a view model object before serialize to xml
