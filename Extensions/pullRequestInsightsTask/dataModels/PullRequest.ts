@@ -1,7 +1,7 @@
 import * as azureGitInterfaces from "azure-devops-node-api/interfaces/GitInterfaces";
 import { AbstractAzureApi } from "../dataProviders/AbstractAzureApi.js";
 import tl = require("azure-pipelines-task-lib/task");
-import commentProperties from "../resources/service_comment_properties.json";
+import * as commentProperties from "../resources/service_comment_properties.json";
 import { ServiceComment } from "../models/ServiceComment.js";
 
 export class PullRequest {

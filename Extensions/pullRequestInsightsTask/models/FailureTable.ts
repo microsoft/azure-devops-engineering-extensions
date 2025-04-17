@@ -1,5 +1,5 @@
 import { AbstractTable } from "./AbstractTable";
-import messages from "../resources/user_messages.json";
+import * as messages from "../resources/user_messages.json";
 import { Branch } from "../dataModels/Branch";
 import { PipelineTask } from "../dataModels/PipelineTask";
 import { AbstractPipeline } from "../dataModels/AbstractPipeline";

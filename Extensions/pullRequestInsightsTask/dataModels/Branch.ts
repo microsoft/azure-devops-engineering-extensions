@@ -1,6 +1,6 @@
 import { AbstractPipeline } from "./AbstractPipeline";
 import tl = require("azure-pipelines-task-lib/task");
-import stats from "stats-lite";
+import * as stats from "stats-lite";
 import { PipelineTask } from "./PipelineTask";
 import { BranchStatus } from "./BranchStatus";
 

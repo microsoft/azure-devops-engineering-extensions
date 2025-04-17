@@ -23,7 +23,7 @@ export abstract class AbstractAzureApi {
    * Fetches current pipeline which task is running in, either build or release depending on AzureApi subclass
    * @param data Object containing variables set by environment and task configurations
    */
-  public abstract async getCurrentPipeline(
+  public abstract getCurrentPipeline(
     data: PipelineData
   ): Promise<AbstractPipeline>;
 
@@ -34,7 +34,7 @@ export abstract class AbstractAzureApi {
    * @param maxNumber Maximum number of pipelines to return
    * @param branchName Name of branch pipelines are running on
    */
-  public abstract async getMostRecentPipelinesOfCurrentType(
+  public abstract getMostRecentPipelinesOfCurrentType(
     project: string,
     currentPipeline: AbstractPipeline,
     maxNumber: number,
@@ -102,7 +102,7 @@ export abstract class AbstractAzureApi {
    * @param project Name of project from which to fetch pipelines
    * @param definitionId Id of definition to fetch
    */
-  public abstract async getDefinition(
+  public abstract getDefinition(
     project: string,
     definitionId: number
   ): Promise<any>;

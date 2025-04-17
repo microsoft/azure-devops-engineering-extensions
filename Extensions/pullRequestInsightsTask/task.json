@@ -9,7 +9,7 @@
     "version": {
         "Major": 0,
         "Minor": 1,
-        "Patch": 18
+        "Patch": 30
     },
     "instanceNameFormat": "PR Insights",
     "inputs": [
@@ -59,7 +59,7 @@
         }
     ],
     "execution": {
-        "Node": {
+        "Node16": {
             "target": "index.js"
         }
     }

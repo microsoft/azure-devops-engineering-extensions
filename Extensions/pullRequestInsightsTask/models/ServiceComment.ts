@@ -3,7 +3,7 @@ import * as azureGitInterfaces from "azure-devops-node-api/interfaces/GitInterfa
 import { AbstractTable } from "./AbstractTable";
 import { AbstractPipeline } from "../dataModels/AbstractPipeline";
 import { TableFactory } from "../factories/TableFactory";
-import messages from "../resources/user_messages.json";
+import * as messages from "../resources/user_messages.json";
 import { TaskInsights } from "../TaskInsights";
 import { Branch } from "../dataModels/Branch";
 import { PipelineTask } from "../dataModels/PipelineTask";

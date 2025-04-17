@@ -1,5 +1,5 @@
 import tl = require("azure-pipelines-task-lib/task");
-import messages from "../resources/user_messages.json";
+import * as messages from "../resources/user_messages.json";
 import { AbstractPipeline } from "../dataModels/AbstractPipeline";
 import { PipelineTask } from "../dataModels/PipelineTask";
 import { AbstractTable } from "./AbstractTable";
@@ -9,6 +9,11 @@ import { Branch } from "../dataModels/Branch";
  * This class represents a table within a comment meant to display data about task regression when the
  * current pipeline has tasks that run over a threshold time
  */
+declare global {
+  interface String {
+    format(...args: any[]): string;
+  }
+}
 export class LongRunningValidationsTable extends AbstractTable {
   private static readonly TIME_LABELS: Map<() => number, string> = new Map([
     [Date.prototype.getUTCHours, "h"],
