@@ -11,5 +11,6 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,                   /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all 		imports. Implies 'allowSyntheticDefaultImports'. */
     "outDir": "../../dist/pullRequestInsightsExtension/pullRequestInsightsTask",
+    "lib": ["es2018", "es2015", "dom"],
   }
 }
